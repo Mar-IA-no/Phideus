@@ -26,6 +26,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -128,9 +130,16 @@ El [contraste completo](../../../experiments/atencion_armonica/RESULTS_LEARNED_P
 terminó los cuatro tests y replays. Compartida mejora ARI primario frente a
 Pares y Desacoplada, sin ventaja clara frente a Local; en familia deformada
 pierde frente a los tres. Las auditorías finales cerraron sin hallazgos
-materiales abiertos. El [siguiente discriminante](../../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
-separa competencia entre fuentes rivales y limitaciones del lector,
-sin atribuir aprendibilidad al gap privilegiado del pool.
+materiales abiertos. El [diagnóstico de fuentes rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y replays: ajuste, cobertura e identidad se separan, sin
+una explicación uniforme del error por márgenes pequeños. La siguiente
+ablación debe aislar evidencia generativa sobre cabeza y pérdida comunes,
+con ausencia y desacople como controles. Comparar `argmin J` con los lectores
+preservados cambia objetivos, acceso y complejidad: es referencia de sistema,
+no atribución causal a geometría. Los priors del sampler siguen siendo supuestos.
+El [diseño inicial](../../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
+requiere protocolo separado y contempla 27 trainings y cuatro tests frescos;
+no hay resultados de esa candidata.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de
@@ -153,7 +162,7 @@ alineación; sus sucesores se eligen por lo aprendido.
 | 1 | Escalón 2: P2 vs P3 | P2/P3 completos | Diagnóstico CKA/probes y lectura del null | Usuario |
 | paralelo | Gate 6 Exp C | Artefactos downstream disponibles | Evidencia de utilidad de features congeladas | Usuario |
 | decisión | Voz Expresiva | Cierre EN↔ZH completo | Elegir Fase 1.2, dominio naturalista o cierre | Usuario |
-| ciclo geométrico | Atención Armónica | Lector aprendido: 36 trainings, cuatro tests y replays completos, evidencia mixta | Diagnóstico finito de rivales observables; Stage B/CQT siguen alternativas | Ejecución autónoma; promoción y GO/NO-GO: usuario |
+| ciclo geométrico | Atención Armónica | Diagnóstico de rivales: 96 escenas y replays completos | Ablación de evidencia generativa con cabeza y loss comunes; Stage B/CQT siguen alternativas | Ejecución autónoma; promoción y GO/NO-GO: usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
 | base acumulativa cerrada | Olas 1–60 | Corpus estratificado, tres líneas preservadas y gate de mapeo ejecutado; el factorial común vigente no conserva una unidad, observación, target y stack decisional comunes. M5 sí valida la separación de fases y autoridad | La bibliografía deja de ser corriente autónoma; EIV queda referencia externa y el router espera evidencia afirmativa de una primitive | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
@@ -183,7 +192,7 @@ autónomo. Las demás filas son alternativas preservadas, no una cola obligatori
 | Gate 6 | hipótesis explícita sobre Exp C | insistir con `Transkun+A4` ya cerrado |
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
-| AA | lector aprendido: cuatro tests completos; auditorías cerradas y siguiente diagnóstico de rivales observables | inferir aprendibilidad desde el oracle, escalar el residual sin ventaja incremental o volver al tuning de τ |
+| AA | rivales observables completos; diseño de ablación de evidencia generativa con cabeza y loss comunes | inferir aprendibilidad desde el oracle, escalar el residual sin ventaja incremental o volver al tuning de τ |
 | PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada; Olas 50–51 separan conjunto identificado y decisión, pero descartan como prioritaria la factorización two-stage simple sin autoridad adicional | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión, output/autoridad o proposal/repair |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 
@@ -272,5 +281,6 @@ set-valued avanzó hasta un runner auditado sobre histórico abierto. EIV
 permanece como referencia externa y el router, diferido. En ese corte se
 planteó congelar el paquete prospectivo antes de cualquier draw. El rebase
 posterior dejó esa extensión pausada e incompleta: no es el próximo goal
-vigente. El ciclo actual continúa desde el contraste neuronal de pérdidas
-hacia un diagnóstico geométrico post-hoc, sin promoción científica.
+vigente. El ciclo actual ya completó el diagnóstico de fuentes rivales y
+continúa hacia una ablación de evidencia generativa sobre cabeza y pérdida
+comunes, sin promoción científica.

@@ -2,6 +2,26 @@
 
 ---
 
+## Fuentes rivales: ajuste, cobertura e identidad (2026-09-08)
+
+El [diagnóstico retrospectivo](../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó las 96 escenas predeclaradas y ambos replays. La búsqueda observable
+quedó sellada antes de abrir las referencias plantadas. Ampliar la familia
+deformada redujo el residual mediano de 10.376 a 1.454 cents, pero las
+particiones exactas pasaron sólo de 18 a 19 entre 23 escenas con candidatos;
+una de las 24 conservó su ausencia de salida. En mayor beta, la plantada
+ajustó mejor en las 24, aunque faltó del universo observable en dos.
+
+La auditoría técnica reconstruyó artefactos y cifras y pidió precisar los
+ejes de replicación: tres checkpoints por tres semillas, para cada lector.
+La corrección quedó integrada. La auditoría de alineación distingue una ley
+sintética traducida a cómputo de una geometría neuronal aprendida; rangos,
+cardinalidades y ramas son priors del banco, no invariantes descubiertos.
+El [siguiente diseño](../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
+mantiene cabeza y loss comunes para aislar evidencia generativa alineada
+frente a ausencia y desacople. Comparar directamente residual clásico y
+costos neuronales no ofrecería esa atribución. No hay promoción arquitectónica.
+
 ## Lector aprendido: cuatro tests completos y balance mixto (2026-09-08)
 
 El [contraste completo](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md)

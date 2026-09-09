@@ -258,8 +258,9 @@ sin ventaja clara del factor conjunto en polifonía; auditorías de evidencia y 
 El lector aprendido posterior completó sus 36 trainings y los cuatro tests
 con replay exacto. Las auditorías de evidencia y alineación cerraron sin
 hallazgos materiales abiertos: primario mixto y familia deformada adversa,
-sin promoción. El siguiente diseño acota un diagnóstico de fuentes rivales
-bajo observación de frecuencias.
+sin promoción. El diagnóstico de fuentes rivales ya completó 96 escenas y
+replays: separa ajuste de familia, cobertura e identidad. La continuidad
+debe aislar la evidencia generativa bajo cabeza y pérdida comunes.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -281,7 +282,11 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Resultado IID del lector aprendido** | `experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_IID.md` | Balance parcial histórico, integrado en el contraste completo |
 | **Resultado completo del lector aprendido** | `experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md` | Cuatro tests y replays, trece métricas, primario, controles, soporte, oracles y auditorías completas |
 | **Métricas completas del lector aprendido** | `experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_MEANS.csv` | Medias de trece métricas por siete lectores y cuatro escenarios |
-| **Fuentes rivales observables** | `experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md` | Siguiente diseño finito: competencia entre explicaciones, ajuste de familia y límites de observabilidad; requiere protocolo y auditoría |
+| **Plan de fuentes rivales** | `experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md` | Diseño inicial del diagnóstico completado; desarrollado por un protocolo separado |
+| **Protocolo de fuentes rivales** | `experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md` | Búsqueda finita, q32, soporte, cotas en grilla y separación de autoridad observable/privilegiada |
+| **Resultado de fuentes rivales** | `experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md` | 96 escenas y replays; ajuste, cobertura, rivales y asociaciones por escenario |
+| **Fuentes rivales por escena** | `experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS_SCENES.csv` | 192 filas de evaluación, con estados sin salida y métricas previas |
+| **Evidencia generativa aprendida** | `experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md` | Diseño inicial de ablación con cabeza/loss comunes; protocolo y experimento pendientes |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |

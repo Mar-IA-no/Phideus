@@ -282,7 +282,31 @@ sources:
     title: Fuentes rivales bajo observación de frecuencias
     path: experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
     authority: finite_successor_design_from_completed_reader_evidence
-    evidence_regime: initial_design_requires_protocol_and_independent_audit
+    evidence_regime: initial_design_executed_via_separate_frozen_protocol
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-OBSERVABLE-RIVALS-PROTOCOL
+    title: Protocolo de fuentes rivales observables
+    path: experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md
+    authority: independently_reviewed_experimental_design
+    evidence_regime: frozen_finite_search_protocol_executed
+    mutable: false
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-OBSERVABLE-RIVALS-RESULTS
+    title: Fuentes rivales, ajuste y cobertura
+    path: experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+    authority: bounded_retrospective_experiment_report
+    evidence_regime: 96_existing_scenes_known_synthetic_law_grid_bounds_exact_replays
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-GENERATIVE-EVIDENCE-PLAN
+    title: Evidencia generativa en un lector aprendido
+    path: experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
+    authority: initial_successor_design
+    evidence_regime: initial_design_requires_separate_executable_protocol
     mutable: true
     fronts: [AA, PPU]
 

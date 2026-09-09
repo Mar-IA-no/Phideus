@@ -7,6 +7,34 @@ policy:
   gpu_coordination: local_requires_scope_duration_vram_notice_and_confirmed_availability_remote_relevant_jobs_authorized_after_resource_verification
 
 architectures:
+  - id: harmonic-generative-evidence-reader
+    name: Lector con evidencia generativa
+    status: candidate
+    priority: initial_design_not_implemented
+    primitive: common invariant partition head with aligned versus absent or decoupled generative evidence
+    learned_components: [partition head with common split and merge entropy regression loss]
+    frozen_components: [three historical pair networks, observable candidate algorithm, explicit generative fitter]
+    evidence_for: finite rival diagnosis separated fit and coverage and produced an observable joint-fit operation
+    evidence_against: no neural result yet; sampler priors and shared generator law limit physical authority
+    next_experiment: 27 matched head trainings and four fresh tests after a separately audited executable protocol
+    source_paths:
+      - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+      - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
+    interpretation: incremental evidence intervention at common head and loss; not novel neural geometry or promoted architecture
+  - id: harmonic-explicit-generative-reader
+    name: Lector generativo explícito
+    status: experimental
+    priority: finite_diagnostic_complete_system_reference_only
+    primitive: source-template fitting in centered log-frequency quotient with global support constraints
+    learned_components: []
+    external_components: [candidate pool union and bounded neighbors, sampler support, finite grid fitter]
+    evidence_for: 96 retrospective scenes and exact replays; extended family reduces deformed residual
+    evidence_against: fit does not identify membership; limited pool coverage; no matched neural comparison or natural-harmony validation
+    next_experiment: preserve as system reference while testing its evidence in a matched learned head
+    source_paths:
+      - experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md
+      - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+    interpretation: computable operation under known synthetic law; not a calibrated posterior or identifiability certificate
   - id: harmonic-learned-partition-reader
     name: Lector aprendido de particiones
     status: candidate
@@ -16,13 +44,15 @@ architectures:
     frozen_components: [three historical descriptor-guided pair networks, candidate pool algorithm]
     evidence_for: 36 trainings and four fresh tests; shared improves primary polyphony ARI over learned pairs and decoupled controls
     evidence_against: no clear primary advantage over local compatibility; shared has lower ARI than all three learned controls under deformed family; oracle gap does not prove learnability
-    next_experiment: bounded observability and ambiguity diagnosis at the frequency-only input before selecting another reader or an extra measurement channel
+    next_experiment: preserve local compatibility as a strong baseline for matched generative-evidence ablation; observability diagnosis now complete
     source_paths:
       - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
       - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md
       - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
       - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
       - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
+      - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+      - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
     interpretation: learned readout on frozen neural geometry; contextual factor utility with adverse family transfer; independently audited with no promotion
   - id: harmonic-source-structured-reader
     name: Lector estructurado con coherencia de fuente

@@ -37,9 +37,13 @@ completó 36 entrenamientos y cuatro tests con auditorías y replay. Tras
 aprender costos de partición, el factor compartido mejora el primario frente
 a Pares y Desacoplada, pero no claramente frente a Local, y perjudica bajo
 familia deformada. No se aprendió una nueva geometría del backbone congelado.
-La continuidad pasa a examinar qué distinciones conserva la observación;
-ni una relación explícita ni un oracle privilegiado garantizan que la
-pertenencia de fuente sea recuperable desde ella.
+El [diagnóstico de fuentes rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y replays: mejor ajuste a la ley no equivale a mejor
+identidad de fuente, y una partición ausente del universo candidato no puede
+ser recuperada por su lector. La operación geométrica es explícita, no una
+nueva geometría neuronal aprendida; los rangos y cardinalidades del sampler
+son priors del experimento, no invariantes físicos. La continuidad debe
+aislar su aporte al aprendizaje manteniendo cabeza y pérdida comparables.
 
 ## Addendum operativo del corte
 

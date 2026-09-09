@@ -23,6 +23,8 @@ source_paths:
   - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -90,8 +92,10 @@ fue el contraste posterior; su [protocolo](../../experiments/atencion_armonica/P
 está ejecutado: 36 trainings, cuatro tests y replays completos. Compartida
 mejora el primario frente a Pares y Desacoplada, no claramente frente a Local,
 y pierde frente a los tres bajo familia deformada. Las auditorías finales
-cerraron sin hallazgos materiales abiertos; el [siguiente discriminante](../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
-examina rivales y márgenes observables del target.
+cerraron sin hallazgos materiales abiertos. El [diagnóstico de rivales](../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y replays: ajuste de familia, cobertura e identidad no
+son equivalentes. La continuidad debe aislar evidencia generativa con cabeza
+y pérdida comunes, sin atribuir a geometría los priors del banco sintético.
 
 ## Leyenda
 
@@ -140,7 +144,7 @@ flowchart LR
 | Escalón 2 | P2 y P3 sostienen un null descriptor-guided | Diagnóstico representacional P2 vs P3 | Foco |
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
-| Atención Armónica | Lector aprendido: cuatro tests y replays completos; fases 0–0.6 preservadas | Diagnóstico de rivales observables | Primario favorable frente a dos controles, no claro frente a Local; daño en deformada; sin promoción |
+| Atención Armónica | Fuentes rivales: 96 escenas y replays; fases 0–0.6 preservadas | Ablación de evidencia generativa bajo cabeza/loss comunes | Ajuste, cobertura e identidad separados; sin promoción |
 | PPU / geometría proporcional | Preflight set-valued histórico cerrado; extensión física incompleta | Corpus y mecanismos como evidencia del ciclo geométrico; no continuar envolvente por inercia | Extensión física pausada |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 

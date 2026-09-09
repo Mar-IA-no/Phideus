@@ -36,9 +36,13 @@ está implementado, con 36 trainings completos y selección auditada. El
 terminó cuatro tests y replays con selección y receta congeladas. Compartida
 mejora el primario frente a Pares y Desacoplada, sin ventaja clara frente a
 Local; bajo familia deformada pierde frente a los tres. Las auditorías finales
-cerraron sin hallazgos materiales abiertos. El [siguiente discriminante](../../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
-examinará rivales y márgenes observables sin asumir que el oracle implica
-aprendibilidad.
+cerraron sin hallazgos materiales abiertos. El [diagnóstico de rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y replays: separa desajuste de familia, ausencia de la
+partición verdadera entre candidatos y rivales que ajustan mejor el ruido.
+El siguiente contraste debe aislar la incorporación de evidencia generativa
+a una cabeza común y una misma pérdida, no comparar costos físicos y
+neuronales como si difirieran sólo en geometría. Los priors del generador
+sintético permanecen explícitos y no adquieren autoridad física.
 El contraste cerrado anterior no demuestra una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.

@@ -43,6 +43,9 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_MEANS.csv
   - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
   - experiments/atencion_armonica/test_learned_partition_reuse.py
@@ -52,7 +55,7 @@ depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
 experiment_status: mixed
-evidence_status: synthetic_loss_and_fixed_and_learned_reader_tests_independently_audited
+evidence_status: synthetic_loss_reader_tests_and_retrospective_rival_diagnostic_with_exact_replays
 decision_status: pending_analysis
 ---
 
@@ -118,15 +121,24 @@ de grupos pequeños en los cuatro escenarios. La evidencia es mixta y no
 promueve una arquitectura ni acredita nueva geometría latente.
 
 Las auditorías finales de evidencia y alineación cerraron sin hallazgos
-materiales abiertos. El [siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
-examina fuentes rivales y márgenes observables, sin certificar unicidad por
-una búsqueda finita ni no-identificabilidad estadística por fits cercanos. Los
+materiales abiertos. El [diagnóstico de fuentes rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y replays. En deformación, el residual mediano baja de
+10.376 a 1.454 cents, mientras las particiones exactas pasan de 18 a 19 entre
+23 escenas con candidatos; una de las 24 sigue sin salida. En mayor beta,
+la referencia plantada ajusta mejor en las 24, pero falta entre candidatos
+en dos. Esto distingue ajuste, cobertura e identidad, no certifica unicidad
+ni no-identificabilidad. Los
 [recursos y recuperaciones](../../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
 conservan los intentos incompletos, las correcciones de validación y la enmienda
 explícita de RAM, sin cambiar modelos, selección ni muestras. El próximo
 movimiento debe distinguir ambigüedad de la observación y limitaciones del
 lector: un oracle dentro del pool no demuestra aprendibilidad, y un residual
-pequeño no identifica una fuente física.
+pequeño no identifica una fuente física. La siguiente ablación debe mantener
+cabeza y pérdida comunes y variar evidencia generativa correcta, ausente o
+desacoplada. El ajuste clásico es una referencia de sistema, no un contraste
+causal de arquitectura; rangos y cardinalidades del sampler no son invariantes
+físicos ni validación de HIT. El [diseño inicial](../../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
+no es todavía un protocolo congelado ni un experimento ejecutado.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

@@ -25,6 +25,9 @@ source_paths:
   - experiments/atencion_armonica/PROTOCOL_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_READER.md
   - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+  - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -162,8 +165,19 @@ terminó 36 trainings y cuatro tests nuevos con replay exacto. Compartida mejora
 el primario de polifonía frente a Pares y Desacoplada, sin ventaja clara sobre
 Local, y pierde frente a los tres en familia deformada. Las auditorías finales
 cerraron sin hallazgos materiales abiertos; no hay promoción ni evidencia de
-nueva geometría latente. El [siguiente diagnóstico](../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
-examina rivales y márgenes observables en q32, no identificabilidad global.
+nueva geometría latente. El [diagnóstico de fuentes rivales](../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+(`SRC-AA-OBSERVABLE-RIVALS-RESULTS`) completó 96 escenas y replays. En deformación,
+el residual mediano baja de 10.376 a 1.454 cents, pero las particiones exactas
+pasan sólo de 18 a 19 entre 23 escenas con candidatos; una de las 24 no tiene
+salida. En mayor beta, la plantada ajusta mejor en las 24 y falta del universo
+observable en dos. Se separan ajuste, cobertura e identidad: ni las cotas de
+grilla prueban identificabilidad global ni los priors del sampler son leyes
+físicas. La próxima ablación debe mantener cabeza y pérdida comunes para
+aislar evidencia generativa correcta frente a ausencia/desacople; `argmin J`
+queda como referencia de sistema, no contraste causal de arquitectura.
+El [diseño inicial](../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
+(`SRC-AA-GENERATIVE-EVIDENCE-PLAN`) requiere protocolo independiente antes de
+27 entrenamientos y cuatro tests frescos; aún no está ejecutado.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen
@@ -957,7 +971,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `E2` | Speech ↔ EGG | `focus_active` | P2 y P3 completos; ningún descriptor supera al baseline correspondiente; null bajo encoder pequeño y WavLM frozen | Comparación `P2 vs P3`: CKA, probes y lectura representacional |
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
-| `AA` | Atención Armónica | `focus_active` | Lector aprendido: 36 trainings, cuatro tests y replays, evidencia mixta | Diagnóstico de rivales observables; Stage B y CQT preservados |
+| `AA` | Atención Armónica | `focus_active` | Fuentes rivales: 96 escenas y replays; ajuste, cobertura e identidad separados | Ablación de evidencia generativa bajo cabeza/loss comunes; Stage B y CQT preservados |
 | `PPU` | Arquitectura proporcional | `physical_extension_paused_incomplete` | Preflight set-valued histórico conservado; extensión física sin cierre | Corpus y mecanismos como evidencia del nuevo ciclo geométrico; no retomar paquete ni router por inercia |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
@@ -1214,9 +1228,9 @@ El registro completo, con tipo y regla de resolución, está en
 
 ## Orden de lectura de decisiones abiertas
 
-1. Ciclo geométrico: lector aprendido con cuatro tests y replays completos;
-   auditorías cerradas y siguiente diagnóstico de observabilidad/ambigüedad
-   de fuentes, sin promover una arquitectura ni retocar tests abiertos.
+1. Ciclo geométrico: fuentes rivales con 96 escenas y replays completos;
+   aislar evidencia generativa bajo cabeza y pérdida comunes, sin promover
+   una arquitectura ni convertir tests abiertos en confirmación independiente.
 2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
 3. `G6C`: mantener separado como pregunta downstream residual.
 4. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio

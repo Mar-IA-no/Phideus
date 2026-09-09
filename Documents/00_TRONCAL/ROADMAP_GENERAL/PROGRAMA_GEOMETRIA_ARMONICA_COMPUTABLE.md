@@ -58,9 +58,15 @@ Desacoplada en el primario de polifonía, pero no muestra ventaja clara sobre
 Local; bajo familia deformada pierde frente a los tres. Local conserva menor
 error absoluto de cantidad de fuentes y menor fragmentación en los cuatro
 escenarios. Las auditorías finales de evidencia y alineación cerraron sin
-hallazgos materiales abiertos. El [siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
-examinará qué distinciones de fuente conserva la observación, sin deducir
-aprendibilidad del oracle ni insuficiencia de frecuencias de estos negativos.
+hallazgos materiales abiertos. El [diagnóstico de fuentes rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y replays: tradujo una ley conocida en una operación sobre
+log-frecuencias centradas, pero no mostró una geometría neuronal aprendida.
+Mejor ajuste de familia, cobertura de candidatos e identidad de fuente no
+son equivalentes. El siguiente contraste debe mantener cabeza y pérdida
+comunes para aislar el aporte de evidencia generativa; comparar directamente
+su residual con costos neuronales mezclaría objetivos, acceso y complejidad.
+Los rangos y cardinalidades del sampler son supuestos del banco, no leyes
+de armonía natural. No se deduce insuficiencia de frecuencias de estos errores.
 
 ## Dos auditorías y un cierre
 

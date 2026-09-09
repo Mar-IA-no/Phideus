@@ -58,9 +58,12 @@ completó después 36 entrenamientos y cuatro tests con replay y auditorías
 independientes. En polifonía, el factor compartido mejora frente a dos
 controles, pero no muestra ventaja clara sobre la compatibilidad local;
 bajo familia deformada pierde frente a los tres controles aprendidos.
-El [siguiente diagnóstico](experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
-examinará fuentes rivales y márgenes observables antes de elegir otra cabeza
-o incorporar otro canal de medición. Las fases históricas siguen preservadas.
+El [diagnóstico de fuentes rivales](experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y sus replays. Distingue cobertura de candidatos, ajuste
+de familia y elección de partición: un residual menor no garantiza identificar
+mejor las fuentes. La continuidad busca aislar qué aporta esa evidencia
+generativa al aprendizaje, sin confundir los priors del mundo sintético con
+geometría natural. Las fases históricas siguen preservadas.
 
 | Frente | Dominio | Funcion | Estado |
 |---|---|---|---|
@@ -69,7 +72,7 @@ o incorporar otro canal de medición. Las fases históricas siguen preservadas.
 | **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo** — `Exp A` y `Exp B` ya cerraron negativamente; `Exp C` queda como línea abierta |
 | **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — null mecanistico inicial cerrado; `P3` primera pasada completa, sigue `P2 vs P3` |
 | **Voz Expresiva Phideus** | Voz expresiva | Test de transferencia descriptor-guided sobre `SSL` vocal y estabilidad translingüística | **Activo** — cierre `EN ↔ ZH` ya consolidado: positivo acotado a `N-adapt`, null/negativo en `N-strict` |
-| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Lector estructurado ejecutado** — cuatro tests frescos y replay; sin ventaja clara del factor conjunto en polifonía, auditorías de evidencia y alineación completas; sin promoción |
+| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Fuentes rivales: diagnóstico completo** — 96 escenas y replays; ajuste, cobertura e identidad separados; sin promoción |
 | **Escalon 3** | Audio XY <-> Lissajous | Banco de pruebas sintetico con ground truth determinista para ratios visibles | **Activo** — baseline dual consolidado; primera linea geometrica ya corrida (`P5-cqtshift` mejor brazo OOD actual) |
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 

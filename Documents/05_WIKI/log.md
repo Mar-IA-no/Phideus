@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-08 — rivales observables ejecutados y continuidad igualada
+
+La síntesis incorpora el resultado de 96 escenas y ambos replays, su
+protocolo congelado y el diseño inicial de evidencia generativa aprendida.
+Separa cobertura, ajuste e identidad y conserva el lector generativo como
+referencia experimental, sin promoción. La próxima ablación mantiene cabeza
+y loss comunes; los priors del sampler no se interpretan como leyes físicas.
+Se sincronizan frente, contexto, mapa, portafolio, registro arquitectónico y
+fuentes, preservando alternativas e histórico.
+
 ## 2026-09-08 — protocolo del lector aprendido e implementación inicial
 
 El protocolo ejecutable está auditado y la implementación comenzó. La

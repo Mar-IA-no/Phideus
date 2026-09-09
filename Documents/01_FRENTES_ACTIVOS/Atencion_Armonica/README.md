@@ -38,9 +38,12 @@ está implementado y las 36 corridas terminaron, con selección auditada. El
 terminó los cuatro tests y replays. Compartida supera a Pares y Desacoplada en
 el primario de polifonía, sin ventaja clara frente a Local; bajo familia
 deformada pierde frente a los tres. Las auditorías de evidencia y alineación
-cerraron sin hallazgos materiales abiertos. El [diagnóstico siguiente](../../../experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md)
-examinará fuentes rivales bajo el mismo puerto observado; no hay arquitectura
-promovida. El
+cerraron sin hallazgos materiales abiertos. El [diagnóstico de fuentes rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y replays. En deformación, ampliar la familia reduce el
+residual mediano de 10.376 a 1.454 cents, pero las particiones exactas sólo
+pasan de 18 a 19 entre las 23 escenas con salida; una de las 24 no tiene
+candidatos admisibles. Cobertura, ajuste e identidad exigen evaluaciones
+separadas. No hay arquitectura promovida. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

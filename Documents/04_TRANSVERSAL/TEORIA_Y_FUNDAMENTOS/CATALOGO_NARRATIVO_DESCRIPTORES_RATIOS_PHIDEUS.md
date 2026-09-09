@@ -40,9 +40,13 @@ Sus cuatro tests y replays, auditados, muestran una utilidad contextual del
 factor compartido: mejora polifonía frente a Pares y Desacoplada, no claramente
 frente a Local, y pierde frente a los tres bajo deformación de familia. Esto
 no agrega una nueva familia descriptorial ni convierte el costo en ley física.
-El siguiente diagnóstico compara explicaciones rivales de la misma observación,
-conservando descriptores convencionales y compatibilidad local como controles
-fuertes, no como etapas que deban abandonarse.
+El [diagnóstico de fuentes rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
+completó 96 escenas y replays. El ajuste generativo queda como operación
+experimental que separa cobertura, residual e identidad, no como descriptor
+físico validado. Para estudiar su incorporación al aprendizaje hay que
+mantener cabeza y pérdida comunes y controlar el desacople de esa evidencia.
+Los descriptores convencionales y la compatibilidad local siguen siendo
+controles fuertes, no etapas que deban abandonarse.
 
 ## Addendum vivo del corte
 
