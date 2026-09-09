@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 8808107e09e70412d760635e94ca73ea537db890
+evidence_commit: abb5a923b5a91d60cf314f300b49a72d050e8f8d
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -145,8 +145,9 @@ y una implementación parcial. El
 [estado operativo](../../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
 registra perfiles CPU/GPU, preparación de train/calibración y carga real
 del corpus completados, con proyección de recursos comprobada. Los 27
-entrenamientos de 50 épocas terminaron; la selección por calibración está
-en ejecución CPU y los cuatro tests frescos siguen sin generar.
+entrenamientos de 50 épocas terminaron; la selección por calibración cerró
+y fue auditada, con época 50 para los tres brazos sobre soporte común 503/512.
+Los cuatro tests frescos siguen sin generar.
 Aún no hay resultados comparativos sobre esos tests.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.

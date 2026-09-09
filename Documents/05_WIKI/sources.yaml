@@ -330,7 +330,7 @@ sources:
     title: Estado de ejecución del lector con evidencia generativa
     path: experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
     authority: operational_status_snapshot
-    evidence_regime: training_complete_calibration_selection_running_no_fresh_test_results
+    evidence_regime: training_and_audited_selection_complete_no_fresh_test_results
     mutable: true
     fronts: [AA, PPU]
 

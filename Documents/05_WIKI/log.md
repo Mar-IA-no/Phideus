@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-09 — selección por calibración auditada
+
+La selección real eligió época 50 para los tres brazos. La auditoría
+independiente reprodujo la elección desde 270 readouts con soporte común
+503/512 y verificó estados elegidos e inicializaciones pareadas. Los tests
+nuevos siguen sin generar; el resultado es desarrollo OPEN, no una ventaja
+de generalización ni promoción arquitectónica.
+
 ## 2026-09-09 — los 27 entrenamientos completos
 
 El lector generativo completó las 50 épocas de sus 27 celdas. La selección
