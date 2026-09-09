@@ -3,8 +3,9 @@
 2026-09-09. La campaña completó sus 27 entrenamientos y la selección por
 calibración. La recuperación del almacén preservó las 512 escenas IID, pero
 la primera etapa de predicción volvió a detenerse por una comparación
-incorrecta entre estructuras en memoria y su representación JSON. No hay
-ejecución activa ni evaluación de test completa; la corrección está en revisión.
+incorrecta entre estructuras en memoria y su representación JSON. La corrección
+explícita ya fue auditada y la campaña se reanudó desde los artefactos
+conservados. Los cuatro tests y sus auditorías de evidencia siguen pendientes.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -58,10 +59,23 @@ Ese intento posterior guardó las 512 features y los tres forwards del backbone,
 pero falló al comprobar el primer registro de escena: JSON convierte tuplas
 en listas y el verificador exigía igualdad de objetos Python. El mismo defecto
 alcanza otros puntos de reapertura. Los artefactos completados se conservan;
-no hay todavía ajustes generativos, inputs del lector ni predicciones IID.
+al cierre de ese intento no había ajustes generativos, inputs del lector ni
+predicciones IID.
 Ambos fallos suman 250.425 segundos del presupuesto original. La reparación
-de serialización requiere una versión explícita y auditada, sin cambiar las
-decisiones experimentales ni ocultar que se corrigió después del primer draw.
+de serialización quedó implementada en dos puertos sucesores explícitos y un
+[supervisor nuevo](resume_generative_json_tests.py), publicados en `ae00812`.
+La auditoría independiente verificó 45 pruebas CPU de contrato, integración
+y supervisión, sin hallazgos materiales. La integración usa aliases OPEN:
+comprueba recuperación, 45 outputs, sellado previo a verdad y replay, pero no
+constituye evidencia de generalización. Sólo cambian seis comparaciones a
+representación JSON canónica y el import del verificador en evaluación;
+se mantienen las decisiones experimentales y los originales congelados.
+El nuevo manifiesto tiene SHA256
+`76beca0b84ff7593f04696e2c51716fd8b211feea8a89e1bc85ab01f8b02c71c`,
+autentica las 520 referencias conservadas y hereda ambos fallos y su tiempo.
+La etapa IID se reanudó con GPU libre verificada, límite de 6 GiB y el
+presupuesto restante original. La enmienda es posterior al primer draw;
+no se presenta como una ejecución inalterada del freeze.
 El [supervisor de tests](run_generative_tests.py) completó el freeze
 antes del primer draw. El archivo
 `data/atencion_armonica/generative_evidence_reader_v1/test_freeze.json`
