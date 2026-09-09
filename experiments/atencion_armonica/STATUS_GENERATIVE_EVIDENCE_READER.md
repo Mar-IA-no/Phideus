@@ -1,9 +1,10 @@
 # Lector con evidencia generativa: estado de ejecución
 
 2026-09-09. La campaña completó sus 27 entrenamientos y la selección por
-calibración. Los tests nuevos se reanudaron tras una recuperación auditada
-del almacén observable, sin regenerar las 512 escenas IID. La primera etapa
-de predicción está en ejecución; todavía no hay evaluación de test completa.
+calibración. La recuperación del almacén preservó las 512 escenas IID, pero
+la primera etapa de predicción volvió a detenerse por una comparación
+incorrecta entre estructuras en memoria y su representación JSON. No hay
+ejecución activa ni evaluación de test completa; la corrección está en revisión.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -53,6 +54,14 @@ La vinculación de identidad se aplicó dentro del worker supervisado, mantenien
 intacto el índice IID. El nuevo registro enlaza el fallo original y hereda sus
 120.097 segundos consumidos, sin reiniciar el presupuesto de cuatro horas.
 No se regeneran escenas ni se modifican las fuentes científicas congeladas.
+Ese intento posterior guardó las 512 features y los tres forwards del backbone,
+pero falló al comprobar el primer registro de escena: JSON convierte tuplas
+en listas y el verificador exigía igualdad de objetos Python. El mismo defecto
+alcanza otros puntos de reapertura. Los artefactos completados se conservan;
+no hay todavía ajustes generativos, inputs del lector ni predicciones IID.
+Ambos fallos suman 250.425 segundos del presupuesto original. La reparación
+de serialización requiere una versión explícita y auditada, sin cambiar las
+decisiones experimentales ni ocultar que se corrigió después del primer draw.
 El [supervisor de tests](run_generative_tests.py) completó el freeze
 antes del primer draw. El archivo
 `data/atencion_armonica/generative_evidence_reader_v1/test_freeze.json`
