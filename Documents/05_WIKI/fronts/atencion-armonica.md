@@ -153,8 +153,8 @@ validación del soporte. La recuperación pasó su auditoría y completó la
 inferencia de polifonía, con los once archivos previos exactamente preservados;
 la evaluación posterior se detuvo por RAM. La liberación anticipada de objetos
 ya serializados pasó su auditoría, pero el reintento también excedió el mismo
-límite antes de completar soporte. Se prepara una enmienda explícita de RAM
-sin cambios científicos. No cambian
+límite antes de completar soporte. La enmienda explícita a 4 GiB pasó su
+auditoría y la evaluación se reanudó sin cambios científicos. No cambian
 modelos ni muestras. Familia deformada sigue pendiente. No hay cierre del
 contraste ni promoción arquitectónica.
 

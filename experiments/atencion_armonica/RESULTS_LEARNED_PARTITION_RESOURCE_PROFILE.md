@@ -411,5 +411,9 @@ exit −15 confirmado y GPU cero. Sus seis payloads coinciden byte por byte
 con el intento anterior, pero siguen siendo parciales. Terminal bajo
 `evaluation_release_recovery_v1/supervision/supervisor-ze8xn75i/terminal.json`,
 SHA-256 `3c363dfc321e45fa3faf59956f5df264936efbe43473fb56aecf7b0c9c1ed2a0`.
-Se prepara una enmienda explícita del límite de RAM de evaluación a 4 GiB,
-sin cambios científicos ni otra ejecución hasta completar su revisión.
+La enmienda explícita del límite de RAM de evaluación a 4 GiB pasó auditoría
+de diseño e implementación y 42 pruebas conjuntas. La ejecución se reanudó
+con identidad nueva y los dos intentos anteriores preservados; todavía no
+se da por demostrada la suficiencia de memoria. Mantiene 1.200 s, CPU-only
+y el cuerpo del evaluador idéntico a la versión anterior. Los límites de
+upstream, los modelos y la receta científica no cambian.
