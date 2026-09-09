@@ -7,6 +7,7 @@ import json
 import os
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -215,6 +216,7 @@ class ReleaseTests(unittest.TestCase):
             request = root/"request.json"
             write_json(request, {"arguments": {"fixed": True}})
             with patch.object(release, "FAILED_REQUEST", release.p.reference(request)), \
+                    patch.object(release, "verify_release_history"), \
                     patch.object(release, "failed_evidence", return_value=refs) as verify:
                 release.compare_failed(out, "ood_polyphony", {"fixed": True})
                 self.assertEqual(verify.call_count, 2)
@@ -226,7 +228,7 @@ class ReleaseTests(unittest.TestCase):
                     release.compare_failed(out, "ood_polyphony", {"fixed": True})
 
     def test_failure_inventory_terminal_and_marker_are_not_completion(self):
-        for mode in ("valid", "extra", "missing", "manifest", "symlink", "marker", "terminal", "hash"):
+        for mode in ("valid", "extra", "directory", "missing", "manifest", "symlink", "marker", "terminal", "hash"):
             with self.subTest(mode=mode), tempfile.TemporaryDirectory(dir=BASE) as folder, ExitStack() as stack:
                 root = Path(folder)
                 failed = root/"outputs"/"ood_polyphony"/"failed"
@@ -243,12 +245,12 @@ class ReleaseTests(unittest.TestCase):
                     "execution_contract": release.SUPPORT_CONTRACT, "arguments": {
                         "support_recovery_authorization": release.SUPPORT_AUTH, "recovery_authorization": old.OLD_AUTH}})
                 request = release.p.reference(root/"request.json")
-                write_json(root/"started.json", {"rss_limit_bytes": release.LIMITS["evaluation"][1],
-                    "wall_limit_seconds": release.LIMITS["evaluation"][0]})
+                write_json(root/"started.json", {"rss_limit_bytes": release.HISTORICAL_LIMITS["evaluation"][1],
+                    "wall_limit_seconds": release.HISTORICAL_LIMITS["evaluation"][0]})
                 terminal = {"status": "FAILED", "worker_terminal_confirmed": True, "worker_exit_code": -15,
                     "result": None, "request": request, "output": rel, "operation": "evaluation",
                     "execution_contract": release.SUPPORT_CONTRACT, "observed_peak_gpu_bytes": 0,
-                    "seconds": 100, "observed_peak_rss_bytes": release.LIMITS["evaluation"][1]+1}
+                    "seconds": 100, "observed_peak_rss_bytes": release.HISTORICAL_LIMITS["evaluation"][1]+1}
                 if mode == "terminal":
                     terminal["worker_terminal_confirmed"] = False
                 write_json(root/"terminal.json", terminal)
@@ -265,6 +267,8 @@ class ReleaseTests(unittest.TestCase):
                     write_json(failed/("manifest.json" if mode == "manifest" else "extra.json"), {"fake": True})
                 if mode == "symlink":
                     (failed/"link").symlink_to(root/"request.json")
+                if mode == "directory":
+                    (failed/"extra_dir").mkdir()
                 for key, value in {"FAILED_ROOT": rel, "FAILED_REQUEST": request, "FAILED_TERMINAL": term,
                         "DIAGNOSTIC": release.p.reference(root/"diagnostic.json")}.items():
                     stack.enter_context(patch.object(release, key, value))
@@ -307,7 +311,7 @@ class ReleaseTests(unittest.TestCase):
                         operator.validate_request(ref)
 
     def test_roster_calls_upstream_closure_before_evaluation(self):
-        splits = {s: dict(executor={"predictions": "support03", "evaluation": "release01"} if s in release.SPLITS_NEW
+        splits = {s: dict(executor={"predictions": "support03", "evaluation": "release02"} if s in release.SPLITS_NEW
             else {"predictions": "memory02", "evaluation": "memory02"}, data="data", aggregate="aggregate",
             logits="logits", scored="scored", normalized="normalized", predictions="predictions",
             evaluation="evaluation", replay="replay") for s in release.TESTS}
@@ -325,7 +329,7 @@ class ReleaseTests(unittest.TestCase):
                 evaluation.assert_not_called()
 
     def test_new_worker_cli_rejects_cuda_and_supervisor_retains_caps(self):
-        self.assertEqual(release.LIMITS, {"evaluation": [1200, 2147483648]})
+        self.assertEqual(release.LIMITS, {"evaluation": [1200, 4294967296]})
         self.assertIs(operator.supervise_process, operator.sop.supervise_process)
         with tempfile.TemporaryDirectory(dir=BASE) as folder:
             # Exercise the actual new CLI through the already-tested process supervisor.
@@ -339,6 +343,86 @@ class ReleaseTests(unittest.TestCase):
             self.assertIsNotNone(result["error"])
             logs = "\n".join(path.read_text() for path in Path(folder).iterdir() if path.suffix == ".log")
             self.assertIn("must not expose CUDA", logs)
+
+    def test_ram_amendment_and_git_history_do_not_reauthorize_v1(self):
+        release.verify_ram_amendment()
+        release.verify_release_history()
+        self.assertNotEqual(release.RECOVERY, release.PREVIOUS_TREE)
+        self.assertEqual(release.ROLES, {"evaluation": "learned_evaluation_release_v2"})
+        self.assertEqual(release.HISTORICAL_LIMITS, {"evaluation": [1200, 2147483648]})
+        receipt = release.p.read_reference(release.RAM_AUDIT)
+        for key, value in (("target", release.PLAN), ("status", "NEEDS_REVISION"), ("reports", [])):
+            with patch.object(release.p, "read_reference", return_value={**receipt, key: value}):
+                with self.assertRaises(PermissionError):
+                    release.verify_ram_amendment()
+        with patch.object(release.subprocess, "run", return_value=SimpleNamespace(stdout=b"wrong historical blob")):
+            with self.assertRaisesRegex(ValueError, "Git blob"):
+                release.verify_release_history()
+        with patch.object(release, "HISTORY", {**release.HISTORY, "sources": {}}):
+            with self.assertRaisesRegex(ValueError, "historical release"):
+                release.verify_release_history()
+        historical_root = release.p.ROOT/release.PREVIOUS_TREE/"outputs/ood_polyphony/evaluation_01"
+        actual_rglob = Path.rglob
+        def inventory(path, pattern):
+            entries = list(actual_rglob(path, pattern))
+            if path == historical_root:
+                entries.append(path/"fixture-extra-directory-does-not-exist")
+            return iter(entries)
+        with patch.object(Path, "rglob", new=inventory):
+            with self.assertRaisesRegex(ValueError, "historical release inventory"):
+                release.verify_release_history()
+        # Evidence-only JSON substitution confined to disposable fixture files.
+        original = release.evidence_only
+        for ref, key, value in (
+                (release.PREVIOUS_TERMINAL, "worker_terminal_confirmed", False),
+                (release.PREVIOUS_DIAGNOSTIC, "partial_inventory", []),
+                (release.PREVIOUS_AUTH, "contract", release.SUPPORT_CONTRACT)):
+            with tempfile.TemporaryDirectory(dir=BASE) as folder:
+                path = Path(folder)/"altered.json"
+                record = json.loads(original(ref).read_bytes())
+                write_json(path, {**record, key: value})
+                with patch.object(release, "evidence_only", side_effect=lambda r: path if r == ref else original(r)):
+                    with self.assertRaises(ValueError):
+                        release.verify_release_history()
+
+    def test_ram_preflight_stops_before_any_worker(self):
+        with patch.object(operator, "validate_request", return_value=({"fixture": True}, Path("unused"))), \
+                patch.object(Path, "read_text", return_value="MemAvailable: 1024 kB\n"), \
+                patch.object(operator, "supervise_process") as worker:
+            with self.assertRaisesRegex(RuntimeError, "8 GiB"):
+                operator.supervised("fixture")
+            worker.assert_not_called()
+
+    def test_v2_request_id_differs_from_failed_v1(self):
+        with tempfile.TemporaryDirectory(dir=BASE) as folder:
+            root = Path(folder)
+            args = {k: "fixture" for k in operator.ARGUMENTS["evaluation"]}
+            args["split"] = "ood_polyphony"
+            with patch.object(release, "RECOVERY", root.relative_to(release.p.ROOT).as_posix()), \
+                    patch.object(release, "verify_authorization", return_value=({"contract": "fixture"}, {})), \
+                    patch.object(operator, "supervised", return_value={"result": "fixture", "supervisor": "fixture"}):
+                operator.step("ood_polyphony_evaluation", "evaluation",
+                    root/"outputs/ood_polyphony/evaluation_01", args)
+            request = json.loads((root/"requests/ood_polyphony_evaluation_01.json").read_bytes())
+            previous = json.loads(release.evidence_only(release.PREVIOUS_REQUEST).read_bytes())
+            self.assertNotEqual(request["request_id"], previous["request_id"])
+            self.assertEqual(request["request_id"], "phideus-evaluation-release-v2-ood_polyphony_evaluation-20260908-01")
+
+    def test_closed_upstream_cannot_be_reproduced_if_receipt_disappears(self):
+        with patch.object(Path, "is_file", return_value=False):
+            for split in ("iid", "ood_beta", "ood_polyphony"):
+                for producer in ("canonical", "memory", "support"):
+                    with self.assertRaisesRegex(PermissionError, "regeneration is forbidden"):
+                        operator.require_preserved(split, split+"_fixture", producer)
+            operator.require_preserved("deformed_family", "new-fixture", "canonical")
+            with patch.object(release, "verify_authorization"), \
+                    patch.object(operator.old_gate, "verify_authorization", return_value=({}, {})), \
+                    patch.object(release.p, "read_reference", return_value={"train_data": "train", "calibration_data": "cal"}), \
+                    patch.object(release.p, "reference", return_value="fixture-grant"), \
+                    patch.object(operator.old_operator, "step") as producer:
+                with self.assertRaisesRegex(PermissionError, "regeneration is forbidden"):
+                    operator.run("fixture-auth")
+                producer.assert_not_called()
 
 
 if __name__ == "__main__":

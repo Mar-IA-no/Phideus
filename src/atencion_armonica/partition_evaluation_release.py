@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import subprocess
 import time
 import numpy as np
 
@@ -22,10 +23,11 @@ from .partial_compatibility_cache import encoded, sha_file
 from .structured_source_artifacts import write_json, write_npz, seal_bundle, mark_failure, verify_bundle
 
 TREE, LOCAL, FROZEN = old.TREE, old.LOCAL, old.FROZEN
-RECOVERY = TREE + "/evaluation_release_recovery_v1"
+RECOVERY = TREE + "/evaluation_release_recovery_v2"
 SPLITS_NEW = old.SPLITS_NEW
-LIMITS = {"evaluation": old.LIMITS["evaluation"]}
-ROLES = {"evaluation": "learned_evaluation_release_v1"}
+HISTORICAL_LIMITS = {"evaluation": old.LIMITS["evaluation"]}
+LIMITS = {"evaluation": [1200, 4294967296]}
+ROLES = {"evaluation": "learned_evaluation_release_v2"}
 EVALUATION_FILES = old.EVALUATION_FILES
 canonical_path, evidence_only = old.canonical_path, old.evidence_only
 SUPPORT_AUTH = {"path": old.RECOVERY + "/authorization/recovery_03.json",
@@ -52,6 +54,99 @@ FAILED_FILES = {"bootstrap.npz", "metrics.json", "candidate_evidence.json", "sum
 SOURCES = ("src/atencion_armonica/partition_evaluation_release.py",
     "experiments/atencion_armonica/run_partition_evaluation_release.py",
     "experiments/atencion_armonica/test_partition_evaluation_release.py")
+RAM_PLAN = {"path": LOCAL + "/PLAN_EVALUATION_RAM_AMENDMENT.md",
+    "sha256": "44aea1746a31ade511ab87864998774f544a7675fe690e0e491722502fa5e4a7"}
+RAM_AUDIT = {"path": LOCAL + "/evaluation_ram_amendment_audit.json",
+    "sha256": "32a9e2782f3c8244fdb4946615578d7eeecad6c048660aa509d5ea32efb61af0"}
+RAM_REPORT = {"path": old.gate02.LIBRARY + "/agent_reports/687_partition_evaluation_ram_amendment_plan_audit.md",
+    "sha256": "647385606f00c3a167c573b4e684feb12f7a7675ebe18988b284801d3a2de1f6"}
+RAM_DIAGNOSIS = {"path": old.gate02.LIBRARY + "/agent_reports/686_partition_evaluation_envelope_diagnosis.md",
+    "sha256": "c0bb5af9184e25a5454eadc3935bb971b0ef0b3a4d65c0907f7c3e547f9ed810"}
+PREVIOUS_DIAGNOSTIC = {"path": old.gate02.LIBRARY + "/experiment_notes/partition_evaluation_release_memory_diagnostic.json",
+    "sha256": "9a52f395baae9bc624ef8582605643395ff968460ee086780dd750e87620a492"}
+PREVIOUS_TREE = TREE + "/evaluation_release_recovery_v1"
+PREVIOUS_CONTRACT = {"path": PREVIOUS_TREE + "/contracts/contract_01.json",
+    "sha256": "3f336f5411559bd221aa42f833a72a71a6d7c9a35e94a5f67ad6dc4ca5281b86"}
+PREVIOUS_AUTH = {"path": PREVIOUS_TREE + "/authorization/recovery_01.json",
+    "sha256": "4733e5f71e3ec6093df79a33217e4bd42dfc80a464e1c404f2cabdc20a087d1a"}
+PREVIOUS_REQUEST = {"path": PREVIOUS_TREE + "/requests/ood_polyphony_evaluation_01.json",
+    "sha256": "cf65150d4d13bf2dffcde1337639323747643b8216c1e2936df6945657bab2c7"}
+PREVIOUS_TERMINAL = {"path": PREVIOUS_TREE + "/supervision/supervisor-ze8xn75i/terminal.json",
+    "sha256": "3c363dfc321e45fa3faf59956f5df264936efbe43473fb56aecf7b0c9c1ed2a0"}
+HISTORY = {"commit": "9e5d08b31fb093e4c33ec88522894200470d7522", "sources": dict(zip(SOURCES, (
+    "09e50e6ab853b20198548754cc63fb8700585843e77f4123cea7a81ec328ece9",
+    "f73100745eee2dd7be290e77e096e5be1c16259c25dfec8540e06ea88f6a05af",
+    "9e11bc04e8633c4854759df4819a5a9057d4bf70a1c99cdc1767409d50741d87")))}
+
+
+def verify_ram_amendment():
+    p.verify_reference(RAM_PLAN)
+    expected = {"schema": "partition-evaluation-ram-amendment-audit-v1", "status": "PASS",
+        "scope": "EVALUATION_RAM_AMENDMENT_PLAN", "target": RAM_PLAN, "reports": [RAM_REPORT]}
+    if p.read_reference(RAM_AUDIT) != expected:
+        raise PermissionError("exact independent RAM amendment acceptance missing")
+    for ref in (RAM_REPORT, RAM_DIAGNOSIS):
+        if not p.verify_reference(ref).read_text().strip():
+            raise ValueError("empty RAM amendment evidence")
+
+
+def verify_release_history():
+    """Prior executor is immutable evidence, never executable current authority."""
+    read = lambda ref: json.loads(evidence_only(ref).read_bytes())
+    contract, auth = read(PREVIOUS_CONTRACT), read(PREVIOUS_AUTH)
+    if (contract["executor_sources"] != HISTORY["sources"] or contract["limits"] != HISTORICAL_LIMITS
+            or contract["roles"] != {"evaluation": "learned_evaluation_release_v1"}
+            or contract["support_contract"] != SUPPORT_CONTRACT
+            or auth["contract"] != PREVIOUS_CONTRACT or auth["status"] != "READY"):
+        raise ValueError("historical release source or authority identity differs")
+    evidence_only(auth["implementation_audit"])
+    for name, expected in HISTORY["sources"].items():
+        blob = subprocess.run(["git", "show", HISTORY["commit"]+":"+name],
+            cwd=p.ROOT, check=True, capture_output=True, timeout=10).stdout
+        if hashlib.sha256(blob).hexdigest() != expected:
+            raise ValueError("historical release Git blob differs")
+    diagnostic, terminal, request = read(PREVIOUS_DIAGNOSTIC), read(PREVIOUS_TERMINAL), read(PREVIOUS_REQUEST)
+    started = read(diagnostic["started"])
+    root = canonical_path(PREVIOUS_TREE+"/outputs/ood_polyphony/evaluation_01",
+        p.ROOT/PREVIOUS_TREE/"outputs"/"ood_polyphony")
+    expected_path = root.relative_to(p.ROOT).as_posix()
+    if (diagnostic["schema"] != "partition-evaluation-release-memory-diagnostic-v1"
+            or diagnostic["status"] != "DIAGNOSTIC_ONLY_NOT_CAMPAIGN_COMPLETION"
+            or diagnostic["terminal"] != PREVIOUS_TERMINAL or diagnostic["request"] != PREVIOUS_REQUEST
+            or diagnostic["contract"] != PREVIOUS_CONTRACT
+            or terminal["schema"] != "partition-evaluation-release-terminal-v1"
+            or terminal["status"] != "FAILED" or terminal["worker_exit_code"] != -15
+            or terminal["worker_terminal_confirmed"] is not True or terminal["result"] is not None
+            or terminal["observed_peak_gpu_bytes"] != 0 or terminal["request"] != PREVIOUS_REQUEST
+            or terminal["operation"] != "evaluation" or terminal["output"] != expected_path
+            or terminal["execution_contract"] != PREVIOUS_CONTRACT
+            or started["rss_limit_bytes"] != HISTORICAL_LIMITS["evaluation"][1]
+            or started["wall_limit_seconds"] != HISTORICAL_LIMITS["evaluation"][0]
+            or terminal["observed_peak_rss_bytes"] <= started["rss_limit_bytes"]
+            or terminal["seconds"] >= started["wall_limit_seconds"]
+            or request["schema"] != "partition-evaluation-release-request-v1"
+            or request["operation"] != "evaluation" or request["output"] != expected_path
+            or request["execution_contract"] != PREVIOUS_CONTRACT
+            or request["arguments"].get("evaluation_release_authorization") != PREVIOUS_AUTH
+            or {k: v for k, v in request["arguments"].items() if k != "evaluation_release_authorization"}
+                != read(FAILED_REQUEST)["arguments"]):
+        raise ValueError("historical release is not the declared confirmed RSS failure")
+    inventory = [{k: row[k] for k in ("path", "sha256")} for row in diagnostic["partial_inventory"]]
+    expected = {expected_path+"/"+name for name in FAILED_FILES | {"FAILURE.json"}}
+    physical = list(root.rglob("*"))
+    if (len(inventory) != 7 or {ref["path"] for ref in inventory} != expected
+            or any(path.is_symlink() or not path.is_file() for path in physical)
+            or {path.relative_to(p.ROOT).as_posix() for path in physical if path.is_file()} != expected):
+        raise ValueError("historical release inventory changed or became retroactively COMPLETE")
+    prior = {Path(ref["path"]).name: ref["sha256"] for ref in failed_evidence()}
+    for ref in inventory:
+        evidence_only(ref)
+        name = Path(ref["path"]).name
+        if name in FAILED_FILES and ref["sha256"] != prior[name]:
+            raise ValueError("the two preserved failed payloads differ")
+    if read(next(ref for ref in inventory if Path(ref["path"]).name == "FAILURE.json")) != {
+            "status": "INCOMPLETE", "error": "RuntimeError(\"TimeoutError('recovery worker exceeded its original CPU envelope')\")"}:
+        raise ValueError("historical release failure marker changed")
 
 
 def failed_evidence():
@@ -69,8 +164,8 @@ def failed_evidence():
             or terminal["request"] != FAILED_REQUEST or terminal["output"] != FAILED_ROOT
             or terminal["operation"] != "evaluation" or terminal["execution_contract"] != SUPPORT_CONTRACT
             or terminal["observed_peak_gpu_bytes"] != 0
-            or started["rss_limit_bytes"] != LIMITS["evaluation"][1]
-            or started["wall_limit_seconds"] != LIMITS["evaluation"][0]
+            or started["rss_limit_bytes"] != HISTORICAL_LIMITS["evaluation"][1]
+            or started["wall_limit_seconds"] != HISTORICAL_LIMITS["evaluation"][0]
             or terminal["seconds"] >= started["wall_limit_seconds"]
             or terminal["observed_peak_rss_bytes"] <= started["rss_limit_bytes"]
             or request["operation"] != "evaluation" or request["output"] != FAILED_ROOT
@@ -83,7 +178,7 @@ def failed_evidence():
     root = canonical_path(FAILED_ROOT, p.ROOT/old.RECOVERY/"outputs"/"ood_polyphony")
     paths = list(root.rglob("*"))
     if (len(inventory) != 7 or {r["path"] for r in inventory} != expected
-            or any(path.is_symlink() for path in paths)
+            or any(path.is_symlink() or not path.is_file() for path in paths)
             or {path.relative_to(p.ROOT).as_posix() for path in paths if path.is_file()} != expected):
         raise ValueError("evaluation failure inventory changed or was retroactively completed")
     for ref in inventory:
@@ -114,7 +209,11 @@ def contract_candidate():
         "diagnostic_report": DIAGNOSTIC_REPORT, "failed_request": FAILED_REQUEST,
         "failed_terminal": FAILED_TERMINAL, "freeze": FROZEN["freeze"],
         "test_authorization": FROZEN["test_authorization"], "roles": ROLES,
-        "test_splits": list(SPLITS_NEW), "limits": LIMITS, "device": "cpu"}
+        "test_splits": list(SPLITS_NEW), "limits": LIMITS, "device": "cpu",
+        "ram_amendment": RAM_PLAN, "ram_audit": RAM_AUDIT, "ram_diagnosis": RAM_DIAGNOSIS,
+        "historical_sources": HISTORY, "previous_diagnostic": PREVIOUS_DIAGNOSTIC,
+        "previous_contract": PREVIOUS_CONTRACT, "previous_authorization": PREVIOUS_AUTH,
+        "previous_request": PREVIOUS_REQUEST, "previous_terminal": PREVIOUS_TERMINAL}
 
 
 @boundary
@@ -127,6 +226,8 @@ def verify_contract(ref):
     if auth["contract"] != SUPPORT_CONTRACT:
         raise PermissionError("support producer identity changed")
     verify_plan_audit()
+    verify_ram_amendment()
+    verify_release_history()
     failed_evidence()
     return record
 
@@ -134,6 +235,8 @@ def verify_contract(ref):
 def create_contract(output):
     output = canonical_path(output, p.ROOT/RECOVERY/"contracts")
     verify_plan_audit()
+    verify_ram_amendment()
+    verify_release_history()
     failed_evidence()
     old.verify_authorization(SUPPORT_AUTH)
     write_json(output, contract_candidate())
@@ -233,12 +336,14 @@ def compare_failed(output, split, arguments):
     if split != "ood_polyphony":
         return
     refs = failed_evidence()
+    verify_release_history()
     if json.loads(evidence_only(FAILED_REQUEST).read_bytes())["arguments"] != arguments:
         raise ValueError("failed-control comparison requires the exact original inputs/predictions")
     for ref in refs:
         if sha_file(output/Path(ref["path"]).name) != ref["sha256"]:
             raise ValueError("recalculated evaluation differs from the six preserved payloads")
     failed_evidence()
+    verify_release_history()
 
 
 def evaluate_test(output, split, *, authorization, data, logits, scored, normalized, predictions, recovery_authorization, support_recovery_authorization, evaluation_release_authorization):

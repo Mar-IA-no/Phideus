@@ -57,6 +57,10 @@ def execute(ref):
 
 def supervised(ref):
     request, output = validate_request(ref)
+    memory = {line.split(":")[0]: int(line.split()[1])*1024
+        for line in Path("/proc/meminfo").read_text().splitlines() if line.startswith("MemAvailable:")}
+    if memory.get("MemAvailable", 0) < 8*1024**3:
+        raise RuntimeError("evaluation RAM amendment requires at least 8 GiB available before launch")
     root = p.ROOT/gate.RECOVERY
     staging = root/"supervision"
     gate.canonical_path(staging, root)
@@ -107,7 +111,7 @@ def step(name, operation, output, arguments):
     output = gate.canonical_path(output, root/"outputs"/arguments["split"])
     auth, _ = gate.verify_authorization(arguments["evaluation_release_authorization"])
     request = {"schema": "partition-evaluation-release-request-v1",
-        "request_id": "phideus-evaluation-release-"+name+"-20260908-01", "operation": operation,
+        "request_id": "phideus-evaluation-release-v2-"+name+"-20260908-01", "operation": operation,
         "output": output.relative_to(p.ROOT).as_posix(), "arguments": arguments,
         "execution_contract": auth["contract"]}
     if saved.exists():
@@ -143,7 +147,7 @@ def check_roster(record, evaluation_release_authorization):
     for split in gate.TESTS:
         case = record["splits"][split]
         new = split in gate.SPLITS_NEW
-        executor = {"predictions": "support03", "evaluation": "release01"} if new else {
+        executor = {"predictions": "support03", "evaluation": "release02"} if new else {
             "predictions": "memory02", "evaluation": "memory02"}
         if (set(case) != {"executor", "data", "aggregate", "logits", "scored", "normalized",
                          "predictions", "evaluation", "replay"} or case["executor"] != executor):
@@ -180,6 +184,23 @@ def check_roster(record, evaluation_release_authorization):
     return record
 
 
+def require_preserved(split, name, producer):
+    """The only upstream production allowed in this continuation is deformed_family."""
+    if split == "deformed_family":
+        return
+    if split not in ("iid", "ood_beta", "ood_polyphony"):
+        raise PermissionError("unknown preservation scope")
+    roots = {"canonical": (p.ROOT/gate.LOCAL/"operation_receipts_06", name+".json"),
+        "memory": (p.ROOT/old_gate.RECOVERY/"receipts", name+"_01.json"),
+        "support": (p.ROOT/gate.old.RECOVERY/"receipts", name+"_01.json")}
+    if producer not in roots:
+        raise PermissionError("unknown preserved producer")
+    root, filename = roots[producer]
+    receipt = gate.canonical_path(root/filename, root)
+    if not receipt.is_file():
+        raise PermissionError("completed upstream receipt missing; regeneration is forbidden")
+
+
 def run(evaluation_release_authorization):
     gate.verify_authorization(evaluation_release_authorization)
     _, contract = old_gate.verify_authorization(gate.old.OLD_AUTH)
@@ -190,6 +211,7 @@ def run(evaluation_release_authorization):
     roster = {}
     for split in gate.TESTS:
         def upstream(name, operation, path, **arguments):
+            require_preserved(split, name, "canonical")
             return old_operator.step(name, operation, p.ROOT/gate.TREE/path, arguments,
                 recovery_auth=gate.old.OLD_AUTH, contract=contract, canonical=True)["result"]
         data = upstream(split+"_00_data", "prepare", f"{split}/shard_00/data", split=split,
@@ -201,6 +223,7 @@ def run(evaluation_release_authorization):
         scored = upstream(split+"_00_scored", "score", f"{split}/shard_00/scored", split=split,
             shard=0, authorization=test_auth, data=data, logits=logits)
         def memory(name, operation, **arguments):
+            require_preserved(split, split+"_"+name, "memory")
             return old_operator.step(split+"_"+name, operation,
                 p.ROOT/old_gate.RECOVERY/"outputs"/split/(name+"_01"),
                 {**arguments, "recovery_authorization": gate.old.OLD_AUTH},
@@ -213,6 +236,7 @@ def run(evaluation_release_authorization):
         if split in gate.SPLITS_NEW:
             old_arguments = {**inputs, "gpu_grant": None, "recovery_authorization": gate.old.OLD_AUTH,
                              "support_recovery_authorization": gate.SUPPORT_AUTH}
+            require_preserved(split, split+"_predictions", "support")
             predictions = sop.step(split+"_predictions", "inference",
                 p.ROOT/gate.old.RECOVERY/"outputs"/split/"predictions_01", old_arguments)["result"]
             arguments = {**inputs, "predictions": predictions, "recovery_authorization": gate.old.OLD_AUTH,
@@ -221,7 +245,7 @@ def run(evaluation_release_authorization):
             evaluation = step(split+"_evaluation", "evaluation",
                 p.ROOT/gate.RECOVERY/"outputs"/split/"evaluation_01", arguments)
             replay = step(split+"_replay", "evaluation", p.ROOT/gate.RECOVERY/"outputs"/split/"replay_01", arguments)
-            consumer, executor = gate, {"predictions": "support03", "evaluation": "release01"}
+            consumer, executor = gate, {"predictions": "support03", "evaluation": "release02"}
         else:
             for name in ("predictions", "evaluation", "replay"):
                 if not (p.ROOT/old_gate.RECOVERY/"receipts"/(split+"_"+name+"_01.json")).is_file():
