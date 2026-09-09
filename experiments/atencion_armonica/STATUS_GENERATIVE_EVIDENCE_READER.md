@@ -5,7 +5,9 @@ calibración. La recuperación del almacén preservó las 512 escenas IID, pero
 la primera etapa de predicción volvió a detenerse por una comparación
 incorrecta entre estructuras en memoria y su representación JSON. La corrección
 explícita ya fue auditada y la campaña se reanudó desde los artefactos
-conservados. Los cuatro tests y sus auditorías de evidencia siguen pendientes.
+conservados. IID completó predicción, evaluación y replay; el test de mayor
+inarmonicidad está en ejecución. Faltan los otros tres tests y las auditorías
+finales de evidencia y alineación.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -86,7 +88,12 @@ identifica las 512 escenas preservadas con SHA256
 `3472ed7a63f64d6597ca73a66628658f606ef14323a3039e179c57eec95ddefe`.
 El protocolo exige guardar 45 predicciones por test antes de abrir su
 supervisión; luego se evalúa y se verifica por replay CPU.
-La recuperación ahora cuenta con pruebas de integración y pausa; eso no
-completa los cuatro tests ni sus auditorías de evidencia, todavía pendientes.
+IID cerró sus tres etapas con salida 0. Su sello de 45 predicciones tiene SHA256
+`5138adb10e4d235f62bac26b0c6e23dd33ba8562ca6160cde6b474f47b9b9469`;
+el índice de evaluación, `117978918ed610daab861e4ae1e02d23447287e40f15b955c7ba42f6ab32d2fc`.
+El replay CPU verificó ese mismo índice sin repetir fit ni forward. Los
+resultados IID son descriptivos y parciales; el primario de familia deformada
+sigue pendiente. La campaña conserva el presupuesto acumulado y continúa
+con los otros tres tests antes de sus auditorías finales.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
 igualada. No hay promoción arquitectónica ni una conclusión nueva sobre HIT.
