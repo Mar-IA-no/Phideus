@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 355db06a7cd4e6cd54e9df409e461a0fdd7d3596
+evidence_commit: 2add292dd020b0d1ce54e98915ef20cd182614d0
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -150,8 +150,9 @@ y fue auditada, con época 50 para los tres brazos sobre soporte común 503/512.
 El freeze cerró y las 512 escenas IID quedaron preservadas. La recuperación
 auditada del almacén permitió guardar features y tres forwards, pero una
 comparación incorrecta entre tuplas y listas JSON detuvo la etapa antes de
-ajustes, predicciones o evaluación. Corresponde corregir la serialización sin
-repetir esos cálculos y completar los cuatro tests. Aún no hay resultados comparativos.
+ajustes, predicciones o evaluación. La reparación de serialización ya fue
+auditada y la campaña se reanudó sin repetir esos cálculos. Corresponde
+completar los cuatro tests y replays; aún no hay resultados comparativos.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de

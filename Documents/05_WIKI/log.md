@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-09 — enmienda JSON auditada; tests reanudados
+
+La enmienda explícita pasó auditoría independiente y 45 pruebas CPU de
+contrato, integración y supervisión. La inferencia IID se reanudó conservando
+el prefijo científico, ambos fallos y su tiempo. Los cuatro tests siguen
+pendientes de cierre; las pruebas técnicas no son evidencia de generalización.
+Fuente: estado operativo en `2add292dd020b0d1ce54e98915ef20cd182614d0`.
+
 ## 2026-09-09 — recuperación del almacén aplicada; fallo JSON posterior
 
 La recuperación auditada mantuvo el índice IID y permitió guardar 512 features

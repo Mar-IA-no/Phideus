@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 355db06a7cd4e6cd54e9df409e461a0fdd7d3596
+evidence_commit: 2add292dd020b0d1ce54e98915ef20cd182614d0
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -191,8 +191,10 @@ o semilla ganadores. El freeze cerró antes de generar las 512 escenas IID.
 La recuperación auditada de un error de identidad del almacén preservó esas
 escenas y permitió guardar features y tres forwards. Un segundo fallo, por
 comparar tuplas con listas JSON, detuvo la etapa antes de ajustes, predicciones
-o evaluación. La reparación de serialización está en revisión; no hay ejecución
-activa ni otros tests generados. Selección OPEN y pruebas mecánicas no son evidencia de ventaja
+o evaluación. La enmienda explícita de serialización pasó auditoría independiente
+y 45 pruebas CPU; la inferencia IID se reanudó conservando ambos fallos,
+artefactos y tiempo consumido. Los cuatro tests siguen pendientes de cierre.
+Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.

@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 355db06a7cd4e6cd54e9df409e461a0fdd7d3596
+evidence_commit: 2add292dd020b0d1ce54e98915ef20cd182614d0
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -152,9 +152,10 @@ cerró y fue auditada: época 50 para los tres brazos, sobre soporte común
 antes de generar las 512 escenas IID, pero la primera inferencia se detuvo
 por un error de integración del almacén. Su recuperación auditada preservó
 esas escenas y permitió guardar features y tres forwards; después se detuvo
-por una comparación incorrecta de tuplas en memoria con listas JSON. No hay
-ajustes, predicciones ni evaluación IID. La reparación de serialización está
-en revisión y los otros tres tests, pendientes de generación. La selección OPEN y
+por una comparación incorrecta de tuplas en memoria con listas JSON. La enmienda
+explícita de serialización ya fue auditada, con 45 pruebas CPU independientes,
+y la inferencia IID se reanudó desde ese prefijo. Los cuatro tests y sus replays
+siguen pendientes de cierre. La selección OPEN y
 las pruebas mecánicas no acreditan una ventaja de generalización.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
