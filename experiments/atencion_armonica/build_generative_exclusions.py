@@ -90,6 +90,8 @@ def mechanical_catalog():
     base = np.asarray(open_rows[0]["log_f"], np.float64)
     add("fresh_store_open_and_arithmetic_aliases", [base, q8],
         TESTS/"test_generative_evidence_fresh_store.py", alias=True)
+    add("fresh_data_open512_and_arithmetic_aliases", [*[row["log_f"] for row in open_rows], q8],
+        TESTS/"test_generative_evidence_fresh_data.py", alias=True)
     changed = base.copy()
     changed[0] = float(np.float32(changed[0]+.25))
     add("rejected_open_truth_q32_mutation", [changed], TESTS/"test_generative_evidence_supervision.py")
