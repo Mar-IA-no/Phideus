@@ -1,9 +1,9 @@
 # Lector con evidencia generativa: estado de ejecución
 
 2026-09-09. La campaña completó sus 27 entrenamientos y la selección por
-calibración. Los tests nuevos están detenidos por un error de integración
-del almacén observable. Se preservaron las 512 escenas IID, todavía sin
-predicciones ni evaluación; los otros tres tests siguen pendientes.
+calibración. Los tests nuevos se reanudaron tras una recuperación auditada
+del almacén observable, sin regenerar las 512 escenas IID. La primera etapa
+de predicción está en ejecución; todavía no hay evaluación de test completa.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -47,9 +47,12 @@ Las revisiones previas de inferencia y supervisión no detectaron un error de
 composición: el productor creó el directorio de draws antes de que el almacén
 observable escribiera su vínculo de identidad. El almacén rechazó esa raíz
 no vacía y detuvo la primera etapa IID antes de features, ajustes, forwards
-o lectura de respuestas. La recuperación está diseñada y pendiente de
-auditoría e implementación; no se regeneran escenas ni se modifican las
-fuentes científicas congeladas.
+o lectura de respuestas. El [supervisor de recuperación](recover_generative_tests.py)
+ya está implementado y auditado: 30 pruebas CPU independientes pasaron.
+La vinculación de identidad se aplicó dentro del worker supervisado, manteniendo
+intacto el índice IID. El nuevo registro enlaza el fallo original y hereda sus
+120.097 segundos consumidos, sin reiniciar el presupuesto de cuatro horas.
+No se regeneran escenas ni se modifican las fuentes científicas congeladas.
 El [supervisor de tests](run_generative_tests.py) completó el freeze
 antes del primer draw. El archivo
 `data/atencion_armonica/generative_evidence_reader_v1/test_freeze.json`
@@ -60,7 +63,7 @@ identifica las 512 escenas preservadas con SHA256
 `3472ed7a63f64d6597ca73a66628658f606ef14323a3039e179c57eec95ddefe`.
 El protocolo exige guardar 45 predicciones por test antes de abrir su
 supervisión; luego se evalúa y se verifica por replay CPU.
-Las pruebas previas fueron mecánicas y no cubrieron esta integración:
-el cierre de los cuatro tests y sus auditorías de evidencia siguen pendientes.
+La recuperación ahora cuenta con pruebas de integración y pausa; eso no
+completa los cuatro tests ni sus auditorías de evidencia, todavía pendientes.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
 igualada. No hay promoción arquitectónica ni una conclusión nueva sobre HIT.
