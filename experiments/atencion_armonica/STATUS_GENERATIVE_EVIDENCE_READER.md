@@ -1,6 +1,6 @@
 # Lector con evidencia generativa: estado de ejecución
 
-2026-09-09. La campaña comenzó sus entrenamientos; todavía no hay resultados
+2026-09-09. La campaña completó sus 27 entrenamientos; todavía no hay resultados
 comparativos de sus cabezas aprendidas sobre los tests nuevos.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
@@ -26,9 +26,15 @@ de la proyección de recursos. Los ajustes guardados se reabren durante la
 recuperación; no se sustituyen escenas.
 
 Los supervisores de entrega, entrenamiento y selección están integrados y
-auditados. El [ejecutor](run_generative_training.py) avanza por los 27
-entrenamientos; la selección real aún no se ejecutó.
-Los tests nuevos permanecen sin generar: requieren el cierre de los 27
-entrenamientos, la selección fijada y el inventario de exclusiones sellado.
+auditados. El [ejecutor](run_generative_training.py) cerró los 27
+entrenamientos de 50 épocas. Conservó 51 snapshots por celda y 270 estados de
+calibración. Los rosters elegibles coinciden: 4036/4096 escenas de train y
+503/512 de calibración; las escenas sin candidatos no se reemplazan.
+El índice `data/atencion_armonica/generative_evidence_reader_v1/training/index.json`
+registra este cierre con SHA256
+`2d495bc107d875e7572670ca39b1db237c6524e0fe56d1f74a5ed9da1298013d`.
+La [selección real](run_generative_selection.py) está en ejecución sólo en CPU.
+Los tests nuevos permanecen sin generar: requieren la selección fijada y
+auditada, el circuito de inferencia verificado y el inventario de exclusiones sellado.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
 igualada. No hay promoción arquitectónica ni una conclusión nueva sobre HIT.
