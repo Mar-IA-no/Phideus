@@ -326,6 +326,14 @@ sources:
     mutable: false
     fronts: [AA, PPU]
 
+  - id: SRC-AA-GENERATIVE-EVIDENCE-STATUS
+    title: Estado de ejecución del lector con evidencia generativa
+    path: experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
+    authority: operational_status_snapshot
+    evidence_regime: resource_profiles_executed_open_preparation_running_no_new_neural_results
+    mutable: true
+    fronts: [AA, PPU]
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md

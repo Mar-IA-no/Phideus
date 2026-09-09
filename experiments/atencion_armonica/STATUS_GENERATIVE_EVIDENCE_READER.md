@@ -25,7 +25,8 @@ guardados se reabren durante la recuperación; no se sustituyen escenas.
 Faltan terminar esa preparación, medir la carga del corpus entregado y
 comprobar la proyección completa antes de comenzar los entrenamientos.
 
-El supervisor de campaña y la selección siguen en integración y auditoría.
+El supervisor de entrega y entrenamiento está integrado y auditado; la
+selección sigue en integración y auditoría.
 Los tests nuevos permanecen sin generar: requieren el cierre de los 27
 entrenamientos, la selección fijada y el inventario de exclusiones sellado.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad

@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 20717654e29a8c7165790fd99257a344dc676c71
+evidence_commit: 7ce64a5e74e51433c154ad5f3cbc435d1ccb2f15
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -47,6 +47,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -141,10 +142,12 @@ desacoplada. El ajuste clásico es una referencia de sistema, no un contraste
 causal de arquitectura; rangos y cardinalidades del sampler no son invariantes
 físicos ni validación de HIT. El [diseño inicial](../../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
 ya se desarrolló en un [protocolo separado](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md).
-La [cabeza común](../../../src/atencion_armonica/generative_evidence_model.py) y sus
-pruebas mecánicas están implementadas; la integración sigue en curso y el
-preflight de recursos está pendiente. Los 27 entrenamientos y cuatro tests
-frescos aún no se ejecutaron.
+El [estado de ejecución](../../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
+separa la implementación de sus resultados: el perfil CPU/GPU y de
+almacenamiento ya se ejecutó y la preparación de train/calibración está en
+curso. Faltan la carga real del corpus entregado y su proyección completa,
+los 27 entrenamientos y los cuatro tests frescos. Las pruebas mecánicas
+no acreditan una ventaja neuronal.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

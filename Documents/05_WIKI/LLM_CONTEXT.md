@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 20717654e29a8c7165790fd99257a344dc676c71
+evidence_commit: 7ce64a5e74e51433c154ad5f3cbc435d1ccb2f15
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -29,6 +29,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -179,9 +180,12 @@ queda como referencia de sistema, no contraste causal de arquitectura.
 El [diseño inicial](../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
 (`SRC-AA-GENERATIVE-EVIDENCE-PLAN`) ya tiene un
 [protocolo separado](../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
-(`SRC-AA-GENERATIVE-EVIDENCE-PROTOCOL`). El núcleo está implementado y la
-integración sigue en curso; el preflight de recursos, los 27 entrenamientos y cuatro tests
-frescos aún no se ejecutaron. Las pruebas mecánicas no son evidencia de ventaja neuronal.
+(`SRC-AA-GENERATIVE-EVIDENCE-PROTOCOL`). El
+[estado de ejecución](../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
+(`SRC-AA-GENERATIVE-EVIDENCE-STATUS`) registra perfil CPU/GPU y de almacenamiento
+ejecutado y preparación de train/calibración en curso. Faltan la carga real
+del corpus entregado y su proyección completa, los 27 entrenamientos y cuatro
+tests frescos. Las pruebas mecánicas no son evidencia de ventaja neuronal.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen

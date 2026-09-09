@@ -4,11 +4,11 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-08
-verified_at: 2026-09-08
-valid_at: 2026-09-08
-recorded_at: 2026-09-08
-evidence_commit: 4cd68374ea8d3acba4f5e76ee5955c83d196ffd3
+updated: 2026-09-09
+verified_at: 2026-09-09
+valid_at: 2026-09-09
+recorded_at: 2026-09-09
+evidence_commit: 7ce64a5e74e51433c154ad5f3cbc435d1ccb2f15
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -25,6 +25,7 @@ source_paths:
   - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -96,6 +97,9 @@ cerraron sin hallazgos materiales abiertos. El [diagnóstico de rivales](../../e
 completó 96 escenas y replays: ajuste de familia, cobertura e identidad no
 son equivalentes. La continuidad debe aislar evidencia generativa con cabeza
 y pérdida comunes, sin atribuir a geometría los priors del banco sintético.
+El [contraste generativo](../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
+está preparando train/calibración después de perfilar CPU/GPU y almacenamiento;
+sus entrenamientos y tests nuevos todavía no aportan resultados.
 
 ## Leyenda
 

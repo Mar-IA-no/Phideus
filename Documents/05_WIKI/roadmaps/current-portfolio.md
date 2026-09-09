@@ -8,7 +8,7 @@ updated: 2026-09-09
 verified_at: 2026-09-09
 valid_at: 2026-09-09
 recorded_at: 2026-09-09
-evidence_commit: 20717654e29a8c7165790fd99257a344dc676c71
+evidence_commit: 7ce64a5e74e51433c154ad5f3cbc435d1ccb2f15
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -29,6 +29,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -140,9 +141,12 @@ preservados cambia objetivos, acceso y complejidad: es referencia de sistema,
 no atribución causal a geometría. Los priors del sampler siguen siendo supuestos.
 El [diseño inicial](../../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
 ya tiene un [protocolo separado](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
-y una implementación parcial. Integración y preflight preceden a los
-27 trainings y cuatro tests frescos, todavía no ejecutados. No hay resultados
-neuronales de esa candidata.
+y una implementación parcial. El
+[estado operativo](../../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
+registra perfiles CPU/GPU y de almacenamiento ejecutados, con preparación
+de train/calibración en curso. La carga real del corpus entregado y su
+proyección completa preceden a los 27 trainings y cuatro tests frescos,
+todavía no ejecutados. No hay resultados neuronales de esa candidata.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de

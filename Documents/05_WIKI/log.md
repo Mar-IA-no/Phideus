@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-09 — preparación generativa en curso
+
+La síntesis distingue perfiles CPU/GPU y de almacenamiento ya ejecutados,
+preparación de train/calibración activa y carga real del corpus entregado
+todavía pendiente. Se enlaza un estado operativo separado del protocolo
+congelado. Entrenamientos y tests nuevos siguen sin resultados; no cambian
+la arquitectura candidata, la pregunta ni las alternativas preservadas.
+
 ## 2026-09-09 — protocolo generativo e implementación parcial
 
 Se incorpora el protocolo separado del lector con evidencia generativa.

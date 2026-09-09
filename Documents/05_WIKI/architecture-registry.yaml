@@ -10,17 +10,18 @@ architectures:
   - id: harmonic-generative-evidence-reader
     name: Lector con evidencia generativa
     status: candidate
-    priority: protocol_defined_core_implemented_integration_and_preflight_pending
+    priority: implementation_integrating_open_preparation_running_training_not_started
     primitive: common invariant partition head with aligned versus absent or decoupled generative evidence
     learned_components: [partition head with common split and merge entropy regression loss]
     frozen_components: [three historical pair networks, observable candidate algorithm, explicit generative fitter]
     evidence_for: finite rival diagnosis separated fit and coverage and produced an observable joint-fit operation
     evidence_against: no neural result yet; sampler priors and shared generator law limit physical authority
-    next_experiment: complete integration and resource preflight, then 27 matched head trainings and four fresh tests under the defined protocol
+    next_experiment: finish OPEN preparation and real delivered-corpus load profile, then 27 matched head trainings and four fresh tests under the defined protocol
     source_paths:
       - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
       - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
       - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
+      - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
       - src/atencion_armonica/generative_evidence_model.py
     interpretation: incremental evidence intervention at common head and loss; not novel neural geometry or promoted architecture
   - id: harmonic-explicit-generative-reader
