@@ -43,7 +43,10 @@ completó 96 escenas y replays. En deformación, ampliar la familia reduce el
 residual mediano de 10.376 a 1.454 cents, pero las particiones exactas sólo
 pasan de 18 a 19 entre las 23 escenas con salida; una de las 24 no tiene
 candidatos admisibles. Cobertura, ajuste e identidad exigen evaluaciones
-separadas. No hay arquitectura promovida. El
+separadas. El [protocolo del siguiente contraste](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
+fija evidencia generativa alineada, ausente o desacoplada sobre una cabeza y
+loss comunes. El núcleo está implementado; integración, preflight de recursos
+y campaña siguen pendientes. No hay arquitectura promovida. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

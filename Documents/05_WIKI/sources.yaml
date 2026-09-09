@@ -318,6 +318,14 @@ sources:
     mutable: false
     fronts: [EIR]
 
+  - id: SRC-AA-GENERATIVE-EVIDENCE-PROTOCOL
+    title: Protocolo del lector con evidencia generativa
+    path: experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
+    authority: prospective_executable_protocol
+    evidence_regime: common_head_joint_evidence_stratified_sham_27_trainings_four_fresh_tests_not_executed
+    mutable: false
+    fronts: [AA, PPU]
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md

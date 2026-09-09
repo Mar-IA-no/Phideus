@@ -4,11 +4,11 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-08
-verified_at: 2026-09-08
-valid_at: 2026-09-08
-recorded_at: 2026-09-08
-evidence_commit: 4cd68374ea8d3acba4f5e76ee5955c83d196ffd3
+updated: 2026-09-09
+verified_at: 2026-09-09
+valid_at: 2026-09-09
+recorded_at: 2026-09-09
+evidence_commit: 20717654e29a8c7165790fd99257a344dc676c71
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -28,6 +28,7 @@ source_paths:
   - experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -176,8 +177,11 @@ físicas. La próxima ablación debe mantener cabeza y pérdida comunes para
 aislar evidencia generativa correcta frente a ausencia/desacople; `argmin J`
 queda como referencia de sistema, no contraste causal de arquitectura.
 El [diseño inicial](../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
-(`SRC-AA-GENERATIVE-EVIDENCE-PLAN`) requiere protocolo independiente antes de
-27 entrenamientos y cuatro tests frescos; aún no está ejecutado.
+(`SRC-AA-GENERATIVE-EVIDENCE-PLAN`) ya tiene un
+[protocolo separado](../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
+(`SRC-AA-GENERATIVE-EVIDENCE-PROTOCOL`). El núcleo está implementado y la
+integración sigue en curso; el preflight de recursos, los 27 entrenamientos y cuatro tests
+frescos aún no se ejecutaron. Las pruebas mecánicas no son evidencia de ventaja neuronal.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen

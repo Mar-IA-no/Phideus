@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-09 — protocolo generativo e implementación parcial
+
+Se incorpora el protocolo separado del lector con evidencia generativa.
+El núcleo y sus pruebas mecánicas ya existen; integración, preflight de
+recursos, 27 entrenamientos y cuatro tests frescos siguen pendientes.
+Este avance no aporta todavía evidencia de ventaja neuronal ni cambia
+el estado candidato o las alternativas preservadas.
+
 ## 2026-09-08 — rivales observables ejecutados y continuidad igualada
 
 La síntesis incorpora el resultado de 96 escenas y ambos replays, su

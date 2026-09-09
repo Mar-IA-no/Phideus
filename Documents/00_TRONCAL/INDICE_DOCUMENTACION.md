@@ -286,7 +286,8 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Protocolo de fuentes rivales** | `experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md` | Búsqueda finita, q32, soporte, cotas en grilla y separación de autoridad observable/privilegiada |
 | **Resultado de fuentes rivales** | `experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md` | 96 escenas y replays; ajuste, cobertura, rivales y asociaciones por escenario |
 | **Fuentes rivales por escena** | `experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS_SCENES.csv` | 192 filas de evaluación, con estados sin salida y métricas previas |
-| **Evidencia generativa aprendida** | `experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md` | Diseño inicial de ablación con cabeza/loss comunes; protocolo y experimento pendientes |
+| **Evidencia generativa aprendida** | `experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md` | Diseño inicial de ablación con cabeza/loss comunes, desarrollado por un protocolo separado |
+| **Protocolo de evidencia generativa** | `experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md` | Canal conjunto, sham estratificado, cabeza común y 27 celdas; implementación parcial, preflight y campaña pendientes |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |

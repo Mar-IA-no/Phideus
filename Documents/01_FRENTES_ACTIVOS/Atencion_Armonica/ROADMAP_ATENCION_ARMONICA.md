@@ -42,7 +42,11 @@ partición verdadera entre candidatos y rivales que ajustan mejor el ruido.
 El siguiente contraste debe aislar la incorporación de evidencia generativa
 a una cabeza común y una misma pérdida, no comparar costos físicos y
 neuronales como si difirieran sólo en geometría. Los priors del generador
-sintético permanecen explícitos y no adquieren autoridad física.
+sintético permanecen explícitos y no adquieren autoridad física. El
+[protocolo separado](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
+ya define el canal conjunto, el sham estratificado y las 27 celdas. El núcleo
+está implementado; restan integración, preflight y ejecución antes de obtener
+evidencia neuronal nueva.
 El contraste cerrado anterior no demuestra una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.

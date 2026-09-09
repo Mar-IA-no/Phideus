@@ -4,11 +4,11 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-09-08
-verified_at: 2026-09-08
-valid_at: 2026-09-08
-recorded_at: 2026-09-08
-evidence_commit: 4cd68374ea8d3acba4f5e76ee5955c83d196ffd3
+updated: 2026-09-09
+verified_at: 2026-09-09
+valid_at: 2026-09-09
+recorded_at: 2026-09-09
+evidence_commit: 20717654e29a8c7165790fd99257a344dc676c71
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -28,6 +28,7 @@ source_paths:
   - experiments/atencion_armonica/PLAN_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -138,8 +139,10 @@ con ausencia y desacople como controles. Comparar `argmin J` con los lectores
 preservados cambia objetivos, acceso y complejidad: es referencia de sistema,
 no atribución causal a geometría. Los priors del sampler siguen siendo supuestos.
 El [diseño inicial](../../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
-requiere protocolo separado y contempla 27 trainings y cuatro tests frescos;
-no hay resultados de esa candidata.
+ya tiene un [protocolo separado](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
+y una implementación parcial. Integración y preflight preceden a los
+27 trainings y cuatro tests frescos, todavía no ejecutados. No hay resultados
+neuronales de esa candidata.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de
