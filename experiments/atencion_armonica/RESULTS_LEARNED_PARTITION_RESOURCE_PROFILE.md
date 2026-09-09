@@ -396,3 +396,12 @@ diagnóstico revisa estructuras ya serializadas que siguen vivas durante el
 soporte; no cambia el límite ni da por recuperada la evaluación antes de medirlo.
 Terminal bajo `support_validation_recovery_v1/supervision/supervisor-fdjeu3ar/terminal.json`,
 SHA-256 `33dd6f6d8d17a436f4ecc36e630c4dbd2a6920f9ba929027655121f8c682f6d9`.
+
+La recuperación de evaluación libera ocho referencias ya serializadas antes
+de reconstruir el soporte, sin modificar el cálculo ni ampliar los 2 GiB.
+Pasó la auditoría independiente de implementación y 38 pruebas conjuntas;
+un fixture produjo los ocho payloads idénticos al evaluador anterior. La
+ejecución real se reanudó desde las predicciones completas de polifonía,
+sin repetir inferencia. Todavía debe demostrar que completa bajo el mismo
+límite. El código está en [el evaluador versionado](../../src/atencion_armonica/partition_evaluation_release.py)
+y [sus pruebas](test_partition_evaluation_release.py).

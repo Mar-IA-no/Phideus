@@ -151,7 +151,9 @@ Mayor inarmonicidad completó también evaluación y replay. La inferencia del
 primario de polifonía se detuvo por un falso rechazo de redondeo en la
 validación del soporte. La recuperación pasó su auditoría y completó la
 inferencia de polifonía, con los once archivos previos exactamente preservados;
-la evaluación posterior se detuvo por RAM y está en diagnóstico. No cambian
+la evaluación posterior se detuvo por RAM. La liberación anticipada de objetos
+ya serializados pasó su auditoría y la evaluación se reanudó bajo el mismo
+límite, sin dar por demostrada todavía su suficiencia. No cambian
 modelos ni muestras. Familia deformada sigue pendiente. No hay cierre del
 contraste ni promoción arquitectónica.
 

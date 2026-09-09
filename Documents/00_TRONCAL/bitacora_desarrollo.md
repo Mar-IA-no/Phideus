@@ -11,7 +11,9 @@ fallo con entradas idénticas: sumar incidencia válida en float32 puede exceder
 la tolerancia por redondeo. La [recuperación acotada](../../experiments/atencion_armonica/RESULTS_LEARNED_PARTITION_RESOURCE_PROFILE.md)
 pasó su auditoría y completó la inferencia de polifonía, igualando los once
 archivos de predicciones del intento fallido. La evaluación posterior se detuvo
-al superar el límite de RAM; se revisa la vida de estructuras ya serializadas.
+al superar el límite de RAM. La corrección que libera estructuras ya serializadas
+antes de reconstruir el soporte pasó su auditoría y las pruebas de regresión;
+la evaluación se reanudó con las mismas predicciones y el mismo límite.
 No cambian modelos, selección ni muestras. El fallo no es un resultado del contraste
 primario. Familia
 deformada y las auditorías globales siguen pendientes.
