@@ -5,9 +5,9 @@ calibración. La recuperación del almacén preservó las 512 escenas IID, pero
 la primera etapa de predicción volvió a detenerse por una comparación
 incorrecta entre estructuras en memoria y su representación JSON. La corrección
 explícita ya fue auditada y la campaña se reanudó desde los artefactos
-conservados. IID y mayor inarmonicidad completaron predicción, evaluación y
-replay; polifonía está en ejecución. Faltan polifonía, familia deformada y
-las auditorías finales de evidencia y alineación.
+conservados. IID, mayor inarmonicidad y polifonía completaron predicción,
+evaluación y replay. Familia deformada, el escenario primario, está en
+ejecución; después faltan las auditorías finales de evidencia y alineación.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -94,8 +94,10 @@ el índice de evaluación, `117978918ed610daab861e4ae1e02d23447287e40f15b955c7ba
 El replay CPU verificó ese mismo índice sin repetir fit ni forward.
 Mayor inarmonicidad también cerró las tres etapas con salida 0 y conservó el
 índice de evaluación `6e4ab2ed02baeeb7efc249686b0e2bafa35c836cb9b9ecec458a51d52473cd21`.
-Los resultados de ambos escenarios son descriptivos y parciales; el primario
-de familia deformada sigue pendiente. La campaña conserva el presupuesto
-acumulado y continúa con los otros dos tests antes de sus auditorías finales.
+Polifonía cerró igualmente las tres etapas y verificó por replay el índice
+`f313459e8de3c3dfbc2588638055cbf110cede4f944d2573563ddab147199fcb`.
+Los resultados de estos tres escenarios son descriptivos y parciales; el
+primario de familia deformada sigue pendiente. La campaña conserva el
+presupuesto acumulado y continúa con ese último test antes de las auditorías finales.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
 igualada. No hay promoción arquitectónica ni una conclusión nueva sobre HIT.
