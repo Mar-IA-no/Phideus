@@ -2,6 +2,23 @@
 
 ---
 
+## Spark como apoyo verificable del proyecto (2026-09-10)
+
+`mensaje recursivo 024 integrado`; `mensaje recursivo 025 integrado`;
+`mensaje recursivo 026 integrado`. La política local queda en
+[AGENTS.md](../../AGENTS.md#política-local-de-spark--mensajes-024026-2026-09-10).
+Spark se incorpora para ampliar cobertura de inventarios, extracción de
+evidencia, tests acotados y búsqueda de fuentes ligada a experimentos concretos.
+La integración y el juicio científico conservan una instancia más capaz;
+la autoauditoría de un worker no sustituye la revisión independiente.
+
+La incorporación fija límites de contexto, esfuerzo, verificadores y ciclos
+de corrección, además de un registro de aprendizajes transferibles entre
+proyectos. Todavía no se ejecutó un piloto Spark propio: sus primeros usos
+deberán producir evidencia local, sin extrapolar las mediciones del informe
+de referencia. Esta revisión no modifica el protocolo experimental, no abre
+otra ola bibliográfica y no levanta la suspensión de GPU.
+
 ## Fuentes rivales: ajuste, cobertura e identidad (2026-09-08)
 
 El [diagnóstico retrospectivo](../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)

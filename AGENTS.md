@@ -149,12 +149,75 @@ Condiciones:
 ## Operación con Orca
 
 1. Elegir el mecanismo por responsabilidad: subagente interno para fan-out breve y efímero; worker Orca cuando importen Task/Dispatch verificables, supervisión, continuidad, preguntas, otro workspace o cierre auditable; handoff simple sólo si el receptor asume ownership completo.
-2. Todo worker o subagente Codex usa siempre el modelo `gpt-5.6-sol` con esfuerzo `high`, salvo instrucción explícita posterior del usuario. No reutilizar como auditoría final un resultado producido con otro modelo cuando todavía sea posible repetirlo bajo esta configuración.
+2. `gpt-5.6-sol` con esfuerzo `high` sigue como default para workers de razonamiento transversal y auditorías independientes. Los mensajes recursivos `024–026` habilitan `gpt-5.3-codex-spark` para trabajo acotado bajo la política siguiente; sus resultados no sustituyen una auditoría final independiente.
 3. Para workers cross-workspace, indicar siempre el `--worktree` destino explícito, también al reutilizar `--terminal`. Ante `terminal_worktree_mismatch`, verificar primero `worktreeId` y selector; no matar ni recrear recursos por reflejo. El mensaje recursivo `017` corrige la interpretación amplia de `014`.
 4. Continuidad e independencia son incompatibles: reutilizar terminal para continuaciones dependientes; lanzar agente y terminal nuevos para auditorías ciegas, réplicas o arbitrajes.
 5. Al cerrar un frente, inventariar y cerrar sólo recursos propios por su protocolo y handle exacto; verificar después con `tab list`, `terminal list`, estados de workers/worktrees y, si aplica, listeners. Nunca cerrar recursos ajenos o de ownership incierto.
 6. Un hallazgo reproducible de Orca se informa con versión, reproducción mínima, esperado/real, IDs, receipts y workaround. La decisión de abrir issue o PR upstream pertenece al administrador raíz.
 7. `m2-alert` se usa sólo si la intervención de Mariano es indispensable después de agotar recuperaciones autónomas. Antes se publica una nota inmutable en inbox con `request_id`, evidencia, próximo responsable y condición de reanudación; Telegram no sustituye inbox, Git ni bitácora.
+
+## Política local de Spark — mensajes 024–026 (2026-09-10)
+
+Spark amplía cobertura; no decide la orientación científica. Usarlo progresivamente
+en tareas útiles, sin inventar trabajo para gastar cuota ni reabrir por inercia
+la campaña bibliográfica cerrada. La suspensión de GPU y los freezes experimentales
+conservan precedencia. La política no equivale a una validación empírica local.
+
+- **Tareas:** inventarios de símbolos, referencias y artefactos; extracción de
+  manifests o métricas ya autorizadas a JSON/CSV; candidatos de enlaces rotos,
+  contradicciones documentales o tests; ejecución de tests CPU ya definidos y
+  acotados; cambios mecánicos pequeños en archivos no congelados, con allowlist.
+  No delegar un comando que `rg`, un parser o un linter resuelva directamente
+  cuando el worker no agregue cobertura o revisión útil.
+- **Frontera:** no editar fuentes congeladas, checkpoints, splits, seeds,
+  receipts ni artefactos canónicos; no abrir truth/holdouts antes del sello
+  previsto. No decidir métricas, loss, arquitectura, GO/NO-GO, interpretación
+  de HIT, seguridad, borrados, merges o despliegues. Puede señalar candidatos
+  de problemas en esos objetos, en lectura autorizada, sin cerrar su validez.
+- **Tamaño y esfuerzo:** una pregunta y una familia de archivos o fuentes por
+  worker; presupuesto local inicial máximo de 32k tokens de material de tarea
+  y 64k de entrada total, incluidas instrucciones. Son límites operativos
+  conservadores, no resultados medidos. Dividir por unidad semántica antes de
+  superar el presupuesto; no cargar toda la memoria, wiki o corpus. `low` para
+  inventario/extracción, `medium` para código pequeño o búsqueda de fuentes;
+  subir esfuerzo sólo con comparación local justificada.
+- **Aceptación:** cada despacho fija entradas, salidas, archivos permitidos,
+  comandos de prueba y condición de cierre. Inventarios incluyen path/línea y
+  cobertura; extracciones conservan fuente, hash y schema con cotejo contra
+  origen; cambios entregan diff y salida cruda de checks explícitamente
+  ejecutados, incluido exit code. El coordinador revalida e integra; una
+  respuesta plausible o una autoauditoría no basta.
+- **Investigación:** wiki/corpus primero; búsquedas externas sólo por una
+  dependencia concreta del experimento. Separar frentes por pregunta y fuente,
+  abrir originales y priorizar papers, documentación y repos oficiales frente
+  a comentarios secundarios. Cada claim conserva URL completa, ubicación,
+  condiciones, limitaciones y distinción entre cita, extracción e inferencia.
+  Guardar crudos verbatim separados y síntesis en `Biblioteca/<tema>/`.
+  Lecturas integrales hermenéuticas, física, geometría/arquitectura/loss y
+  arbitraje de contradicciones quedan al coordinador capaz o auditor independiente;
+  la coincidencia de scouts no demuestra verdad.
+- **Loops y escalación:** máximo inicial de tres rondas trazables por tarea,
+  cerrando antes si se agotaron unidades y pasan los checks. Un fallo material,
+  ambigüedad de fuente, contexto insuficiente o conflicto de ownership se eleva
+  al coordinador/Sol; no corregir silenciosamente el protocolo para hacer pasar
+  un test. Réplicas nuevas pueden desafiar claims, no simular independencia
+  reutilizando el mismo hilo ni sustituir la auditoría científica.
+- **Operación:** registrar clase de delegación, owner, propósito e IDs antes de
+  lanzar. Comprobar modelo y esfuerzo en el runtime, no preguntárselos al modelo.
+  Si Spark no está expuesto en el mecanismo elegido, no sustituirlo en silencio;
+  usar un mecanismo autorizado que lo soporte o registrar la limitación.
+  Para Orca: Task/Dispatch, worktree explícito, worker nuevo para seleccionar
+  modelo/esfuerzo; cierre por `worker-release` y reconciliación del handle.
+  No archivar sesiones top-level ni cerrar recursos ajenos por heurística.
+- **Aprendizaje compartido:** en la primera tarea compatible, comparar candidato
+  inicial, correcciones y verificador; registrar modelo, esfuerzo, alcance,
+  contexto, tiempos observados, errores y resultado en `Biblioteca/<tema>/`.
+  No transferir latencias de otro proyecto ni una prueba aislada como capacidad
+  general. Actualizar esta política sólo ante evidencia material. Hallazgos
+  transversales verificables van una sola vez al administrador por inbox, con
+  `request_id`, estado `finding_for_admin_review`, evidencia, reproducibilidad,
+  regla candidata, próximo responsable y condición de reanudación. No enviar
+  ACK ni progreso; la skill común la mantiene el administrador.
 
 ## 📡 Mensajes recursivos (estructura /mnt/m2-1TB)
 
