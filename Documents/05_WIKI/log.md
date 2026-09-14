@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-14 — contrato y núcleo de energía geométrica
+
+Se enlazan el protocolo concreto y el estado de implementación. Contrato y
+núcleo aritmético pasaron auditoría; adaptación completa, runner y campaña
+siguen pendientes. Se conservan controles de información/precisión igualadas,
+la distinción entre prior inicial y aprendizaje, y el límite numérico del
+roundtrip. No hay nuevos resultados comparativos ni promoción.
+Fuente: `a6477eddc88ab600ff855d888f05aef30f14eeb9`.
+
 ## 2026-09-14 — sucesor: energía geométrica para la decisión
 
 Se registra el plan inicial de contraste prospectivo operación/interfaz × loss.

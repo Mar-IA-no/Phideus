@@ -427,7 +427,23 @@ sources:
     title: Energía geométrica para la decisión
     path: experiments/atencion_armonica/PLAN_GEOMETRIC_DECISION_ENERGY.md
     authority: initial_experimental_design
-    evidence_regime: prospective_operation_interface_by_objective_plan_executable_protocol_pending
+    evidence_regime: initial_operation_interface_by_objective_plan_detailed_by_separate_protocol
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-GEOMETRIC-DECISION-PROTOCOL
+    title: Contrato de energía geométrica para la decisión
+    path: experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
+    authority: audited_experimental_design
+    evidence_regime: eight_routes_by_loss_arms_72_planned_trainings_no_campaign_result
+    mutable: false
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-GEOMETRIC-DECISION-STATUS
+    title: Implementación de energía geométrica para la decisión
+    path: experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
+    authority: implementation_status
+    evidence_regime: audited_arithmetic_core_partial_open_adapter_no_training_or_fresh_test
     mutable: true
     fronts: [AA, PPU]
 

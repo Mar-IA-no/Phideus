@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: b29ff5f48867cfdd7896e619d4a77f7204ca6cb3
+evidence_commit: a6477eddc88ab600ff855d888f05aef30f14eeb9
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -38,6 +38,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -173,9 +175,10 @@ Extendida. Oracles, cobertura, regresión y estratos delimitan explicaciones,
 sin identificar una causa. La auditoría técnica final autenticó el cierre
 y reextrajo16escenas; el [estado](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
 conserva1350.970249s acumulados y la enmienda explícita del presupuesto.
-El siguiente experimento debe separar operación geométrica y aprendizaje
-de la decisión sobre muestras nuevas, manteniendo descriptores y clásico
-como controles; no seguir con post-hoc o heads por inercia.
+El siguiente experimento separa operación geométrica y aprendizaje de la
+decisión sobre muestras nuevas, manteniendo descriptores y clásico como
+controles. Tiene [protocolo y núcleo auditados](../../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md),
+pero pipeline completa y campaña pendientes; no es otra evaluación post-hoc.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de
@@ -317,6 +320,6 @@ set-valued avanzó hasta un runner auditado sobre histórico abierto. EIV
 permanece como referencia externa y el router, diferido. En ese corte se
 planteó congelar el paquete prospectivo antes de cualquier draw. El rebase
 posterior dejó esa extensión pausada e incompleta: no es el próximo goal
-vigente. El ciclo actual ya completó el contraste de evidencia generativa
-sobre cabeza y pérdida comunes y continúa hacia un diagnóstico de operación
-geométrica y objetivo de aprendizaje, sin promoción científica.
+vigente. El ciclo actual completó el contraste de evidencia generativa y el
+diagnóstico de operación y objetivo; implementa ahora su contraste prospectivo
+de energía geométrica para la decisión, sin promoción científica.

@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: b29ff5f48867cfdd7896e619d4a77f7204ca6cb3
+evidence_commit: a6477eddc88ab600ff855d888f05aef30f14eeb9
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -41,6 +41,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md
   - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -242,6 +244,11 @@ Los perfiles/costo conservan fuentes separadas en el
 El relevo debe ser prospectivo, separando operación geométrica en la decisión
 y loss, no sólo otra cabeza ni tuning sobre tests abiertos. Representación,
 optimización, época seleccionada y loss siguen sin atribución causal.
+Ese relevo ya tiene contrato concreto (`SRC-AA-GEOMETRIC-DECISION-PROTOCOL`)
+y núcleo aritmético auditado (`SRC-AA-GEOMETRIC-DECISION-STATUS`): cuatro rutas
+por dos losses, mismos ocho inputs en los controles no Local y bypass explícito
+con precisión igualada. Pipeline y campaña siguen pendientes; la corrección
+inicial nula hereda una regla de decisión, no demuestra aprendizaje.
 No hay promoción científica ni evidencia física externa añadida.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
@@ -1295,9 +1302,10 @@ El registro completo, con tipo y regla de resolución, está en
 
 ## Orden de lectura de decisiones abiertas
 
-1. Ciclo geométrico: contraste generativo completo con resultado mixto;
-   diagnosticar operación, target y decisión en CPU, sin promover una
-   arquitectura ni convertir tests abiertos en confirmación independiente.
+1. Ciclo geométrico: contraste generativo y diagnóstico operador–objetivo
+   completos; implementar y ejecutar energía geométrica para la decisión desde
+   su contrato y núcleo auditados, sin promover arquitectura ni convertir
+   tests abiertos en confirmación independiente.
 2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
 3. `G6C`: mantener separado como pregunta downstream residual.
 4. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio

@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 28025b07e77e7962c692a1549754f870bc84393a
+evidence_commit: a6477eddc88ab600ff855d888f05aef30f14eeb9
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -60,6 +60,8 @@ source_paths:
   - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -192,8 +194,12 @@ hallazgos materiales abiertos dentro de sus alcances.
 
 El [plan de energía geométrica para la decisión](../../../experiments/atencion_armonica/PLAN_GEOMETRIC_DECISION_ENERGY.md)
 abre el sucesor: separar operación/interfaz y loss, con controles de inyección,
-correspondencia desacoplada, Local y referencia clásica. Su protocolo ejecutable
-y auditoría están pendientes; no hay nueva campaña iniciada.
+correspondencia desacoplada, Local y referencia clásica. El
+[protocolo concreto](../../../experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md)
+y el núcleo aritmético ya fueron auditados. El
+[estado](../../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
+separa esa implementación de la adaptación y pipeline todavía pendientes;
+no hay nueva campaña iniciada ni ventaja experimental demostrada.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

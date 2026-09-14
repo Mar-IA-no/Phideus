@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: b29ff5f48867cfdd7896e619d4a77f7204ca6cb3
+evidence_commit: a6477eddc88ab600ff855d888f05aef30f14eeb9
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -34,6 +34,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -112,8 +114,9 @@ y las auditorías finales cerraron sin hallazgos materiales abiertos. El
 [diagnóstico de operación y objetivo](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
 completó 2048 escenas y replay: mejor orden global según VI no asegura mejor
 elección del mínimo. En familia deformada, Extendida conserva mejor la decisión
-que las cabezas. El relevo debe separar operación geométrica y loss sobre
-muestras nuevas, sin otra adaptación a estos tests ni promoción.
+que las cabezas. El relevo separa operación geométrica y loss sobre muestras
+nuevas: [contrato y núcleo implementado](../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md),
+con campaña pendiente y sin adaptación a esos tests ni promoción.
 
 ## Leyenda
 
@@ -162,7 +165,7 @@ flowchart LR
 | Escalón 2 | P2 y P3 sostienen un null descriptor-guided | Diagnóstico representacional P2 vs P3 | Foco |
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
-| Atención Armónica | Evidencia generativa: 27 entrenamientos y cuatro tests con replay; fases 0–0.6 preservadas | Diagnóstico CPU de operación geométrica, target y decisión | Resultado mixto, sin promoción |
+| Atención Armónica | Evidencia generativa y diagnóstico operador–objetivo completos; fases 0–0.6 preservadas | Energía geométrica: contrato y núcleo auditados, pipeline pendiente | Sin campaña nueva ni promoción |
 | PPU / geometría proporcional | Preflight set-valued histórico cerrado; extensión física incompleta | Corpus y mecanismos como evidencia del ciclo geométrico; no continuar envolvente por inercia | Extensión física pausada |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
