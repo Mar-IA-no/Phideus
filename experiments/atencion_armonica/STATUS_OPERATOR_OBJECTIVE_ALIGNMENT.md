@@ -1,6 +1,9 @@
 # Operación geométrica y objetivo: estado de implementación
 
-2026-09-14. Goal activo e incompleto. El
+2026-09-14. Barrido, replay y auditorías finales técnica y de alineación
+completos. El [resultado](RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+conserva métricas, soportes y límites. Los cortes de implementación siguientes
+son históricos, no bloqueos vigentes. El
 [protocolo](PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md) pasó auditoría
 independiente después de precisar la autoridad de inputs, el orden canónico,
 el canal realmente entregado, las reducciones numéricas y la agregación.
@@ -113,8 +116,20 @@ Operaciones y cierres nuevos están aislados del recovery legacy. La autoridad
 de ejecución reside en la revisión inmutable ligada al código auditado; este
 corte habilita barrido y replay, pero no los presenta como ya completados.
 
+El barrido revisado completó las 2048 escenas y cuatro resúmenes en el intento
+0006 (821.245900 s); el replay 0007 los reprodujo exactamente (351.275624 s).
+La auditoría técnica 0008 autenticó el cierre completo y reextrajo 16 escenas
+seleccionadas de antemano; pasó 496 comprobaciones matemáticas independientes
+de método y la equivalencia entre kernels, dentro del alcance declarado.
+Consumió 154.628551 s. El ledger acumuló 1350.970249 s desde el primer intento,
+sin reiniciar el presupuesto. La raíz y hashes de los cierres se conservan
+en el informe; no se deben relanzar operadores para consultar su estado.
+
 El diagnóstico sigue siendo retrospectivo. No cambia el pool, los targets,
 la época seleccionada ni las redes; tampoco convierte mínimo UB en toda la
 información recibida por la cabeza. La GPU no es necesaria para este hito.
-El perfil no aporta un resultado de alineación del roster, promoción
-arquitectónica ni GO/NO-GO.
+Los perfiles históricos no aportaban por sí solos evidencia científica;
+el roster completo sí permite el diagnóstico descrito, no promoción
+arquitectónica ni GO/NO-GO. La auditoría independiente de interpretación cerró
+sin hallazgos materiales; precisó target matemático float64 frente a targets
+entregados float32 y exigió separar operación/interfaz y loss en el relevo.

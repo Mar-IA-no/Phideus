@@ -2,7 +2,7 @@
 
 > Documento estructural del frente. Resume la pregunta científica, el estado metodológico actual y la secuencia de fases prevista sin confundir incubación local con propagación canónica al troncal.
 
-## Rebase vigente — 2026-09-08
+## Rebase vigente — 2026-09-14
 
 Atención Armónica pasa a ser el banco inicial del
 [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
@@ -43,10 +43,14 @@ El [contraste generativo](../../../experiments/atencion_armonica/RESULTS_GENERAT
 completó 27 entrenamientos y cuatro tests con replay, manteniendo cabeza y
 pérdida comunes. En el primario deformado, el canal alineado mejora ARI frente
 al desacoplado, sin ventaja clara frente a Local; en polifonía pierde frente
-al desacoplado. El [siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-comparará orden geométrico, target de entropías y decisión aprendida, usando
-estados preservados en CPU. La ventaja del sistema clásico Extendida en el
-primario no identifica la mediación responsable ni autoriza tuning post-test.
+al desacoplado. El [diagnóstico completo](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+reutilizó 2048 escenas en CPU y completó su replay. En el primario deformado,
+las cabezas mejoran el orden global según VI frente a Extendida, pero eligen
+peor su mínimo. La diferencia entre oracles VI y ARI es pequeña en este corpus;
+el diagnóstico no identifica representación, optimización o loss como causa.
+El siguiente contraste debe separar operación geométrica y aprendizaje de la
+decisión sobre muestras nuevas, manteniendo controles fuertes y sin tuning
+post-test. La inversión observada dentro de estratos no es causal.
 Los priors del generador sintético permanecen explícitos y no adquieren
 autoridad física.
 El contraste cerrado anterior no demuestra una nueva geometría neuronal aprendida.

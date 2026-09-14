@@ -74,12 +74,17 @@ desacople, sin establecer una ventaja clara sobre Local. En polifonía la
 comparación con Desacoplada se invierte. El operador explícito conserva
 interés como referencia de sistema, pero no se identifica todavía qué se
 pierde al traducirlo a representación y aprendizaje. El
-[siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-interroga esa mediación: relación entre orden geométrico y target, regresión
-de sus componentes, ranking aprendido y cobertura del universo candidato.
-Reutiliza artefactos en CPU, sin nuevos entrenamientos ni expansión
-bibliográfica automática. Su cierre debe justificar un experimento o una
-indeterminación concreta, no prolongar una cadena de lectores adaptados.
+[diagnóstico completo](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+interroga esa mediación sobre 2048 escenas preservadas y su replay. En la
+familia deformada, mejorar el orden global según el target no implica elegir
+mejor su mínimo: la operación clásica conserva mejor esa decisión que las
+cabezas. La distinción es geométrica y funcional, no sólo métrica: una
+representación debe preservar las relaciones necesarias para la operación
+que se le pide, no cualquier semejanza agregada. El resultado tampoco atribuye
+el error a representación, optimización o loss. Justifica un contraste
+prospectivo que separe esas contribuciones y mantenga la referencia clásica
+y los descriptores como adversarios fuertes, no una cadena de lectores
+adaptados a los tests ya abiertos.
 
 ## Dos auditorías y un cierre
 

@@ -65,9 +65,12 @@ mejor las fuentes. El [contraste de evidencia generativa](experiments/atencion_a
 completó 27 entrenamientos y cuatro tests con replay. En familia deformada,
 el canal alineado mejora ARI frente al desacoplado, sin ventaja clara frente
 a Local; en polifonía pierde frente al desacoplado. El
-[siguiente diagnóstico](experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-examinará la correspondencia entre operación geométrica, target y decisión
-aprendida. Los priors sintéticos no se confunden con geometría natural;
+[diagnóstico posterior](experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+completó 2048 escenas y replay: en familia deformada, las cabezas mejoran el
+orden global según el target, pero la regla geométrica clásica elige mejor
+su mínimo. Sigue un contraste prospectivo entre operación y aprendizaje de
+la decisión, sin atribuir todavía la diferencia a una causa. Los priors
+sintéticos no se confunden con geometría natural;
 las fases históricas y alternativas siguen preservadas.
 
 | Frente | Dominio | Funcion | Estado |
@@ -77,7 +80,7 @@ las fases históricas y alternativas siguen preservadas.
 | **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo** — `Exp A` y `Exp B` ya cerraron negativamente; `Exp C` queda como línea abierta |
 | **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — null mecanistico inicial cerrado; `P3` primera pasada completa, sigue `P2 vs P3` |
 | **Voz Expresiva Phideus** | Voz expresiva | Test de transferencia descriptor-guided sobre `SSL` vocal y estabilidad translingüística | **Activo** — cierre `EN ↔ ZH` ya consolidado: positivo acotado a `N-adapt`, null/negativo en `N-strict` |
-| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Evidencia generativa: resultado mixto** — 27 entrenamientos y cuatro tests con replay; siguiente diagnóstico de operación y objetivo, sin promoción |
+| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Operación y objetivo: diagnóstico completo** — mejor orden global no asegura mejor decisión; relevo prospectivo, sin promoción |
 | **Escalon 3** | Audio XY <-> Lissajous | Banco de pruebas sintetico con ground truth determinista para ratios visibles | **Activo** — baseline dual consolidado; primera linea geometrica ya corrida (`P5-cqtshift` mejor brazo OOD actual) |
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 

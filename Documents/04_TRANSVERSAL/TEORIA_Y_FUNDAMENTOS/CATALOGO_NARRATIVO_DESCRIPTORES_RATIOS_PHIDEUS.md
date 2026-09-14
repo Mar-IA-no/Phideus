@@ -52,6 +52,14 @@ ajuste, no un descriptor físico validado ni una operación neuronal nueva.
 Los descriptores convencionales y la compatibilidad local siguen siendo
 controles fuertes, no etapas que deban abandonarse.
 
+El [diagnóstico posterior](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+separa calidad del orden global y calidad de la decisión: en familia deformada,
+la cabeza mejora la primera frente a la regla clásica, pero no la segunda.
+No basta entonces con que las cotas estén presentes como descriptores ni con
+que mejore su correspondencia agregada con el target. Falta contrastar cómo
+la operación y la pérdida conservan la elección, sin dar por demostrada la
+insuficiencia de la interfaz actual ni crear una nueva familia descriptorial.
+
 ## Addendum vivo del corte
 
 Este catalogo cambia de estatuto en este corte. Hasta ahora habia tendido a contar de corrido una sola historia: la de "los descriptores de ratios" de Phideus. Esa continuidad era util para no perder la genealogia, pero dejaba mezcladas tres cosas distintas:

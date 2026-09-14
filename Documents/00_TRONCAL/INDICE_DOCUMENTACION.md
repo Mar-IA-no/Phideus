@@ -262,8 +262,10 @@ sin promoción. El diagnóstico de fuentes rivales ya completó 96 escenas y
 replays: separa ajuste de familia, cobertura e identidad. El contraste
 generativo posterior completó 27 entrenamientos y cuatro tests con replay:
 primario favorable frente a Desacoplada, sin ventaja clara sobre Local;
-polifonía adversa frente a Desacoplada. Sigue el diagnóstico retrospectivo
-de correspondencia entre operación geométrica y objetivo de aprendizaje.
+polifonía adversa frente a Desacoplada. El diagnóstico retrospectivo posterior
+completó 2048 escenas y replay: mejor orden global no asegura mejor elección
+del mínimo. Sigue discriminar operación geométrica y aprendizaje de la decisión
+con un contraste prospectivo, no otra adaptación sobre tests abiertos.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -295,6 +297,7 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Métricas de evidencia generativa** | `experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_METRICS.csv` | 676 filas de métricas, contrastes y referencias con fuente y hash |
 | **Estado de evidencia generativa** | `experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md` | Ejecución, recuperaciones, sellos y cierre del supervisor |
 | **Operación y objetivo** | `experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md` | Diseño finito de diagnóstico CPU de ranking, targets, cobertura y error aprendido |
+| **Resultado de operación y objetivo** | `experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md` | Roster y replay completos; orden global frente a decisión, oracles, regresión, estratos y límites |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |

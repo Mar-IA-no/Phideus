@@ -47,10 +47,12 @@ separadas. El [contraste generativo](../../../experiments/atencion_armonica/RESU
 completó 27 entrenamientos y cuatro tests con replay sobre cabeza y loss
 comunes. En el primario deformado, Generativa mejora ARI frente a Desacoplada,
 sin ventaja clara frente a Local; en polifonía pierde frente a Desacoplada.
-El [siguiente diagnóstico CPU](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-examinará la correspondencia entre operación geométrica, target y decisión
-aprendida, sin entrenar otra cabeza sobre los tests abiertos. No hay
-arquitectura promovida. El
+El [diagnóstico CPU de operación y objetivo](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+completó 2048 escenas y replay: en familia deformada, las cabezas ordenan
+mejor el conjunto según VI, pero Extendida elige mejor su mínimo. No son la
+misma propiedad; tampoco una menor MSE garantiza mejor decisión. El resultado
+orienta un contraste prospectivo de operación geométrica y loss, sin atribuir
+todavía la diferencia a ninguna de ellas. No hay arquitectura promovida. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

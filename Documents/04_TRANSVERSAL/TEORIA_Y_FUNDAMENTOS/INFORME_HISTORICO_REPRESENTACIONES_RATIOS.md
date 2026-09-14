@@ -51,6 +51,14 @@ entre operación, target y decisión, no declarar suficiente o innecesaria la
 geometría. No modifica el catálogo histórico ni aprende una nueva geometría
 del backbone.
 
+El [diagnóstico de operación y objetivo](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+añade una distinción: en el primario deformado, las cabezas preservan mejor
+el orden global de candidatos según VI, pero la regla clásica elige mejor
+el mínimo. Una correspondencia agregada no garantiza conservar la relación
+que gobierna la decisión. Esto orienta el diseño conjunto de operación y
+pérdida sin identificar todavía cuál explica el error ni modificar los
+descriptores históricos.
+
 ## Addendum operativo del corte
 
 Este informe ya no puede cerrarse con la vieja formula "Escalon 1 funciono y ahora habria que generalizar". Ese lenguaje quedo atras.

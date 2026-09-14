@@ -2,6 +2,23 @@
 
 ---
 
+## Operación y objetivo: diagnóstico completo y relevo prospectivo (2026-09-14)
+
+El [diagnóstico](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+completó 2048 escenas, replay exacto y auditorías independientes técnica y de
+alineación. En familia deformada, las cabezas ordenan mejor el conjunto según
+VI normalizada, pero el criterio geométrico clásico elige mejor su mínimo.
+Una menor pérdida de regresión tampoco garantiza mejor decisión. La cobertura,
+los oracles y los estratos delimitan explicaciones sin identificar una causa.
+
+El objetivo local queda respondido y el horizonte geométrico se conserva:
+el siguiente contraste debe separar operación/interfaz explícita y loss de
+decisión sobre muestras nuevas, con descriptores y regla clásica como controles.
+No corresponde encadenar otro post-hoc ni promover una arquitectura. El ledger
+acumuló 1350.970249 segundos CPU; no se usó GPU. La enmienda de ejecución
+conservó el consumo anterior y su límite quedó explícito. Las revisiones de
+costo siguientes son antecedentes históricos del cierre, no bloqueos activos.
+
 ## Operación y objetivo: carga real inventariada (2026-09-14)
 
 El [inventario autenticado](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md)
