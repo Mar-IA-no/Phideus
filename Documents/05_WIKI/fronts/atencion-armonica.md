@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 7ccd87a0d58884620114f9ef8b807980f203563e
+evidence_commit: e2e9233c04814a2f7f061cef0111d12de3ac0564
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -207,6 +207,9 @@ separados de cabeza, fitter y carga. El
 registra ahora la campaña de 72 entrenamientos iniciada en CUDA, con supervisor
 y admisión auditados. El operador de selección común también quedó auditado;
 su perfil y ejecución reales esperan el cierre completo del entrenamiento.
+El ensamblado y almacén observables también están auditados: fits recuperables
+desde factores, entradas compartidas y linaje autenticado original–roundtrip.
+Sus 25 pruebas CPU no sustituyen el freeze ni la evaluación prospectiva.
 Tests, probes y evaluación prospectiva siguen pendientes. No hay ventaja
 experimental demostrada ni promoción arquitectónica.
 

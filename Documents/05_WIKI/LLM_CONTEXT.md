@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 7ccd87a0d58884620114f9ef8b807980f203563e
+evidence_commit: e2e9233c04814a2f7f061cef0111d12de3ac0564
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -257,6 +257,11 @@ amortizada favoreció CUDA para la cabeza y el supervisor auditado ya inició
 la campaña completa de 72 celdas. El operador de selección común, su perfil
 CPU y la reautenticación de checkpoints también están implementados y
 auditados, pero esperan ejecución tras el cierre del entrenamiento.
+El ensamblado observable y su store también cerraron auditoría y 25 pruebas
+CPU: schemas de factores sin supervisión, replay exacto de fits desde factores,
+fuentes originales autenticadas y probes con linaje y coordenadas preservados.
+El freeze/productor futuro conserva la autoridad sobre los draws; estos puertos
+no abren tests ni demuestran generalización.
 Tests nuevos, probes y evaluación prospectiva siguen pendientes. La corrección
 inicial nula hereda una regla de decisión, no demuestra aprendizaje.
 No hay promoción científica ni evidencia física externa añadida.

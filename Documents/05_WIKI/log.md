@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — escenas recuperables y linaje de probes
+
+Con el entrenamiento CUDA aún activo, el ensamblado/store de escenas cerró
+su auditoría: factores con schema cerrado, fits recuperables y vínculo
+original–roundtrip verificado. Las 25 pruebas CPU acreditan el mecanismo,
+no la procedencia de draws ni resultados prospectivos. Fuente:
+`e2e9233c04814a2f7f061cef0111d12de3ac0564`.
+
 ## 2026-09-14 — perfiles CPU/CUDA completos
 
 Los perfiles de cabeza y fitter terminaron, incluida recuperación exacta CUDA,
