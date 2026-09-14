@@ -1,6 +1,6 @@
 # Energía geométrica para la decisión — estado de implementación
 
-2026-09-14. Preparación OPEN y perfiles CPU/CUDA completos; campaña de entrenamiento iniciada en CUDA, todavía sin cierre completo.
+2026-09-14. Preparación OPEN, perfiles, 72 entrenamientos y selección por calibración completos. Tests prospectivos todavía sin abrir.
 
 El [protocolo](PROTOCOL_GEOMETRIC_DECISION_ENERGY.md), auditado antes de la
 campaña, fija cuatro rutas por dos pérdidas: Inyección, Geométrica,
@@ -63,18 +63,41 @@ no elige una semilla o backbone ganador. El
 [perfil CPU específico](../../src/atencion_armonica/geometric_decision_selection_profile.py)
 también quedaron implementados y auditados. Reautentican el cierre integral
 de cada celda, su estado final y los once checkpoints de calibración;
-no aceptan un output parcial como finalización. Su ejecución real sigue
-pendiente del cierre del entrenamiento y del perfil de selección.
+no aceptan un output parcial como finalización. Su ejecución real completó
+la selección sobre las 720 calibraciones elegibles, sin forward ni fitting.
+El perfil CPU específico consumió 4,909168 s y la selección 109,324164 s;
+el ledger acumula 76,504152 s de perfil y 109,324164 s de evaluación/replay.
+La selección conserva una época común por brazo, no una semilla ganadora:
+
+| Ruta | MSE | Decisión |
+|---|---:|---:|
+| Inyección | 45 | 30 |
+| Geométrica | 40 | 45 |
+| Desacoplada | 45 | 40 |
+| Local | 50 | 45 |
+
+La fuente es `data/atencion_armonica/geometric_decision_energy_v1/selection/selection.json`,
+SHA256 `a0e8912bab71ed7b79745d802477962b6fcb472e44eb2cf53ead54c726d35abc`.
+El cierre del operador, `control/attempts/0008/finish.json` bajo la raíz
+experimental, tiene SHA256
+`b1933a5822291892595154a885f325292067214ba095f12c63dd397d7d5d5700`.
+Estas épocas son decisiones de calibración, no evidencia de generalización.
 
 El [supervisor completo](train_geometric_decision.py), auditado junto con la
-admisión y proyección de recursos, ya inició las 72 celdas en CUDA. Reutiliza
+admisión y proyección de recursos, completó las 72 celdas en CUDA. Reutiliza
 una carga por backbone y conserva las celdas completas sin reentrenarlas al
 recuperar. El [plan de ejecución](PLAN_GEOMETRIC_DECISION_CAMPAIGN.md) mantiene
-las 50 épocas, semillas, pérdidas y controles del protocolo. El inicio de la
-campaña no equivale a su cierre ni permite interpretar ventajas entre brazos.
+las 50 épocas, semillas, pérdidas y controles del protocolo. El entrenamiento
+completo consumió 4912,186859 s, dentro de la reserva de 6046 s y del tope
+acumulado de 14400 s. El cierre `training/complete.json` tiene SHA256
+`deb1b7c6b7059255fa08a313f3b45278ddd525077e41d89a3dab3aaa18c8ca81`;
+su recibo `control/attempts/0006/finish.json` tiene SHA256
+`bda2550d6cd90521e59a2f33c3a9f22b7e49197648303f86357a12a21ccd6378`.
+Ambos pertenecen a `data/atencion_armonica/geometric_decision_energy_v1/`.
+Completar entrenamiento y selección no permite interpretar ventajas entre brazos.
 
-Permanecen pendientes el cierre de los 72 entrenamientos, perfil y selección
-calibrada real, freeze prospectivo, tests nuevos, probes, replay y auditorías
+Permanecen pendientes el archivo prospectivo de estados seleccionados,
+freeze prospectivo, tests nuevos, probes, replay y auditorías
 finales. Los tests nuevos no se abrieron; todavía no hay resultados del
 contraste prospectivo que permitan evaluar generalización.
 
@@ -88,6 +111,15 @@ preservan el linaje por evento y las coordenadas del roundtrip. La auditoría
 cerró sus findings dentro de ese alcance. Estos puertos no autorizan draws:
 el freeze y el operador prospectivo deben establecer la procedencia de las
 observaciones y de la normalización. No se ejecutaron todavía con tests nuevos.
+
+El [ensamblador recuperable](../../src/atencion_armonica/geometric_decision_pipeline.py),
+la extensión de exclusiones y el archivo numérico de cabezas pasaron auditoría
+de sus interfaces. Dos defectos de identidad y recuperación se corrigieron
+antes de usarlos: JSON no canónico se rechaza antes del cálculo y los callbacks
+no pueden modificar los metadatos autenticados por aliasing. Las pruebas de
+estas tres interfaces son mecánicas; todavía no se construyó el catálogo real
+de exclusiones ni se exportaron los estados seleccionados. Su uso exige
+admisión explícita del cierre de selección y del futuro freeze.
 
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,
