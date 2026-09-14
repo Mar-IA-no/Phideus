@@ -4,11 +4,11 @@ id: front-atencion-armonica
 kind: front
 page_status: current
 front_status: focus_active
-updated: 2026-09-09
-verified_at: 2026-09-09
-valid_at: 2026-09-09
-recorded_at: 2026-09-09
-evidence_commit: df7b61ea37088690342c4ca1d8a807e50719b1d2
+updated: 2026-09-14
+verified_at: 2026-09-14
+valid_at: 2026-09-14
+recorded_at: 2026-09-14
+evidence_commit: 7dd87df5b9fcbf840e03d1364b86c6738fb7869e
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -156,8 +156,8 @@ por una comparación incorrecta de tuplas en memoria con listas JSON. La enmiend
 explícita de serialización ya fue auditada, con 45 pruebas CPU independientes,
 y la inferencia IID se reanudó desde ese prefijo. IID, mayor inarmonicidad y
 polifonía completaron predicción, evaluación y replay; familia deformada y las
-auditorías finales siguen pendientes. La inferencia del último test está
-pausada de forma recuperable por disponibilidad de GPU, sin ejecución activa.
+auditorías finales siguen pendientes. La inferencia del último test se reanudó
+el 2026-09-14 con GPU habilitada, preservando ajustes y presupuesto acumulado.
 La selección OPEN y
 las pruebas mecánicas no acreditan una ventaja de generalización.
 

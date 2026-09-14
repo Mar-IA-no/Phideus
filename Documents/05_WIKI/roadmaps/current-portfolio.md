@@ -4,11 +4,11 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-09-09
-verified_at: 2026-09-09
-valid_at: 2026-09-09
-recorded_at: 2026-09-09
-evidence_commit: df7b61ea37088690342c4ca1d8a807e50719b1d2
+updated: 2026-09-14
+verified_at: 2026-09-14
+valid_at: 2026-09-14
+recorded_at: 2026-09-14
+evidence_commit: 7dd87df5b9fcbf840e03d1364b86c6738fb7869e
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -153,8 +153,8 @@ comparación incorrecta entre tuplas y listas JSON detuvo la etapa antes de
 ajustes, predicciones o evaluación. La reparación de serialización ya fue
 auditada y la campaña se reanudó sin repetir esos cálculos. IID, mayor
 inarmonicidad y polifonía completaron predicción, evaluación y replay.
-Familia deformada quedó pausada de forma recuperable por disponibilidad de
-GPU, sin ejecución activa. Corresponde completar ese test y las auditorías
+Familia deformada se reanudó el 2026-09-14 con GPU habilitada y conserva
+sus artefactos y presupuesto. Corresponde completar ese test y las auditorías
 finales; los resultados disponibles son parciales y descriptivos.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.

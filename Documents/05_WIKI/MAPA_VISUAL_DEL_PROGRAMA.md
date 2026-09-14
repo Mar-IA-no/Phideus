@@ -4,11 +4,11 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-09
-verified_at: 2026-09-09
-valid_at: 2026-09-09
-recorded_at: 2026-09-09
-evidence_commit: df7b61ea37088690342c4ca1d8a807e50719b1d2
+updated: 2026-09-14
+verified_at: 2026-09-14
+valid_at: 2026-09-14
+recorded_at: 2026-09-14
+evidence_commit: 7dd87df5b9fcbf840e03d1364b86c6738fb7869e
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -104,8 +104,8 @@ completos; la auditoría confirmó época 50 para los tres brazos. La campaña
 de tests se reanudó tras dos reparaciones de integración auditadas. La enmienda
 JSON conserva las 512 escenas IID, sus features, tres forwards y el tiempo
 consumido. IID, mayor inarmonicidad y polifonía completaron evaluación y replay;
-familia deformada está pausada de forma recuperable por disponibilidad de
-GPU. Faltan ese test y las auditorías finales.
+familia deformada se reanudó el 2026-09-14 desde su pausa recuperable con
+GPU habilitada. Faltan ese test y las auditorías finales.
 
 ## Leyenda
 

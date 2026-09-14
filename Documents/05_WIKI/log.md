@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — primario reanudado desde la pausa recuperable
+
+La inferencia de familia deformada se reanudó con disponibilidad de GPU
+verificada y el mismo manifiesto. Conserva ajustes, observaciones y tiempo
+acumulado; los tres tests completos no se repiten. El primario y las auditorías
+finales siguen pendientes.
+Fuente: estado operativo en `7dd87df5b9fcbf840e03d1364b86c6738fb7869e`.
+
 ## 2026-09-09 — primario pausado de forma recuperable
 
 La GPU quedó suspendida y el último worker terminó con pausa recuperable,
