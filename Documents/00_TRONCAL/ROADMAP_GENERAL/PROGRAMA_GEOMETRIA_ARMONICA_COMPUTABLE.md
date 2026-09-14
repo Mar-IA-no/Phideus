@@ -62,11 +62,24 @@ hallazgos materiales abiertos. El [diagnóstico de fuentes rivales](../../../exp
 completó 96 escenas y replays: tradujo una ley conocida en una operación sobre
 log-frecuencias centradas, pero no mostró una geometría neuronal aprendida.
 Mejor ajuste de familia, cobertura de candidatos e identidad de fuente no
-son equivalentes. El siguiente contraste debe mantener cabeza y pérdida
-comunes para aislar el aporte de evidencia generativa; comparar directamente
-su residual con costos neuronales mezclaría objetivos, acceso y complejidad.
+son equivalentes. La comparación directa del residual con costos neuronales
+mezclaría objetivos, acceso y complejidad.
 Los rangos y cardinalidades del sampler son supuestos del banco, no leyes
 de armonía natural. No se deduce insuficiencia de frecuencias de estos errores.
+
+El [contraste generativo](../../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+mantuvo cabeza y pérdida comunes en 27 entrenamientos y cuatro tests con
+replay. En el primario deformado, alinear el canal mejora ARI frente al
+desacople, sin establecer una ventaja clara sobre Local. En polifonía la
+comparación con Desacoplada se invierte. El operador explícito conserva
+interés como referencia de sistema, pero no se identifica todavía qué se
+pierde al traducirlo a representación y aprendizaje. El
+[siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+interroga esa mediación: relación entre orden geométrico y target, regresión
+de sus componentes, ranking aprendido y cobertura del universo candidato.
+Reutiliza artefactos en CPU, sin nuevos entrenamientos ni expansión
+bibliográfica automática. Su cierre debe justificar un experimento o una
+indeterminación concreta, no prolongar una cadena de lectores adaptados.
 
 ## Dos auditorías y un cierre
 

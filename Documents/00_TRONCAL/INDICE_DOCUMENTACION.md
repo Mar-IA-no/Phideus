@@ -259,8 +259,11 @@ El lector aprendido posterior completó sus 36 trainings y los cuatro tests
 con replay exacto. Las auditorías de evidencia y alineación cerraron sin
 hallazgos materiales abiertos: primario mixto y familia deformada adversa,
 sin promoción. El diagnóstico de fuentes rivales ya completó 96 escenas y
-replays: separa ajuste de familia, cobertura e identidad. La continuidad
-debe aislar la evidencia generativa bajo cabeza y pérdida comunes.
+replays: separa ajuste de familia, cobertura e identidad. El contraste
+generativo posterior completó 27 entrenamientos y cuatro tests con replay:
+primario favorable frente a Desacoplada, sin ventaja clara sobre Local;
+polifonía adversa frente a Desacoplada. Sigue el diagnóstico retrospectivo
+de correspondencia entre operación geométrica y objetivo de aprendizaje.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -287,7 +290,11 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Resultado de fuentes rivales** | `experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md` | 96 escenas y replays; ajuste, cobertura, rivales y asociaciones por escenario |
 | **Fuentes rivales por escena** | `experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS_SCENES.csv` | 192 filas de evaluación, con estados sin salida y métricas previas |
 | **Evidencia generativa aprendida** | `experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md` | Diseño inicial de ablación con cabeza/loss comunes, desarrollado por un protocolo separado |
-| **Protocolo de evidencia generativa** | `experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md` | Canal conjunto, sham estratificado, cabeza común y 27 celdas; implementación parcial, preflight y campaña pendientes |
+| **Protocolo de evidencia generativa** | `experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md` | Canal conjunto, sham estratificado, cabeza común y 27 celdas; campaña ejecutada con enmienda JSON explícita |
+| **Resultado de evidencia generativa** | `experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md` | Cuatro tests, intervalos, soporte, intervenciones y límites del resultado mixto |
+| **Métricas de evidencia generativa** | `experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_METRICS.csv` | 676 filas de métricas, contrastes y referencias con fuente y hash |
+| **Estado de evidencia generativa** | `experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md` | Ejecución, recuperaciones, sellos y cierre del supervisor |
+| **Operación y objetivo** | `experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md` | Diseño finito de diagnóstico CPU de ranking, targets, cobertura y error aprendido |
 | **Perfil GPU de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_GPU_PROFILE.md` | Recursos medidos sobre fixtures máximos; proyección acotada, no resultado de aprendizaje |
 | **Preflight de compatibilidad** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_PREFLIGHT.md` | Corte mecánico previo al entrenamiento: descriptor no constante y gradientes CPU; campaña posterior documentada aparte |
 | **Diagnóstico de amplitudes** | `experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md` | Canal global accesible en la muestra histórica; no atribución de uso a las redes |

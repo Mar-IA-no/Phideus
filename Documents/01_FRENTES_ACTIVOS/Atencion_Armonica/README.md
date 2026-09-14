@@ -2,7 +2,7 @@
 
 > Frente nuevo en incubación local que prueba si una representación explícita de pares con actualización triangular puede capturar estructura armónica global de una mezcla polifónica mejor que un backbone token-only con features armónicas inyectadas.
 
-## Ciclo vigente — geometría, arquitectura y pérdida (2026-09-08)
+## Ciclo vigente — geometría, arquitectura y pérdida (2026-09-14)
 
 El frente es el banco inicial del
 [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
@@ -43,10 +43,14 @@ completó 96 escenas y replays. En deformación, ampliar la familia reduce el
 residual mediano de 10.376 a 1.454 cents, pero las particiones exactas sólo
 pasan de 18 a 19 entre las 23 escenas con salida; una de las 24 no tiene
 candidatos admisibles. Cobertura, ajuste e identidad exigen evaluaciones
-separadas. El [protocolo del siguiente contraste](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
-fija evidencia generativa alineada, ausente o desacoplada sobre una cabeza y
-loss comunes. El núcleo está implementado; integración, preflight de recursos
-y campaña siguen pendientes. No hay arquitectura promovida. El
+separadas. El [contraste generativo](../../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+completó 27 entrenamientos y cuatro tests con replay sobre cabeza y loss
+comunes. En el primario deformado, Generativa mejora ARI frente a Desacoplada,
+sin ventaja clara frente a Local; en polifonía pierde frente a Desacoplada.
+El [siguiente diagnóstico CPU](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+examinará la correspondencia entre operación geométrica, target y decisión
+aprendida, sin entrenar otra cabeza sobre los tests abiertos. No hay
+arquitectura promovida. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

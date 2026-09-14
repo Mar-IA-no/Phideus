@@ -7,8 +7,10 @@ incorrecta entre estructuras en memoria y su representación JSON. La correcció
 explícita ya fue auditada y la campaña se reanudó desde los artefactos
 conservados. IID, mayor inarmonicidad y polifonía completaron predicción,
 evaluación y replay. Familia deformada, el escenario primario, se reanudó
-desde su pausa recuperable con GPU disponible verificada. La inferencia está
-activa; faltan ese test y las auditorías finales de evidencia y alineación.
+desde su pausa recuperable y también completó las tres etapas. El supervisor
+terminó con salida 0; las auditorías finales de evidencia y alineación cerraron
+sin hallazgos materiales abiertos. El [informe comparativo](RESULTS_GENERATIVE_EVIDENCE_READER.md)
+conserva los cuatro escenarios y sus límites, sin promoción arquitectónica.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -97,15 +99,27 @@ Mayor inarmonicidad también cerró las tres etapas con salida 0 y conservó el
 índice de evaluación `6e4ab2ed02baeeb7efc249686b0e2bafa35c836cb9b9ecec458a51d52473cd21`.
 Polifonía cerró igualmente las tres etapas y verificó por replay el índice
 `f313459e8de3c3dfbc2588638055cbf110cede4f944d2573563ddab147199fcb`.
-Los resultados de estos tres escenarios son descriptivos y parciales; el
-primario de familia deformada sigue pendiente. La campaña conserva el
-presupuesto acumulado. La inferencia del último test cerró con estado
+Los resultados de esos tres escenarios son descriptivos. La campaña conserva
+el presupuesto acumulado. La inferencia del último test había cerrado con estado
 `PAUSED_RECOVERABLE` y salida 75, conservando los datos y ajustes ya guardados.
 El supervisor también terminó durante la suspensión. El 2026-09-14 se reanudó
 con GPU habilitada y libre verificada, desde el mismo manifiesto y sin cambiar
 el protocolo. El intento de reanudación parte de 5203.610 segundos acumulados
 y conserva 23 ajustes y 22 registros observables del último test, además de
 sus 512 escenas, features y tres forwards ya guardados. No se repiten los
-tres tests completos. El cierre y las auditorías finales siguen pendientes.
+tres tests completos. La reanudación completó predicción, evaluación y replay
+con salida 0. El sello del primario tiene SHA256
+`f7eb8fd8c025e3dff6153c78d22ed9d0396ffa4b3cd839f58a0b14f1d8ca1d81`;
+la evaluación y su replay conservaron el índice
+`0d1091c78ed9fdd6abe6625964c16b7854389b548408754502c611be7facc12e`.
+El cierre `fresh/test_completion.json`, SHA256
+`160473a7c88ab9e9a296a9e37a3145546a6ccc7019dbec473394ccd966cae3f9`,
+autentica trece etapas y 7101.919 segundos acumulados de las cuatro horas
+disponibles. La GPU quedó liberada; no queda un supervisor experimental activo.
+El exportador produjo las 676 filas de métricas y el JSON de síntesis sin
+recalcular estadísticas. Las auditorías finales están completas: la técnica
+recalculó las métricas desde crudos autenticados y la de alineación revisó el
+balance geométrico, los límites y el siguiente diseño. No se repitieron fits,
+entrenamientos ni forwards durante esa verificación.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
 igualada. No hay promoción arquitectónica ni una conclusión nueva sobre HIT.

@@ -1,7 +1,7 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-09-08
+**Fecha**: 2026-09-14
 **Version**: 2.5
 
 ---
@@ -42,8 +42,14 @@ completó 96 escenas y replays: mejor ajuste a la ley no equivale a mejor
 identidad de fuente, y una partición ausente del universo candidato no puede
 ser recuperada por su lector. La operación geométrica es explícita, no una
 nueva geometría neuronal aprendida; los rangos y cardinalidades del sampler
-son priors del experimento, no invariantes físicos. La continuidad debe
-aislar su aporte al aprendizaje manteniendo cabeza y pérdida comparables.
+son priors del experimento, no invariantes físicos. El
+[contraste generativo posterior](../../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+mantuvo cabeza y pérdida comunes: el canal alineado mejora ARI frente al
+desacople en el primario deformado, sin ventaja clara frente a Local; bajo
+polifonía pierde frente al desacople. Esto justifica examinar la correspondencia
+entre operación, target y decisión, no declarar suficiente o innecesaria la
+geometría. No modifica el catálogo histórico ni aprende una nueva geometría
+del backbone.
 
 ## Addendum operativo del corte
 

@@ -2,6 +2,33 @@
 
 ---
 
+## Evidencia generativa: contraste completo y relevo geométrico (2026-09-14)
+
+El [contraste generativo](../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+completó 27 entrenamientos y cuatro tests con replay. La reanudación del
+primario preservó escenas, ajustes y presupuesto, sin repetir los tres tests
+ya cerrados. El supervisor terminó con salida 0 y 7101.919 segundos
+acumulados, incluyendo fallos y pausa recuperable. La enmienda JSON posterior
+al primer draw sigue explícita en el estado operativo.
+
+En familia deformada, Generativa mejora ARI frente a Desacoplada, sin ventaja
+clara frente a Local bajo los intervalos predeclarados. En polifonía pierde
+frente a Desacoplada. Las referencias clásicas conservan interés, pero su
+comparación con las cabezas es de sistema: no localiza causalmente qué
+traducción de la geometría falla. La auditoría técnica recalculó desde crudos
+los lectores, referencias, soporte y oracles; la lectura final de alineación
+cerró tres inconsistencias de estado documental. Ambas auditorías terminaron
+sin hallazgos materiales abiertos dentro de su alcance. No hay promoción
+arquitectónica ni validación física de HIT.
+
+El [siguiente diseño](../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+plantea un diagnóstico CPU del orden geométrico frente al target, de la
+regresión de entropías y del ranking aprendido, separando además la falta de
+candidatos. Reutilizará estados preservados, sin otro entrenamiento adaptado
+a los tests abiertos. La pregunta vuelve a la correspondencia entre fenómeno,
+operación y pérdida, y debe producir un experimento discriminante o una
+indeterminación concreta antes de escalar.
+
 ## Spark como apoyo verificable del proyecto (2026-09-10)
 
 `mensaje recursivo 024 integrado`; `mensaje recursivo 025 integrado`;

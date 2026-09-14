@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-09-08
+Fecha de actualizacion: 2026-09-14
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -43,8 +43,12 @@ no agrega una nueva familia descriptorial ni convierte el costo en ley física.
 El [diagnóstico de fuentes rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
 completó 96 escenas y replays. El ajuste generativo queda como operación
 experimental que separa cobertura, residual e identidad, no como descriptor
-físico validado. Para estudiar su incorporación al aprendizaje hay que
-mantener cabeza y pérdida comunes y controlar el desacople de esa evidencia.
+físico validado. El [contraste generativo](../../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+ya mantuvo cabeza y pérdida comunes y controló el desacople: la alineación
+del canal ayuda frente a ese control en el primario deformado, sin ventaja
+clara de ARI frente a Local, y perjudica en polifonía frente a Desacoplada.
+Las seis cotas suministradas siguen siendo una interfaz de evidencia del
+ajuste, no un descriptor físico validado ni una operación neuronal nueva.
 Los descriptores convencionales y la compatibilidad local siguen siendo
 controles fuertes, no etapas que deban abandonarse.
 
