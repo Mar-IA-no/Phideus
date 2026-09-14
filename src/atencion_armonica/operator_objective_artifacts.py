@@ -6,6 +6,8 @@ artifact is changed; no orphaned output tree is adopted or repaired.
 from __future__ import annotations
 
 import base64
+from contextlib import contextmanager
+import ctypes
 import gzip
 import hashlib
 from io import BytesIO
@@ -108,6 +110,38 @@ def atomic_bytes(path, raw):
     return {"bytes": len(raw), "sha256": hashlib.sha256(raw).hexdigest()}
 
 
+def _commit_directory(staging, target):
+    """Linux atomic directory publication, refusing even an empty old target."""
+    rename = ctypes.CDLL(None, use_errno=True).renameat2
+    rename.argtypes = (ctypes.c_int, ctypes.c_char_p, ctypes.c_int, ctypes.c_char_p, ctypes.c_uint)
+    rename.restype = ctypes.c_int
+    if rename(-100, os.fsencode(staging), -100, os.fsencode(target), 1) != 0:
+        error = ctypes.get_errno()
+        raise OSError(error, os.strerror(error), str(target))
+    fd = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
+class StagedPublication:
+    """Private transaction members whose references name the final directory."""
+    def __init__(self, root, prefix):
+        self.root, self.prefix = root, prefix
+
+    def publish(self, relative, raw):
+        parts = AuthenticatedReader.parts(relative)
+        path = self.root.joinpath(*parts)
+        if any(p.is_symlink() for p in [path, *path.parents]):
+            raise ValueError("staged publication cannot traverse symlinks")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        return {"path": self.prefix+"/"+relative, **atomic_bytes(path, raw)}
+
+    def publish_json(self, relative, value):
+        return self.publish(relative, encoded(value))
+
+
 class DiagnosticStore:
     def __init__(self, root, *, project_root):
         project = Path(project_root)
@@ -129,8 +163,15 @@ class DiagnosticStore:
             raise ValueError("initial manifest must be PREPARED")
         if self.root.exists():
             raise FileExistsError("explicit initialize never adopts an existing output root")
-        self.root.mkdir(parents=True)
-        self.publish_json("manifest.json", manifest, initializing=True)
+        staging_base = self.project/".agent-work/phideus-operator-objective-20260914"
+        if any(p.is_symlink() for p in [staging_base, *staging_base.parents]):
+            raise ValueError("bootstrap staging cannot traverse symlinks")
+        staging_base.mkdir(parents=True, exist_ok=True)
+        staging = staging_base/("bootstrap-"+uuid.uuid4().hex+".partial")
+        staging.mkdir()
+        atomic_bytes(staging/"manifest.json", encoded(manifest))
+        self.root.parent.mkdir(parents=True, exist_ok=True)
+        _commit_directory(staging, self.root)
 
     def manifest(self):
         path = self.root/"manifest.json"
@@ -160,6 +201,28 @@ class DiagnosticStore:
 
     def publish_json(self, relative, value, *, initializing=False):
         return self.publish(relative, encoded(value), initializing=initializing)
+
+    @contextmanager
+    def transaction(self, relative):
+        """Publish a whole directory or preserve an uncommitted private stage.
+
+        A pause after commit sees every member; a pause before commit exposes
+        no completed unit. A later attempt never adopts the old private stage.
+        """
+        self.manifest()
+        target = self.path(relative)
+        if target.exists():
+            raise FileExistsError("transaction cannot adopt an existing directory")
+        target.parent.mkdir(parents=True, exist_ok=True)
+        staging = target.with_name(f".{target.name}.{uuid.uuid4().hex}.partial")
+        staging.mkdir()
+        yield StagedPublication(staging, relative)
+        fd = os.open(staging, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(fd)
+        finally:
+            os.close(fd)
+        _commit_directory(staging, target)
 
     def read(self, ref):
         return AuthenticatedReader(self.root).bytes(ref)

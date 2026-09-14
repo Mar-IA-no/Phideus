@@ -54,26 +54,37 @@ ARI contra la referencia local. No revisó ni ejecutó el inventario completo,
 la extracción real, el perfil ni los componentes operativos añadidos después.
 
 También existen [bundles/publicación](../../src/atencion_armonica/operator_objective_artifacts.py)
-y [presupuesto acumulado](../../src/atencion_armonica/operator_objective_budget.py),
-con 11 pruebas propias pasadas. La suite conjunta tiene 66 pruebas pasadas.
-Estos dos módulos todavía requieren auditoría e integración en un ejecutor:
-lock de proceso, etapas, pausas, prefijos y replay completo no están cerrados.
+y [presupuesto acumulado](../../src/atencion_armonica/operator_objective_budget.py).
+El [ejecutor](../../src/atencion_armonica/operator_objective_runner.py) incorpora
+lock de proceso, revisión ligada a código y runtime, etapas separadas,
+pausas, prefijos autenticados y replay exacto desde los compactos. Sus
+[pruebas](test_operator_objective_runner.py) pasan; la suite completa
+alcanza 83 pruebas CPU pasadas. El ciclo se probó con fixtures, incluidas
+interrupción, corrupción y negativa a adoptar archivos huérfanos.
 La proyección conserva la reserva de auditoría y el margen ×2; fallos e
 intentos sin cierre no reciben devolución silenciosa de tiempo.
 
-Falta completar ese ejecutor y auditar su frontera operativa. Después deben
-ejecutarse inventario de 2048 recibos, cuatro perfiles fijados, recibo de
-presupuesto, barrido y replay, seguidos de auditorías de evidencia y alineación.
-No se ejecutó ninguna de esas etapas ni se atribuye al PASS parcial autoridad
-para saltarlas.
+La auditoría operativa detectó cuatro defectos de publicación y estados.
+La corrección publica cada unidad mediante una transacción de directorio,
+terminaliza los fallos de recursos del arranque y liga cada cierre global
+al hash de un intento exitoso, después del último control. Las pruebas
+reproducen las interrupciones antes y después de publicar. Un candidato de
+cierre guardado y sellado por un intento exitoso permite terminar esa
+publicación tras una caída, sin recalcular el roster ni abrir otro presupuesto.
+Los candidatos de intentos pausados o fallidos no reciben autoridad. La
+reauditoría independiente cerró esas correcciones sin defectos materiales
+abiertos en el ejecutor revisado.
 
-El rebase de recibos observa unos 893 MB comprimidos y 9.28 GB decodificados
-de factores; no es una medición de costo ni una validación de sus blobs.
-El protocolo fija un operador CPU, un hilo, 6 GiB RSS y 30 minutos acumulados
-de operadores, con reserva de auditoría y guardas de almacenamiento. No se
-iniciará el roster si el perfil no justifica ese presupuesto.
+El [inventario y perfil reales](RESULTS_OPERATOR_OBJECTIVE_PROFILE.md) ya
+pasaron: 2048 recibos autenticados y las cuatro escenas 0 extraídas y cotejadas,
+con 13.815751 s acumulados. La proyección conservadora da 10943.721359 s,
+superior al límite de 1800 s. El barrido no se inició. Sigue una revisión
+acotada de costo sobre los compactos preservados, sin repetir fits, reducir
+el roster ni ampliar tiempo en silencio. Después siguen barrido y replay
+cuando el costo lo permita, y las auditorías de evidencia y alineación.
 
 El diagnóstico sigue siendo retrospectivo. No cambia el pool, los targets,
 la época seleccionada ni las redes; tampoco convierte mínimo UB en toda la
 información recibida por la cabeza. La GPU no es necesaria para este hito.
-No hay resultado nuevo de alineación, promoción arquitectónica ni GO/NO-GO.
+El perfil no aporta un resultado de alineación del roster, promoción
+arquitectónica ni GO/NO-GO.

@@ -123,7 +123,14 @@ class AttemptBudget:
                              "charged_before": self.charged_before, "allocated_seconds": available}
         self.closed = False
         store.publish_json(self.relative+"/start.json", self.start_record)
-        self.check()
+        try:
+            self.check()
+        except BudgetExceeded:
+            self.finish("BUDGET_EXHAUSTED")
+            raise
+        except Exception:
+            self.finish("FAILED")
+            raise
 
     @staticmethod
     def _local_json(path):
@@ -155,7 +162,7 @@ class AttemptBudget:
         if sum(_own_bytes(root) for root in roots if root.exists())+additional_bytes > self.limits["new_bytes"]:
             raise BudgetExceeded("diagnostic new-output envelope exceeded")
 
-    def finish(self, status):
+    def finish(self, status, *, completion=None):
         if self.closed or status not in ("COMPLETE", "FAILED", "PAUSED", "BUDGET_EXHAUSTED"):
             raise ValueError("invalid or duplicate attempt terminal state")
         elapsed = self.clock()-self.started
@@ -163,6 +170,10 @@ class AttemptBudget:
                   "seconds": max(elapsed, 0.),
                   "observed_seconds": elapsed, "charged_total": self.charged_before+max(elapsed, 0.),
                   "rss_peak_bytes": resource.getrusage(resource.RUSAGE_SELF).ru_maxrss*1024}
+        if completion is not None:
+            if status != "COMPLETE":
+                raise ValueError("only a successful attempt can seal a completion")
+            record["completion"] = completion
         self.store.publish_json(self.relative+"/finish.json", record)
         self.closed = True
         return record

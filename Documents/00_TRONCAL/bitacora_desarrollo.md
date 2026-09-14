@@ -2,6 +2,17 @@
 
 ---
 
+## Operación y objetivo: ejecutor auditado y perfil fuera de presupuesto (2026-09-14)
+
+El [ejecutor](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+pasó reauditoría después de corregir publicación transaccional y estados de
+cierre. La suite completa pasa 83 pruebas CPU. El inventario autenticó los
+2048 recibos y el perfil extrajo las cuatro escenas fijadas, consumiendo
+13.815751 segundos acumulados. La [proyección de costo](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md)
+supera el límite de 30 minutos: el barrido no se inició. Sigue una revisión
+del cálculo y la serialización sobre compactos ya guardados; no se modifican
+las redes, no se recorta el roster ni se declara completado el diagnóstico.
+
 ## Operación y objetivo: conexión al corpus auditada (2026-09-14)
 
 El [adaptador](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)

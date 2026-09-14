@@ -2,6 +2,7 @@
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import numpy as np
 
@@ -85,6 +86,36 @@ class StoreBudgetTests(unittest.TestCase):
         fourth = self.attempt()
         self.assertEqual(fourth.allocation, 9.)
         fourth.finish("COMPLETE")
+
+    def test_initial_resource_failure_has_terminal_exhausted_receipt(self):
+        with patch.object(budget.AttemptBudget, "check", side_effect=budget.BudgetExceeded("fixture guard")):
+            with self.assertRaises(budget.BudgetExceeded):
+                self.attempt()
+        end = self.store.json({"path": "attempts/0000/finish.json",
+                              "sha256": artifacts.hashlib.sha256((self.root/"attempts/0000/finish.json").read_bytes()).hexdigest()})
+        self.assertEqual(end["status"], "BUDGET_EXHAUSTED")
+        self.assertEqual(end["seconds"], 0.)
+        with self.assertRaisesRegex(budget.BudgetExceeded, "terminal exhausted"):
+            self.attempt()
+
+    def test_bootstrap_interruption_preserves_private_stage_not_half_initialized_root(self):
+        root = self.project/".agent-work/phideus-operator-objective-20260914/other-root"
+        store = artifacts.DiagnosticStore(root, project_root=self.project)
+        with patch.object(artifacts, "_commit_directory", side_effect=InterruptedError("fixture")):
+            with self.assertRaises(InterruptedError):
+                store.initialize({"status": "PREPARED"})
+        self.assertFalse(root.exists())
+        store.initialize({"status": "PREPARED"})
+        self.assertEqual(store.manifest()[0]["status"], "PREPARED")
+
+    def test_transaction_never_replaces_even_empty_destination(self):
+        with self.assertRaises(FileExistsError):
+            with self.store.transaction("unit") as publication:
+                publication.publish_json("data.json", {"value": 1})
+                # Simulated other owner's late directory creation.
+                (self.root/"unit").mkdir()
+        self.assertEqual(list((self.root/"unit").iterdir()), [])
+        self.assertTrue(list(self.root.glob(".unit.*.partial")))
 
     def test_unclean_attempt_consumes_entire_reservation(self):
         first = self.attempt("profile")
