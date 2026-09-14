@@ -2,6 +2,17 @@
 
 ---
 
+## Operación y objetivo: cache equivalente, revisión de costo abierta (2026-09-14)
+
+El [cache del diagnóstico](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md)
+reutiliza resultados intermedios idénticos y reprodujo los cuatro bundles
+preservados sin cambiar sus bytes. Diseño, implementación y medición pasaron
+auditoría independiente; la suite conjunta pasa 92 pruebas CPU. El nuevo
+perfil acumula 15.821776 segundos entre todos los intentos, pero su
+proyección conserva un costo superior al límite. Sigue revisar serialización
+y trabajo restante antes del barrido. No hubo nueva extracción, entrenamiento
+o GPU, y esta mejora operativa no constituye evidencia de alineación geométrica.
+
 ## Operación y objetivo: ejecutor auditado y perfil fuera de presupuesto (2026-09-14)
 
 El [ejecutor](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)

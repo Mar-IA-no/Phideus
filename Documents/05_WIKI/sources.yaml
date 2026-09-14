@@ -382,6 +382,14 @@ sources:
     mutable: false
     fronts: [AA, PPU]
 
+  - id: SRC-AA-OPERATOR-OBJECTIVE-CACHE-PROFILE
+    title: Perfil del diagnóstico cacheado con equivalencia exacta
+    path: experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
+    authority: authenticated_operational_profile
+    evidence_regime: four_fixed_compacts_byte_equal_forecast_exceeds_budget_no_full_roster
+    mutable: false
+    fronts: [AA, PPU]
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md

@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-14 — cache equivalente y perfil separado
+
+La revisión cacheada preservó los cuatro bundles; la suite conjunta pasa
+92 pruebas CPU. El perfil sigue fuera de presupuesto y no habilita barrido
+ni cierre científico. Continúa la revisión de costo sin modificar v1.
+Fuente: `2766187ca3801aa69dd92abe52a183dced0b800d`.
+
 ## 2026-09-14 — ejecutor auditado y perfil de costo
 
 Se incorpora el perfil fijo: 83 pruebas CPU, inventario2048 y cuatro escenas
