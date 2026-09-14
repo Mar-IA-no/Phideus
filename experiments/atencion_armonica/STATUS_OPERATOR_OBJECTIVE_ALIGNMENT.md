@@ -83,6 +83,14 @@ acotada de costo sobre los compactos preservados, sin repetir fits, reducir
 el roster ni ampliar tiempo en silencio. Después siguen barrido y replay
 cuando el costo lo permita, y las auditorías de evidencia y alineación.
 
+La [primera revisión cacheada](RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md)
+ya fue implementada, auditada y medida sobre esos cuatro compactos: conserva
+todos sus bytes y lleva la suite conjunta a 92 pruebas CPU pasadas. Acumula
+15.821776 s entre inventario y perfiles, sin reiniciar presupuesto. La
+proyección baja a 8023.686073 s pero sigue excediendo 1800 s; no habilita
+barrido. Sigue revisar serialización y costo restante, con una revisión de
+runtime explícita antes de producción. La versión congelada permanece intacta.
+
 El diagnóstico sigue siendo retrospectivo. No cambia el pool, los targets,
 la época seleccionada ni las redes; tampoco convierte mínimo UB en toda la
 información recibida por la cabeza. La GPU no es necesaria para este hito.
