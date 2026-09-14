@@ -97,6 +97,13 @@ Acumula 16.400343 s; la proyección sigue fuera del límite. La acción siguient
 es revisar carga real, costos fijos y preparación reutilizable mediante una
 enmienda operativa auditada, no continuar optimizando sin revisar la admisión.
 
+El [inventario de carga observado](RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md)
+ya cubre las 2048 escenas: 113167 candidatos, máximo 70 por escena y 3403295
+pares. Acumula 23.820175 s, sin extraer factores ni ejecutar el diagnóstico.
+Permite formular una enmienda de costo con carga real; no habilita por sí
+solo el barrido. El siguiente corte debe resolver la ejecución completa,
+incluidas validación y replay, conservando el tiempo ya consumido.
+
 El diagnóstico sigue siendo retrospectivo. No cambia el pool, los targets,
 la época seleccionada ni las redes; tampoco convierte mínimo UB en toda la
 información recibida por la cabeza. La GPU no es necesaria para este hito.
