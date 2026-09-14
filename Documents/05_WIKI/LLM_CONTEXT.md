@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: bea5f7de479f572f981ea955e747494461ff1a78
+evidence_commit: 5240536353eb4bf3876e21f4a55217cf0ecc06cb
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -33,6 +33,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_METRICS.csv
   - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -214,6 +216,11 @@ El [siguiente diseño](../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTI
 orden geométrico frente a target, regresión de entropías, ranking aprendido
 y cobertura. La ventaja de Extendida como sistema no localiza una causa;
 el diagnóstico es retrospectivo y no autoriza adaptar heads a estos tests.
+Su protocolo ejecutable ya pasó auditoría independiente
+(`SRC-AA-OPERATOR-OBJECTIVE-PROTOCOL`). El núcleo tiene 18 pruebas CPU pasadas,
+pero faltan adaptador, ejecutor, auditoría de implementación, perfil, barrido
+y replay (`SRC-AA-OPERATOR-OBJECTIVE-STATUS`). No hay resultados nuevos del
+roster ni cierre de este goal.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde

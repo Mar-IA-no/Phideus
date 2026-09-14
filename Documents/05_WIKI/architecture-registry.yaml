@@ -10,7 +10,7 @@ architectures:
   - id: harmonic-generative-evidence-reader
     name: Lector con evidencia generativa
     status: candidate
-    priority: four_tests_replayed_independent_audits_complete_operator_objective_diagnostic_next
+    priority: operator_objective_protocol_audited_core_tested_diagnostic_roster_pending
     primitive: common invariant partition head with aligned versus absent or decoupled generative evidence
     learned_components: [partition head with common split and merge entropy regression loss]
     frozen_components: [three historical pair networks, observable candidate algorithm, explicit generative fitter]
@@ -24,6 +24,8 @@ architectures:
       - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
       - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
       - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
+      - experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md
+      - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
       - src/atencion_armonica/generative_evidence_model.py
     interpretation: incremental evidence intervention at common head and loss; not novel neural geometry or promoted architecture
   - id: harmonic-explicit-generative-reader

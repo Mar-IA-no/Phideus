@@ -1,7 +1,7 @@
 # Índice de la wiki de Phideus
 
 > Actualizado: 2026-09-14
-> Corte base de evidencia: `bea5f7de479f572f981ea955e747494461ff1a78`
+> Corte base de evidencia: `5240536353eb4bf3876e21f4a55217cf0ecc06cb`
 
 ## Entradas
 
@@ -58,6 +58,6 @@
 - Validación: `python scripts/lint_phideus_wiki.py`
 
 La recuperación canónica usa enlaces, front matter, `catalog.json` y el
-registro arquitectónico. Con `18` páginas y `77` fuentes, una capa de embeddings duplicaría
+registro arquitectónico. Con `18` páginas y `79` fuentes, una capa de embeddings duplicaría
 estado sin resolver una falla observada de retrieval; se difiere hasta que una
 evaluación de recuperación demuestre que el índice estructurado no alcanza.

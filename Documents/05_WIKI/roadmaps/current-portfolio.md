@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: bea5f7de479f572f981ea955e747494461ff1a78
+evidence_commit: 5240536353eb4bf3876e21f4a55217cf0ecc06cb
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -32,6 +32,7 @@ source_paths:
   - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -164,6 +165,10 @@ El [siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OPERATOR
 separa orden geométrico, target, regresión de componentes, decisión y cobertura
 sobre artefactos preservados en CPU. No es otro entrenamiento ni una atribución
 causal de la brecha con Extendida, que sigue siendo referencia de sistema.
+El [estado actual](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+es protocolo auditado y núcleo con 18 pruebas CPU pasadas. Sigue el adaptador
+y ejecutor, después auditoría de implementación y perfil antes del barrido;
+no se ha ejecutado todavía el roster diagnóstico.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de

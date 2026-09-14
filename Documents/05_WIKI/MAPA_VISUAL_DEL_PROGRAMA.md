@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: bea5f7de479f572f981ea955e747494461ff1a78
+evidence_commit: 5240536353eb4bf3876e21f4a55217cf0ecc06cb
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -28,6 +28,7 @@ source_paths:
   - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -106,6 +107,8 @@ y las auditorías finales cerraron sin hallazgos materiales abiertos. El
 [siguiente diagnóstico](../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
 examinará operación geométrica, target y decisión aprendida sobre artefactos
 en CPU, sin otro entrenamiento adaptado a estos tests ni promoción.
+Su [implementación](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+comenzó con protocolo auditado y núcleo probado; el barrido sigue pendiente.
 
 ## Leyenda
 

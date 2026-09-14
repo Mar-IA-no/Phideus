@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — protocolo operador–objetivo auditado y núcleo probado
+
+Se incorporan protocolo y estado de implementación, con 18 pruebas CPU del
+núcleo pasadas. Las cuatro superficies principales distinguen ese avance del
+barrido aún pendiente; no cambia la interpretación de los resultados previos
+ni se declara cerrado el diagnóstico. Fuente: contenido en
+`5240536353eb4bf3876e21f4a55217cf0ecc06cb`.
+
 ## 2026-09-14 — contraste generativo cerrado y relevo operador–objetivo
 
 Los 27 entrenamientos, cuatro tests y replays terminaron; las auditorías

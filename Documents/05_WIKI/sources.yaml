@@ -358,6 +358,22 @@ sources:
     mutable: true
     fronts: [AA, PPU]
 
+  - id: SRC-AA-OPERATOR-OBJECTIVE-PROTOCOL
+    title: Protocolo de operación geométrica, objetivo y decisión
+    path: experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md
+    authority: independently_audited_executable_protocol
+    evidence_regime: retrospective_diagnostic_contract_before_roster_execution
+    mutable: false
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-OPERATOR-OBJECTIVE-STATUS
+    title: Estado del diagnóstico operador–objetivo
+    path: experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+    authority: implementation_status
+    evidence_regime: audited_protocol_and_unit_tested_core_not_roster_evidence
+    mutable: true
+    fronts: [AA, PPU]
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md
