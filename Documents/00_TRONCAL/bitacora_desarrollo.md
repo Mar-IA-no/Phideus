@@ -2,6 +2,18 @@
 
 ---
 
+## Operación y objetivo: conexión al corpus auditada (2026-09-14)
+
+El [adaptador](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+autenticó los headers de los cuatro tests, conservando las 45 predicciones
+por test antes de exponer las 27 originales. La auditoría independiente del
+núcleo y las rutas de lectura/cálculo/agregación no dejó defectos materiales
+abiertos en ese corte. El conjunto actual pasa 66 pruebas CPU; los módulos
+posteriores de archivos y presupuesto aún necesitan integrarse y auditarse
+con el ejecutor. No se ejecutaron inventario, perfil, extracción de factores
+ni barrido. La diferencia entre orden de freeze e inferencia se resolvió
+mediante el mapeo explícito, sin cambiar los artefactos anteriores.
+
 ## Operación y objetivo: fuentes, escenas y agregación implementadas (2026-09-14)
 
 El [diagnóstico](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)

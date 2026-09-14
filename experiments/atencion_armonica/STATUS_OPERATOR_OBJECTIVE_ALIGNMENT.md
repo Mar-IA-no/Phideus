@@ -39,12 +39,33 @@ el canal float32; verifica los donantes guardados sin sortear un nuevo sham.
 El ensamblado calcula las cuatro referencias y las 27 celdas, y la agregación
 mantiene unidad escena, soportes por métrica y slices pool/neighbor/absent.
 
-Faltan conectar estos puertos al manifiesto y roster autenticado de los cuatro
-tests, cotejar targets y elecciones archivadas, construir el ejecutor con
-presupuesto y replay, y realizar pruebas de integración y auditoría de
-implementación. Después corresponden perfiles de las cuatro escenas fijadas,
-recibo de presupuesto, barrido de las 2048 escenas y replay, seguidos de
-auditorías de evidencia y alineación. No se ejecutó ninguna de esas etapas.
+El [adaptador del corpus cerrado](../../src/atencion_armonica/operator_objective_corpus.py)
+ya liga cierre, freeze, sellos, predicciones y normalizador TRAIN; implementa
+inventario, extracción y cotejo de targets/decisiones. La autenticación de
+headers reales de los cuatro tests verificó 45 predicciones y 27 originales
+por test, sin extraer factores ni abrir sidecars. Una comprobación inicial
+detectó que orden de freeze y orden de inferencia no coinciden; la conexión
+usa ahora la permutación explícita `freeze_index`, sin modificar fuentes.
+
+La auditoría independiente de núcleo, fuentes, escena, agregación y corpus
+cerró sin defectos materiales abiertos en ese corte: 55 pruebas pasadas,
+headers de cuatro tests autenticados y 2958 comparaciones deterministas de
+ARI contra la referencia local. No revisó ni ejecutó el inventario completo,
+la extracción real, el perfil ni los componentes operativos añadidos después.
+
+También existen [bundles/publicación](../../src/atencion_armonica/operator_objective_artifacts.py)
+y [presupuesto acumulado](../../src/atencion_armonica/operator_objective_budget.py),
+con 11 pruebas propias pasadas. La suite conjunta tiene 66 pruebas pasadas.
+Estos dos módulos todavía requieren auditoría e integración en un ejecutor:
+lock de proceso, etapas, pausas, prefijos y replay completo no están cerrados.
+La proyección conserva la reserva de auditoría y el margen ×2; fallos e
+intentos sin cierre no reciben devolución silenciosa de tiempo.
+
+Falta completar ese ejecutor y auditar su frontera operativa. Después deben
+ejecutarse inventario de 2048 recibos, cuatro perfiles fijados, recibo de
+presupuesto, barrido y replay, seguidos de auditorías de evidencia y alineación.
+No se ejecutó ninguna de esas etapas ni se atribuye al PASS parcial autoridad
+para saltarlas.
 
 El rebase de recibos observa unos 893 MB comprimidos y 9.28 GB decodificados
 de factores; no es una medición de costo ni una validación de sus blobs.
