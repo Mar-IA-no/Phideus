@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 057b59374d0694d7d6855730ba80860d72d174aa
+evidence_commit: b29ff5f48867cfdd7896e619d4a77f7204ca6cb3
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -37,6 +37,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -165,26 +166,16 @@ las auditorías finales cerraron sin hallazgos materiales abiertos. El
 [resultado](../../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
 es mixto: Generativa mejora ARI frente a Desacoplada en el primario deformado,
 sin ventaja clara frente a Local; pierde frente a Desacoplada en polifonía.
-El [siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-separa orden geométrico, target, regresión de componentes, decisión y cobertura
-sobre artefactos preservados en CPU. No es otro entrenamiento ni una atribución
-causal de la brecha con Extendida, que sigue siendo referencia de sistema.
-El [estado actual](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-incluye protocolo e implementación auditados y 83 pruebas CPU pasadas.
-El [perfil](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md)
-autenticó 2048 recibos y procesó las cuatro escenas fijadas; su proyección
-supera el presupuesto temporal. Sigue revisión de costo, sin reducir el
-roster ni ampliar tiempo en silencio; barrido y replay siguen sin ejecutar.
-El [cache posterior](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md)
-preserva los cuatro bundles y pasa 92 pruebas conjuntas, pero la proyección
-continúa fuera del límite. Sigue revisar costo restante y continuidad del
-runtime; no otra campaña neuronal por inercia.
-La [optimización de medias y codec](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md)
-preservó la equivalencia sin resolver por sí sola la admisión. La
-[enmienda posterior](../../../experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md)
-pasó auditoría e implementación: revisa explícitamente costo y límite acumulado,
-conserva el consumo anterior y habilita barrido/replay. Ese resultado completo,
-no el preflight, debe decidir el siguiente experimento.
+El [diagnóstico de operación y objetivo](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+completó 2048 escenas y replay. En familia deformada, el mejor orden global
+de las cabezas según VI no conserva mejor la elección del mínimo que
+Extendida. Oracles, cobertura, regresión y estratos delimitan explicaciones,
+sin identificar una causa. La auditoría técnica final autenticó el cierre
+y reextrajo16escenas; el [estado](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+conserva1350.970249s acumulados y la enmienda explícita del presupuesto.
+El siguiente experimento debe separar operación geométrica y aprendizaje
+de la decisión sobre muestras nuevas, manteniendo descriptores y clásico
+como controles; no seguir con post-hoc o heads por inercia.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de
@@ -237,7 +228,7 @@ autónomo. Las demás filas son alternativas preservadas, no una cola obligatori
 | Gate 6 | hipótesis explícita sobre Exp C | insistir con `Transkun+A4` ya cerrado |
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
-| AA | contraste generativo completo; diagnóstico CPU de operación, target y decisión | inferir aprendibilidad desde el oracle, entrenar sobre tests abiertos o volver al tuning de τ |
+| AA | diagnóstico completo; relevo prospectivo de operación geométrica y aprendizaje de la decisión | confundir orden global con argmin, inferir causas desde estratos o entrenar sobre tests abiertos |
 | PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada; Olas 50–51 separan conjunto identificado y decisión, pero descartan como prioritaria la factorización two-stage simple sin autoridad adicional | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión, output/autoridad o proposal/repair |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 

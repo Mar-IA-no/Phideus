@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 057b59374d0694d7d6855730ba80860d72d174aa
+evidence_commit: b29ff5f48867cfdd7896e619d4a77f7204ca6cb3
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -33,6 +33,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -108,13 +109,11 @@ pérdida comunes. En el primario deformado, la alineación del canal ayuda
 frente al desacople, sin ventaja clara de ARI sobre Local; en polifonía
 pierde frente a Desacoplada. Los fallos y recuperaciones están preservados,
 y las auditorías finales cerraron sin hallazgos materiales abiertos. El
-[siguiente diagnóstico](../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-examinará operación geométrica, target y decisión aprendida sobre artefactos
-en CPU, sin otro entrenamiento adaptado a estos tests ni promoción.
-Su [implementación](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-incluye protocolo, ejecutor y revisión operativa auditados, con 134 pruebas
-CPU. La enmienda explícita de costo y presupuesto habilita el barrido completo
-y replay; el goal sigue abierto hasta obtener y auditar su resultado científico.
+[diagnóstico de operación y objetivo](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+completó 2048 escenas y replay: mejor orden global según VI no asegura mejor
+elección del mínimo. En familia deformada, Extendida conserva mejor la decisión
+que las cabezas. El relevo debe separar operación geométrica y loss sobre
+muestras nuevas, sin otra adaptación a estos tests ni promoción.
 
 ## Leyenda
 
@@ -188,7 +187,7 @@ flowchart TD
     NOW --> G6C["Completar o cerrar Gate 6 Exp C"]
     NOW --> VED{"Voz: ¿diagnóstico o dominio naturalista?"}
     NOW --> GEO["Evidencia generativa completa<br/>27 entrenamientos · cuatro tests y replays"]
-    GEO --> ALIGN["Siguiente diagnóstico CPU<br/>orden geométrico · target · decisión"]
+    GEO --> ALIGN["Diagnóstico completo<br/>orden global ≠ calidad de decisión"]
     GEO -.-> AAD{"Alternativas AA preservadas"}
     NOW --> E3D{"E3: ¿replicación, activation o transferencia?"}
     NOW -.-> GTD{"Antecedentes PPU preservados<br/>composición proporcional explícita"}

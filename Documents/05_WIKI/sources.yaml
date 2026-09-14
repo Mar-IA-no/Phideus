@@ -415,6 +415,14 @@ sources:
     fronts: [AA, PPU]
     note: "Diseño congelado; su auditoría posterior y estado de implementación se registran en STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md. No equivale a un resultado científico del roster."
 
+  - id: SRC-AA-OPERATOR-OBJECTIVE-RESULTS
+    title: Orden geométrico, aprendizaje y decisión
+    path: experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+    authority: retrospective_mechanism_diagnostic_report
+    evidence_regime: 2048_preserved_scenes_exact_replay_separate_oracles_regression_ranking_decision_and_strata
+    mutable: true
+    fronts: [AA, PPU]
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md

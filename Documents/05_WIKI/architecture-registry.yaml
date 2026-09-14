@@ -7,16 +7,28 @@ policy:
   gpu_coordination: local_requires_scope_duration_vram_notice_and_confirmed_availability_remote_relevant_jobs_authorized_after_resource_verification
 
 architectures:
+  - id: harmonic-decision-geometric-energy
+    name: Energía geométrica para la decisión
+    status: candidate
+    priority: prospective_design_required_after_operator_objective_diagnosis
+    primitive: explicit geometric fit operation retained in the global partition decision, contrasted separately from the learning objective
+    evidence_for: classical Extended chooses better VI minima than learned heads in the deformed-family diagnostic despite lower global Kendall correlation
+    evidence_against: no learned version implemented; diagnostic does not identify representation versus loss or optimization; stratified reversal is not causal
+    next_experiment: prospective operation-by-objective contrast with equal observable access, explicit-descriptor and classical controls, geometric transformation checks and fresh tests
+    source_paths:
+      - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+      - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
+    interpretation: candidate experimental direction, not a selected formula, architectural promotion or learned physical geometry
   - id: harmonic-generative-evidence-reader
     name: Lector con evidencia generativa
     status: candidate
-    priority: operator_objective_protocol_audited_core_tested_diagnostic_roster_pending
+    priority: operator_objective_diagnostic_and_replay_complete
     primitive: common invariant partition head with aligned versus absent or decoupled generative evidence
     learned_components: [partition head with common split and merge entropy regression loss]
     frozen_components: [three historical pair networks, observable candidate algorithm, explicit generative fitter]
     evidence_for: 27 trainings and four fresh tests with replay; aligned channel improves primary deformed-family ARI versus decoupled evidence
     evidence_against: no clear primary ARI advantage over Local; lower polyphony ARI than Decoupled; classical Extended system stronger in primary but not a matched causal comparison; synthetic priors limit authority
-    next_experiment: retrospective CPU diagnosis of geometric-score versus target ranking, entropy-component prediction, decision regret and candidate coverage; no post-test head tuning
+    next_experiment: prospective separation of geometric operation and decision learning; retained as evidence and comparator rather than automatic next head
     source_paths:
       - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
       - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
@@ -26,6 +38,7 @@ architectures:
       - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
       - experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md
       - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+      - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
       - src/atencion_armonica/generative_evidence_model.py
     interpretation: incremental evidence intervention at common head and loss; not novel neural geometry or promoted architecture
   - id: harmonic-explicit-generative-reader
@@ -37,11 +50,12 @@ architectures:
     external_components: [candidate pool union and bounded neighbors, sampler support, finite grid fitter]
     evidence_for: 96 retrospective scenes and exact replays; extended family reduces deformed residual
     evidence_against: fit does not identify membership; limited pool coverage; no matched neural comparison or natural-harmony validation
-    next_experiment: compare its candidate ordering against the normalized entropy target and learned reader ordering on preserved outputs
+    next_experiment: preserve as a strong system reference in prospective geometric-operation and decision-objective contrasts; higher primary decision quality does not imply higher global ranking quality
     source_paths:
       - experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md
       - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
       - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
+      - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
     interpretation: computable operation under known synthetic law; not a calibrated posterior or identifiability certificate
   - id: harmonic-learned-partition-reader
     name: Lector aprendido de particiones

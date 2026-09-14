@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 057b59374d0694d7d6855730ba80860d72d174aa
+evidence_commit: b29ff5f48867cfdd7896e619d4a77f7204ca6cb3
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -58,6 +58,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md
   - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -167,38 +168,26 @@ acumulados del supervisor. Los cuatro tests y las auditorías finales ya cerraro
 sin hallazgos materiales abiertos dentro del alcance revisado. No hay promoción
 ni autoridad física añadida por draws sintéticos.
 
-El [siguiente diseño](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-diagnosticará en CPU la relación entre orden geométrico, target y ranking
-aprendido, separando regresión de componentes, oracles y cobertura. La mayor
-ARI de Extendida en el primario es evidencia de sistema, no identificación
-causal del módulo que falla. No se entrenará otro lector sobre estos tests.
-El [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-ya pasó auditoría independiente. El [estado de implementación](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-registra 83 pruebas CPU pasadas y auditoría de implementación, incluido el
-ejecutor. El [perfil fijo](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md)
-completó inventario de 2048 recibos y cuatro escenas, con 13.815751 s
-acumulados. La proyección conservadora supera los 30 minutos permitidos:
-el barrido y replay no se iniciaron. Sigue revisión de costo sobre los
-compactos guardados, sin cambiar el roster ni inferir alineación desde el perfil.
+El [diagnóstico de operación y objetivo](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+completó 2048 escenas y replay sin entrenamiento ni GPU. En familia deformada,
+Generativa mejora τ-b frente a Extendida (0.434221 frente a 0.240753), pero
+tiene mayor regret VI (0.082377 frente a 0.030361): ordenar mejor el conjunto
+no garantiza elegir mejor su mínimo. Soporte primario: 484/512 escenas.
+Los conjuntos óptimos VI/ARI se intersectan en 479/484; esa discrepancia
+observada no explica la brecha de decisión. La inversión del regret dentro
+de estratos de tamaños/disponibilidad/rama es descriptiva, no causal.
 
-La [revisión cacheada](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md)
-conservó los bytes completos de las cuatro escenas y llevó la suite a 92
-pruebas CPU. La proyección sigue excediendo el límite; el siguiente corte
-revisa serialización y costo restante antes de habilitar un runtime completo.
-No hubo nuevo entrenamiento ni uso de GPU.
+El [estado operativo](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+conserva los perfiles, la enmienda explícita y 1350.970249 s acumulados hasta
+la auditoría técnica final, sin reiniciar el ledger. Se autenticó el cierre
+completo y se reextrajeron 16 escenas seleccionadas de antemano; no es una
+segunda extracción independiente de todo el corpus. El siguiente contraste
+debe separar operación geométrica y aprendizaje de la decisión con muestras
+nuevas y controles fuertes. El diagnóstico no identifica representación,
+optimización o loss como causa ni promueve arquitectura.
 
-El [corte de medias y codec](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md)
-también preservó las cuatro escenas, con 107 pruebas pasadas. Su proyección
-seguía excediendo el límite inicial y motivó revisar carga real y costos fijos.
-
-El [inventario completo de carga](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md)
-ya autenticó 2048 escenas y 113167 candidatos. La carga observada de pares
-es aproximadamente la mitad del supuesto inicial. La
-[enmienda de ejecución](../../../experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md)
-ya pasó auditoría e implementación, con 134 pruebas conjuntas. Amplía
-explícitamente el límite acumulado a 7200 s sin reiniciarlo y conserva la
-reserva de auditoría. Habilita el barrido completo y replay; no los confunde
-con un resultado de correspondencia geométrica ni con promoción arquitectónica.
+Las auditorías finales técnica y de interpretación/alineación cerraron sin
+hallazgos materiales abiertos dentro de sus alcances.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

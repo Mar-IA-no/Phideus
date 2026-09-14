@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 057b59374d0694d7d6855730ba80860d72d174aa
+evidence_commit: b29ff5f48867cfdd7896e619d4a77f7204ca6cb3
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -40,6 +40,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md
   - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -216,38 +217,32 @@ Polifonía es adversa frente a Desacoplada. Los soportes son 505/512, 497/512,
 451/512 y 484/512; las nueve celdas se promedian dentro de escena, no se
 tratan como réplicas independientes. Las 676 filas publicadas conservan trece
 métricas, contrastes y referencias (`SRC-AA-GENERATIVE-EVIDENCE-METRICS`).
-El [siguiente diseño](../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-(`SRC-AA-OPERATOR-OBJECTIVE-PLAN`) reutilizará artefactos en CPU para separar
-orden geométrico frente a target, regresión de entropías, ranking aprendido
-y cobertura. La ventaja de Extendida como sistema no localiza una causa;
-el diagnóstico es retrospectivo y no autoriza adaptar heads a estos tests.
-Su protocolo ejecutable ya pasó auditoría independiente
-(`SRC-AA-OPERATOR-OBJECTIVE-PROTOCOL`). Núcleo, puertos, ensamblado, agregación
-y conexión al corpus pasaron auditoría independiente, con headers de los cuatro
-tests autenticados. El ejecutor ya pasó reauditoría y la suite tiene 83
-pruebas CPU pasadas (`SRC-AA-OPERATOR-OBJECTIVE-STATUS`). Inventario2048 y
-cuatro perfiles se completaron en 13.815751 s acumulados; la proyección
-conservadora de 10943.721359 s supera el límite de 1800 s
-(`SRC-AA-OPERATOR-OBJECTIVE-PROFILE`). Sigue revisión de costo sobre compactos,
-sin barrido/replay completo ni resultado de alineación del roster. Goal incompleto.
-El cache posterior fue auditado y medido: cuatro bundles byte-idénticos,
-92 pruebas CPU pasadas y 15.821776 s acumulados. La misma fórmula proyecta
-8023.686073 s; sigue sin caber. Se preservan v1 y presupuesto mientras se
-revisan serialización y costo restante (`SRC-AA-OPERATOR-OBJECTIVE-CACHE-PROFILE`).
-El corte posterior de medias/codec conserva bytes y recibos, con 107 pruebas
-pasadas y 16.400343 s acumulados. Proyecta 6251.429694 s: sigue sin caber.
-La admisión inicial amplificaba por pares también los gastos de publicación;
-ese resultado motivó revisar carga real, costos fijos y continuidad del runtime
-(`SRC-AA-OPERATOR-OBJECTIVE-FAST-PROFILE`), no más optimización local.
-El inventario posterior cubre las 2048 escenas: 113167 candidatos, máximo70,
-3403295 pares, 111 escenas vacías conservadas; acumulado23.820175 s.
-No extrae factores ni diagnostica (`SRC-AA-OPERATOR-OBJECTIVE-WORKLOAD`).
-La enmienda posterior y su runtime pasaron auditoría y134pruebas conjuntas:
-límite7200s explícito, carryover conservado, reserva600, margen×2 y provisión
-no medida de900s para costos residuales. Nuevas operaciones/cierres están
-aislados del recovery legacy; sólo la revisión autenticada habilita ejecución
-(`SRC-AA-OPERATOR-OBJECTIVE-EXECUTION`). El goal sigue incompleto hasta barrido,
-replay, informe y auditorías finales. No hay promoción científica.
+El [diagnóstico completo](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+(`SRC-AA-OPERATOR-OBJECTIVE-RESULTS`) reutilizó 2048 escenas y produjo replay
+exacto sin fit, training, forward o GPU. Primario deformado484/512:
+Generativa τ0.434221/regretVI0.082377/ARI0.786475 frente a Extendida
+τ0.240753/regret0.030361/ARI0.883872. Mejor orden global no implica mejor
+decisión. Oracles VI/ARI coinciden canónicamente476/484 e intersectan óptimos
+479/484; ARI perdido por elegir mínimoVI0.000442. Float32 cambia una firma,
+dentro1e-12. No explica la brecha grande de decisión en este corpus.
+Generativa−Extendida regret completo+0.052016, por k+0.045873,
+tamaños/disponibilidad+0.009694, además rama−0.009746; son estimandos distintos
+y la última clave depende del score, no descomposición causal. La brecha
+persiste con plantada presente. En polifonía Generativa tiene menor MSE por
+componente que Desacoplada, pero peor regret y ARI; no hay ganador global.
+
+Protocolo, módulos y enmienda operativa fueron auditados;134pruebas conjuntas.
+Barrido0006, replay0007 y auditoría técnica0008 completos: total1350.970249s
+bajo7200s explícitos, mismo ledger. Cierre2048+4 autenticado,16reextracciones
+estructurales y496controles independientes de método. Extracción reutiliza
+puertos autenticados; no se presenta como réplica independiente2048.
+Los perfiles/costo conservan fuentes separadas en el
+[estado](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+(`SRC-AA-OPERATOR-OBJECTIVE-STATUS`, `SRC-AA-OPERATOR-OBJECTIVE-EXECUTION`).
+El relevo debe ser prospectivo, separando operación geométrica en la decisión
+y loss, no sólo otra cabeza ni tuning sobre tests abiertos. Representación,
+optimización, época seleccionada y loss siguen sin atribución causal.
+No hay promoción científica ni evidencia física externa añadida.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde

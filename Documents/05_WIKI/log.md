@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-14 — orden global y decisión, diagnóstico cerrado
+
+El roster2048, replay y auditorías técnica y de alineación están completos.
+En familia deformada, las cabezas ordenan mejor según VI pero Extendida elige
+mejor el mínimo; los estratos no identifican una causa. Se conserva una nueva
+dirección candidata, energía geométrica para la decisión, cuyo contraste debe
+separar operación/interfaz y loss sobre muestras nuevas. No hay promoción.
+Los perfiles permanecen como fuentes históricas, no bloqueos actuales.
+Fuente: `b29ff5f48867cfdd7896e619d4a77f7204ca6cb3`.
+
 ## 2026-09-14 — ejecutor completo habilitado tras revisión explícita
 
 La enmienda y el runtime pasaron auditoría y 134 pruebas. Conservan los
