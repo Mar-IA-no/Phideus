@@ -423,6 +423,14 @@ sources:
     mutable: true
     fronts: [AA, PPU]
 
+  - id: SRC-AA-GEOMETRIC-DECISION-PLAN
+    title: Energía geométrica para la decisión
+    path: experiments/atencion_armonica/PLAN_GEOMETRIC_DECISION_ENERGY.md
+    authority: initial_experimental_design
+    evidence_regime: prospective_operation_interface_by_objective_plan_executable_protocol_pending
+    mutable: true
+    fronts: [AA, PPU]
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md

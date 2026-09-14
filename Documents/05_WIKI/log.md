@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-14 — sucesor: energía geométrica para la decisión
+
+Se registra el plan inicial de contraste prospectivo operación/interfaz × loss.
+Controles de inyección, correspondencia desacoplada, Local y clásico; protocolo
+ejecutable y auditoría pendientes, sin campaña nueva. Fuente:
+`28025b07e77e7962c692a1549754f870bc84393a`.
+
 ## 2026-09-14 — orden global y decisión, diagnóstico cerrado
 
 El roster2048, replay y auditorías técnica y de alineación están completos.
