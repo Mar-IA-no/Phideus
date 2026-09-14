@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 5240536353eb4bf3876e21f4a55217cf0ecc06cb
+evidence_commit: 1b7b9fc2bc7450f6366ebfb587578e9b47452b4d
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -108,7 +108,8 @@ y las auditorías finales cerraron sin hallazgos materiales abiertos. El
 examinará operación geométrica, target y decisión aprendida sobre artefactos
 en CPU, sin otro entrenamiento adaptado a estos tests ni promoción.
 Su [implementación](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-comenzó con protocolo auditado y núcleo probado; el barrido sigue pendiente.
+incluye protocolo auditado, núcleo, puertos de fuentes y agregación probados;
+la integración del roster y el barrido siguen pendientes.
 
 ## Leyenda
 

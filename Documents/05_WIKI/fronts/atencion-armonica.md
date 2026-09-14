@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 5240536353eb4bf3876e21f4a55217cf0ecc06cb
+evidence_commit: 1b7b9fc2bc7450f6366ebfb587578e9b47452b4d
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -169,8 +169,9 @@ ARI de Extendida en el primario es evidencia de sistema, no identificación
 causal del módulo que falla. No se entrenará otro lector sobre estos tests.
 El [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md)
 ya pasó auditoría independiente. El [estado de implementación](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-registra 18 pruebas CPU del núcleo pasadas, con adaptador, ejecutor, auditoría
-de implementación, perfil, barrido y replay todavía pendientes. Es avance de
+registra 44 pruebas CPU del núcleo, fuentes, escenas y agregación pasadas.
+Conexión al roster, ejecutor, auditoría de implementación, perfil, barrido
+y replay siguen pendientes. Es avance de
 implementación, no evidencia experimental nueva ni cierre del diagnóstico.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria

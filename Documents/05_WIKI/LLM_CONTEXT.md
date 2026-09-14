@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 5240536353eb4bf3876e21f4a55217cf0ecc06cb
+evidence_commit: 1b7b9fc2bc7450f6366ebfb587578e9b47452b4d
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -217,8 +217,9 @@ orden geométrico frente a target, regresión de entropías, ranking aprendido
 y cobertura. La ventaja de Extendida como sistema no localiza una causa;
 el diagnóstico es retrospectivo y no autoriza adaptar heads a estos tests.
 Su protocolo ejecutable ya pasó auditoría independiente
-(`SRC-AA-OPERATOR-OBJECTIVE-PROTOCOL`). El núcleo tiene 18 pruebas CPU pasadas,
-pero faltan adaptador, ejecutor, auditoría de implementación, perfil, barrido
+(`SRC-AA-OPERATOR-OBJECTIVE-PROTOCOL`). Núcleo, puertos de fuentes, ensamblado
+por escena y agregación tienen 44 pruebas CPU pasadas; faltan conexión al
+roster autenticado, ejecutor, auditoría de implementación, perfil, barrido
 y replay (`SRC-AA-OPERATOR-OBJECTIVE-STATUS`). No hay resultados nuevos del
 roster ni cierre de este goal.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja

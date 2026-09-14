@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — puertos de fuentes y diagnóstico por escena implementados
+
+El estado enlazado incorpora lectura/extracción, ensamblado por escena y
+agregación descriptiva, con 44 pruebas CPU conjuntas. Continúan pendientes
+la integración al roster fuente, ejecutor, auditoría, perfil y ejecución.
+No cambia la lectura científica del contraste anterior. Fuente:
+`1b7b9fc2bc7450f6366ebfb587578e9b47452b4d`.
+
 ## 2026-09-14 — protocolo operador–objetivo auditado y núcleo probado
 
 Se incorporan protocolo y estado de implementación, con 18 pruebas CPU del
