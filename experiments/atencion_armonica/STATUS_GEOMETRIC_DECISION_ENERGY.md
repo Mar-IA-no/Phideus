@@ -1,6 +1,6 @@
 # Energía geométrica para la decisión — estado de implementación
 
-2026-09-14. Preparación OPEN completa; entrenamiento científico no iniciado.
+2026-09-14. Preparación OPEN y perfiles CPU/CUDA completos; entrenamiento científico no iniciado.
 
 El [protocolo](PROTOCOL_GEOMETRIC_DECISION_ENERGY.md), auditado antes de la
 campaña, fija cuatro rutas por dos pérdidas: Inyección, Geométrica,
@@ -48,8 +48,11 @@ optimizador y generadores aleatorios, checkpoints recuperables y salidas
 firmadas float64 de calibración al inicio y cada cinco épocas. Las
 [pruebas de recuperación](test_geometric_decision_cell.py) completan 50 épocas
 con fixtures de soporte elegible pequeño y comprueban igualdad exacta frente
-a una ejecución interrumpida. No son entrenamientos científicos. La prueba
-positiva de recuperación CUDA sigue pendiente del perfil del backend elegido.
+a una ejecución interrumpida. No son entrenamientos científicos. Los
+[perfiles CPU/CUDA](RESULTS_GEOMETRIC_DECISION_PROFILE.md) ya completaron la
+prueba positiva de recuperación exacta CUDA en cuatro casos mecánicos,
+además de medir cabeza, fitter y carga completa. Su consumo acumulado es
+71,594984 s de los 600 s de perfil; no se repitieron los ajustes de todo OPEN.
 
 La [preparación durable](../../src/atencion_armonica/geometric_decision_corpus.py)
 y el [selector de época](../../src/atencion_armonica/geometric_decision_selection.py)
@@ -58,9 +61,9 @@ El selector exige las nueve celdas por brazo y las diez épocas elegibles;
 no elige una semilla o backbone ganador.
 
 Permanecen pendientes completar el supervisor de las 72 celdas,
-perfil CPU/GPU, admisión de recursos, entrenamiento, selección calibrada real,
+admisión de recursos, entrenamiento, selección calibrada real,
 freeze prospectivo, tests nuevos, probes, replay y auditorías finales.
-La GPU está disponible, pero no se usó en este corte de implementación.
+La GPU se usó sólo en los perfiles; no hay resultados científicos nuevos.
 
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,

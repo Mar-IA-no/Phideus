@@ -19,7 +19,8 @@ def training_work(eligible_train, eligible_calibration):
     cells = len(ARMS)*len(CHECKPOINTS)*len(READER_SEEDS)
     return {"cells": cells, "epochs_per_cell": 50, "updates_per_epoch": batches,
         "last_batch_scenes": eligible_train-(batches-1)*32,
-        "updates": cells*steps, "snapshots": cells*len(snapshots),
+        "updates": cells*steps, "warmup_updates": cells*5, "steady_updates": cells*(steps-5),
+        "snapshots": cells*len(snapshots),
         "noninitial_snapshots": cells*(len(snapshots)-1),
         "calibration_batches": cells*11*math.ceil(eligible_calibration/32),
         "checkpoint_corpus_loads": len(CHECKPOINTS)}
@@ -48,7 +49,8 @@ def head_forecast(cases, *, eligible_train, eligible_calibration, corpus_load_se
     if len(devices) != 1 or not devices <= {"cpu", "cuda:0"}:
         raise ValueError("one backend per head forecast required")
     work = training_work(eligible_train, eligible_calibration)
-    rates = {"updates": max(float(np.mean(c["all_update_seconds"])) for c in cases.values()),
+    rates = {"warmup_updates": max(float(np.mean(c["all_update_seconds"][:5])) for c in cases.values()),
+             "steady_updates": max(float(np.mean(c["all_update_seconds"][5:])) for c in cases.values()),
              "noninitial_snapshots": max(max(c["snapshot_io_seconds"]) for c in cases.values()),
              "calibration_batches": max(max(c["evaluation_batch_io_seconds"]) for c in cases.values()),
              "cells": max(c["setup_seconds"] for c in cases.values()),
@@ -56,5 +58,5 @@ def head_forecast(cases, *, eligible_train, eligible_calibration, corpus_load_se
     costs = {key: value*work[key] for key, value in rates.items()}
     return {"device": next(iter(devices)), "work": work, "measured_unit_seconds": rates,
             "projected_cost_components": costs, "projected_seconds_before_margin": sum(costs.values()),
-            "method": "max case mean updates including warmup; max snapshot/evaluation/setup; measured corpus load",
+            "method": "first five updates per cell charged separately; max case mean remaining updates; max snapshot/evaluation/setup; measured corpus load",
             "limits": "timing forecast only; excludes future tests and does not prove an upper bound"}
