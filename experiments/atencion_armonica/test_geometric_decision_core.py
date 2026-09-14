@@ -64,6 +64,39 @@ def test_equal_information_and_scalar_donor():
         np.testing.assert_array_equal(local[k], inputs[k])
 
 
+def test_singleton_donor_strata_preserve_scalar_exactly():
+    q, z, triples, residual, _, _ = fixture(12)
+    partitions = sorted([ge.law.signature([list(range(4)), list(range(4, 12))]),
+                         ge.law.signature([list(range(6)), list(range(6, 12))])])
+    fits = [{"partition": p, "status": "FITTED", "branches":
+             {b: {"LB": float(i+1), "UB": float(i+2)} for b in ge.BRANCHES}}
+            for i, p in enumerate(partitions)]
+    raw = ge.observable_rows(q, z, triples, residual, partitions, fits)
+    cn = ge.fit_common_normalizer(lambda: iter([raw]))
+    en = {"mean": [0.]*6, "scale": [1.]*6}
+    delivered = ge.model_inputs(raw, cn, en, "generative", split_seed=11, scene_id=1)
+    inputs, record = core.delivered_interface(delivered, raw, scale=2., split_seed=11, scene_id=1)
+    sham = record["six_channel_sham"]
+    assert sham["donors"] == [0, 1]
+    assert all(r["shift"] is None and r["status"] == "NO_PERMUTATION" for r in sham["strata"])
+    assert record["scalar_changed_mask"] == [False, False]
+    assert inputs["evidence"][:, 6].tobytes() == inputs["evidence"][:, 7].tobytes()
+
+
+def test_empty_interface_is_preserved_but_not_collated():
+    q, z, triples, residual, _, _ = fixture()
+    empty = ge.observable_rows(q, z, triples, residual, [], [])
+    cn = {"mean": [0.]*5, "scale": [1.]*5}
+    en = {"mean": [0.]*6, "scale": [1.]*6}
+    delivered = ge.model_inputs(empty, cn, en, "generative", split_seed=11, scene_id=2)
+    inputs, record = core.delivered_interface(delivered, empty, scale=2., split_seed=11, scene_id=2)
+    assert inputs["evidence"].shape == (0, 8)
+    assert record["scalar_changed_mask"] == []
+    assert record["six_channel_sham"]["donors"] == []
+    with pytest.raises(ValueError, match="eligible"):
+        collate([inputs])
+
+
 @pytest.mark.parametrize("route", core.ROUTES)
 def test_common_initial_state_and_exact_bypass(route):
     inputs, _, _ = interface()
