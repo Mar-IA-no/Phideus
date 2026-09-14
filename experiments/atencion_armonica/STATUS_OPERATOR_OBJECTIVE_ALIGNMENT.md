@@ -104,6 +104,15 @@ Permite formular una enmienda de costo con carga real; no habilita por sí
 solo el barrido. El siguiente corte debe resolver la ejecución completa,
 incluidas validación y replay, conservando el tiempo ya consumido.
 
+La [enmienda de ejecución completa](AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md)
+y su implementación pasaron auditoría independiente y 134 pruebas conjuntas.
+Revisan explícitamente el límite acumulado de 1800 a 7200 s, sin reiniciarlo;
+conservan memoria, disco, margen ×2 y reserva final de 600 s. La proyección
+incluye carga observada y provisiones declaradas para costos no medidos.
+Operaciones y cierres nuevos están aislados del recovery legacy. La autoridad
+de ejecución reside en la revisión inmutable ligada al código auditado; este
+corte habilita barrido y replay, pero no los presenta como ya completados.
+
 El diagnóstico sigue siendo retrospectivo. No cambia el pool, los targets,
 la época seleccionada ni las redes; tampoco convierte mínimo UB en toda la
 información recibida por la cabeza. La GPU no es necesaria para este hito.
