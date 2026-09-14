@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — preparación OPEN completa
+
+El operador auditado completó la adaptación de TRAIN/calibración, preservando
+fuentes, escala, entradas y consumo acumulado. No repitió fits/forwards ni
+inició entrenamiento científico. La siguiente etapa es el perfil de backends
+y la integración de las corridas. Fuente:
+`59c11dd2c0e171c39c277241d74450b193ab7c5e`.
+
 ## 2026-09-14 — entrenamiento recuperable implementado
 
 El adaptador y el runner de una celda cierran sus auditorías técnicas. La

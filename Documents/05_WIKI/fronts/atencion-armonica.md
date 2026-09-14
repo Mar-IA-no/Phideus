@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: c66f7d94ff94080e8edc2564ba9581d33f38c6be
+evidence_commit: 59c11dd2c0e171c39c277241d74450b193ab7c5e
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -197,9 +197,10 @@ abre el sucesor: separar operación/interfaz y loss, con controles de inyección
 correspondencia desacoplada, Local y referencia clásica. El
 [protocolo concreto](../../../experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md)
 y el núcleo aritmético, el adaptador y el runner recuperable de una celda ya
-fueron auditados. Preparación durable y selección están implementadas; el
+fueron auditados. La preparación OPEN ya se ejecutó completa, sin refits ni
+forwards; el selector está implementado y auditado. El
 [estado](../../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
-separa esa implementación de la adaptación real y del pipeline todavía pendientes;
+separa esos resultados operativos del entrenamiento y pipeline todavía pendientes;
 no hay nueva campaña iniciada ni ventaja experimental demostrada.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria

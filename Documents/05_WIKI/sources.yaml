@@ -443,7 +443,7 @@ sources:
     title: Implementación de energía geométrica para la decisión
     path: experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
     authority: implementation_status
-    evidence_regime: audited_core_adapter_recoverable_cell_preparation_selection_implemented_no_scientific_training
+    evidence_regime: audited_recoverable_cell_complete_open_adaptation_no_scientific_training
     mutable: true
     fronts: [AA, PPU]
 

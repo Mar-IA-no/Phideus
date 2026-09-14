@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: c66f7d94ff94080e8edc2564ba9581d33f38c6be
+evidence_commit: 59c11dd2c0e171c39c277241d74450b193ab7c5e
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -248,8 +248,9 @@ Ese relevo ya tiene contrato concreto (`SRC-AA-GEOMETRIC-DECISION-PROTOCOL`)
 y núcleo, adaptador y runner recuperable de una celda auditados
 (`SRC-AA-GEOMETRIC-DECISION-STATUS`): cuatro rutas
 por dos losses, mismos ocho inputs en los controles no Local y bypass explícito
-con precisión igualada. Preparación durable y selector están implementados;
-integración y campaña siguen pendientes. La corrección
+con precisión igualada. La preparación OPEN está completa y autenticada;
+el selector está implementado y auditado. Perfiles de backend, integración
+del entrenamiento y campaña siguen pendientes. La corrección
 inicial nula hereda una regla de decisión, no demuestra aprendizaje.
 No hay promoción científica ni evidencia física externa añadida.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
