@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 39215f627891ddd073626a2c6673b05206eef80c
+evidence_commit: 7ccd87a0d58884620114f9ef8b807980f203563e
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -253,8 +253,11 @@ con precisión igualada. La preparación OPEN está completa y autenticada;
 el selector está implementado y auditado. Los perfiles CPU/CUDA están completos,
 incluida recuperación exacta CUDA; consumieron 71,594984 s de perfil y no
 entrenaron celdas científicas (`SRC-AA-GEOMETRIC-DECISION-PROFILE`). La proyección
-amortizada favorece CUDA para la cabeza, pendiente de admisión del supervisor.
-Integración del entrenamiento y campaña siguen pendientes. La corrección
+amortizada favoreció CUDA para la cabeza y el supervisor auditado ya inició
+la campaña completa de 72 celdas. El operador de selección común, su perfil
+CPU y la reautenticación de checkpoints también están implementados y
+auditados, pero esperan ejecución tras el cierre del entrenamiento.
+Tests nuevos, probes y evaluación prospectiva siguen pendientes. La corrección
 inicial nula hereda una regla de decisión, no demuestra aprendizaje.
 No hay promoción científica ni evidencia física externa añadida.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
@@ -1310,8 +1313,8 @@ El registro completo, con tipo y regla de resolución, está en
 ## Orden de lectura de decisiones abiertas
 
 1. Ciclo geométrico: contraste generativo y diagnóstico operador–objetivo
-   completos; implementar y ejecutar energía geométrica para la decisión desde
-   su contrato y núcleo auditados, sin promover arquitectura ni convertir
+   completos; completar la campaña de energía geométrica para la decisión,
+   ya iniciada en CUDA, y su evaluación prospectiva, sin promover arquitectura ni convertir
    tests abiertos en confirmación independiente.
 2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
 3. `G6C`: mantener separado como pregunta downstream residual.

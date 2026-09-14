@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 39215f627891ddd073626a2c6673b05206eef80c
+evidence_commit: 7ccd87a0d58884620114f9ef8b807980f203563e
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -204,8 +204,11 @@ forwards; el selector está implementado y auditado. Los
 también están completos, con recuperación exacta CUDA comprobada y costos
 separados de cabeza, fitter y carga. El
 [estado](../../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
-separa esos resultados operativos del entrenamiento y pipeline todavía pendientes;
-no hay nueva campaña iniciada ni ventaja experimental demostrada.
+registra ahora la campaña de 72 entrenamientos iniciada en CUDA, con supervisor
+y admisión auditados. El operador de selección común también quedó auditado;
+su perfil y ejecución reales esperan el cierre completo del entrenamiento.
+Tests, probes y evaluación prospectiva siguen pendientes. No hay ventaja
+experimental demostrada ni promoción arquitectónica.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
