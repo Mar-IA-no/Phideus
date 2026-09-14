@@ -2,6 +2,17 @@
 
 ---
 
+## Operación y objetivo: fuentes, escenas y agregación implementadas (2026-09-14)
+
+El [diagnóstico](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+sumó puertos de lectura autenticada, extracción de cotas/canales, ensamblado
+de las cuatro referencias y 27 celdas por escena, y agregación descriptiva
+por escenario. Las 44 pruebas de desarrollo pasan en CPU; comprueban también
+soportes indefinidos y separación de las comparaciones pareadas. Todavía falta
+la conexión al roster fuente y el ejecutor con presupuesto/replay antes de
+auditar la implementación y perfilar. No se abrió ningún archivo de factores
+de la campaña ni se produjo evidencia experimental nueva.
+
 ## Operación y objetivo: protocolo auditado y núcleo inicial (2026-09-14)
 
 El [nuevo diagnóstico](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)

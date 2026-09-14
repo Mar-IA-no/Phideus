@@ -25,8 +25,23 @@ tipos numéricos estrictos y fórmula de ARI con conteos enteros de pares.
 La ejecución posterior terminó con salida 0. Estas pruebas no certifican
 componentes todavía no construidos ni producen evidencia de la campaña.
 
-Faltan el adaptador de lectura autenticada/extracción compacta, el ejecutor,
-la agregación completa de escenarios, pruebas de integración y auditoría de
+Ya se añadieron los [puertos de lectura y extracción](../../src/atencion_armonica/operator_objective_sources.py),
+el [ensamblado por escena](../../src/atencion_armonica/operator_objective_scene.py)
+y la [agregación por escenario](../../src/atencion_armonica/operator_objective_aggregate.py).
+Las 44 pruebas conjuntas pasan en CPU: 18 del núcleo, 16 de fuentes/canales,
+6 de escena y 4 de agregación. Son fixtures matemáticos y archivos temporales
+pequeños, no ejecuciones sobre escenas de la campaña.
+
+La lectura verifica referencias, rutas sin symlinks, tamaños, hashes y
+compresión; las cabeceras de arrays se comprueban antes de permitir su
+asignación de memoria. La extracción conserva las seis cotas, sus ramas y
+el canal float32; verifica los donantes guardados sin sortear un nuevo sham.
+El ensamblado calcula las cuatro referencias y las 27 celdas, y la agregación
+mantiene unidad escena, soportes por métrica y slices pool/neighbor/absent.
+
+Faltan conectar estos puertos al manifiesto y roster autenticado de los cuatro
+tests, cotejar targets y elecciones archivadas, construir el ejecutor con
+presupuesto y replay, y realizar pruebas de integración y auditoría de
 implementación. Después corresponden perfiles de las cuatro escenas fijadas,
 recibo de presupuesto, barrido de las 2048 escenas y replay, seguidos de
 auditorías de evidencia y alineación. No se ejecutó ninguna de esas etapas.
