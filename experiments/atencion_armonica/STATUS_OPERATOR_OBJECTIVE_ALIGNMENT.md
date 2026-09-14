@@ -91,6 +91,12 @@ proyección baja a 8023.686073 s pero sigue excediendo 1800 s; no habilita
 barrido. Sigue revisar serialización y costo restante, con una revisión de
 runtime explícita antes de producción. La versión congelada permanece intacta.
 
+El [corte posterior de medias y codec](RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md)
+también conserva las cuatro escenas byte a byte, con 107 pruebas CPU pasadas.
+Acumula 16.400343 s; la proyección sigue fuera del límite. La acción siguiente
+es revisar carga real, costos fijos y preparación reutilizable mediante una
+enmienda operativa auditada, no continuar optimizando sin revisar la admisión.
+
 El diagnóstico sigue siendo retrospectivo. No cambia el pool, los targets,
 la época seleccionada ni las redes; tampoco convierte mínimo UB en toda la
 información recibida por la cabeza. La GPU no es necesaria para este hito.
