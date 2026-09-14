@@ -71,3 +71,16 @@ La implementación nueva se audita antes de activar los puertos reales.
 Auditorías de validez técnica y alineación después del contraste completo.
 El cierre exige informe, wiki/documentación y commit/push. Los resultados,
 no esta secuencia de implementación, decidirán el siguiente goal.
+
+## Correcciones de interfaz de la auditoría R764
+
+Antes de ejecución, el store exige schemas cerrados de factores y sus
+asignaciones, y recompone los fits desde esos factores con igualdad canónica;
+no repite el barrido de grilla. Ese costo de replay entra en el perfil completo.
+La fuente lleva derivación tipada: original enlaza bytes observacionales
+autenticados; roundtrip enlaza una fuente original autenticada, recalcula el
+linaje y conserva las coordenadas diagnósticas. La autoridad de que un original
+provenga de un draw admitido pertenece al freeze/productor futuro, no a una
+etiqueta proporcionada por un caller arbitrario. El source conserva una única
+observación JSON canónica para el hash y el retorno. No cambia la hipótesis,
+el roster, las pérdidas ni los presupuestos del protocolo.

@@ -78,6 +78,17 @@ calibrada real, freeze prospectivo, tests nuevos, probes, replay y auditorías
 finales. Los tests nuevos no se abrieron; todavía no hay resultados del
 contraste prospectivo que permitan evaluar generalización.
 
+El [ensamblado observable](../../src/atencion_armonica/geometric_decision_observables.py)
+y el [almacén de escenas](../../src/atencion_armonica/geometric_decision_scene_store.py)
+ya están implementados y auditados con 25 pruebas CPU. Conservan features,
+logits de tres backbones, factores de ajuste completos y entradas raw/delivered;
+los fits se reconstruyen desde sus factores para verificar coherencia sin
+repetir la grilla. Los probes enlazan una fuente original autenticada y
+preservan el linaje por evento y las coordenadas del roundtrip. La auditoría
+cerró sus findings dentro de ese alcance. Estos puertos no autorizan draws:
+el freeze y el operador prospectivo deben establecer la procedencia de las
+observaciones y de la normalización. No se ejecutaron todavía con tests nuevos.
+
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,
 sin presentarla como test prospectivo. El reemplazo no se eligió por
