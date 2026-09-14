@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: c7833b53b573fac992ecd72654847682d61d940d
+evidence_commit: 057b59374d0694d7d6855730ba80860d72d174aa
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -57,6 +57,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md
+  - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -188,14 +189,16 @@ No hubo nuevo entrenamiento ni uso de GPU.
 
 El [corte de medias y codec](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md)
 también preservó las cuatro escenas, con 107 pruebas pasadas. Su proyección
-sigue excediendo el límite: el próximo paso revisa carga real y costos fijos
-mediante una enmienda operativa, antes del barrido y su replay.
+seguía excediendo el límite inicial y motivó revisar carga real y costos fijos.
 
 El [inventario completo de carga](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md)
 ya autenticó 2048 escenas y 113167 candidatos. La carga observada de pares
-es aproximadamente la mitad del supuesto inicial. El siguiente corte debe
-resolver admisión y ejecución completa; el inventario no es todavía un
-resultado sobre correspondencia geométrica.
+es aproximadamente la mitad del supuesto inicial. La
+[enmienda de ejecución](../../../experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md)
+ya pasó auditoría e implementación, con 134 pruebas conjuntas. Amplía
+explícitamente el límite acumulado a 7200 s sin reiniciarlo y conserva la
+reserva de auditoría. Habilita el barrido completo y replay; no los confunde
+con un resultado de correspondencia geométrica ni con promoción arquitectónica.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

@@ -406,6 +406,15 @@ sources:
     mutable: false
     fronts: [AA, PPU]
 
+  - id: SRC-AA-OPERATOR-OBJECTIVE-EXECUTION
+    title: Enmienda de ejecución completa del diagnóstico
+    path: experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
+    authority: explicit_operational_revision_design
+    evidence_regime: same_scientific_contract_observed_workload_cumulative_budget_and_isolated_recovery
+    mutable: false
+    fronts: [AA, PPU]
+    note: "Diseño congelado; su auditoría posterior y estado de implementación se registran en STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md. No equivale a un resultado científico del roster."
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md

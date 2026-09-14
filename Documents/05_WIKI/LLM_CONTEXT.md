@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: c7833b53b573fac992ecd72654847682d61d940d
+evidence_commit: 057b59374d0694d7d6855730ba80860d72d174aa
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -39,6 +39,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md
+  - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -235,15 +236,18 @@ El cache posterior fue auditado y medido: cuatro bundles byte-idénticos,
 revisan serialización y costo restante (`SRC-AA-OPERATOR-OBJECTIVE-CACHE-PROFILE`).
 El corte posterior de medias/codec conserva bytes y recibos, con 107 pruebas
 pasadas y 16.400343 s acumulados. Proyecta 6251.429694 s: sigue sin caber.
-La admisión actual amplifica por pares también los gastos de publicación;
-el próximo paso es una revisión explícita de carga real, costos fijos y
-continuidad del runtime (`SRC-AA-OPERATOR-OBJECTIVE-FAST-PROFILE`), no más
-optimización local sin evaluar su suficiencia. No hay roster ni replay completos.
+La admisión inicial amplificaba por pares también los gastos de publicación;
+ese resultado motivó revisar carga real, costos fijos y continuidad del runtime
+(`SRC-AA-OPERATOR-OBJECTIVE-FAST-PROFILE`), no más optimización local.
 El inventario posterior cubre las 2048 escenas: 113167 candidatos, máximo70,
 3403295 pares, 111 escenas vacías conservadas; acumulado23.820175 s.
-No extrae factores ni diagnostica. La enmienda siguiente debe resolver
-costos, validación y replay sin reiniciar el consumo histórico
-(`SRC-AA-OPERATOR-OBJECTIVE-WORKLOAD`).
+No extrae factores ni diagnostica (`SRC-AA-OPERATOR-OBJECTIVE-WORKLOAD`).
+La enmienda posterior y su runtime pasaron auditoría y134pruebas conjuntas:
+límite7200s explícito, carryover conservado, reserva600, margen×2 y provisión
+no medida de900s para costos residuales. Nuevas operaciones/cierres están
+aislados del recovery legacy; sólo la revisión autenticada habilita ejecución
+(`SRC-AA-OPERATOR-OBJECTIVE-EXECUTION`). El goal sigue incompleto hasta barrido,
+replay, informe y auditorías finales. No hay promoción científica.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde

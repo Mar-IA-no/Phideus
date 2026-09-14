@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 5a6953ea789f69982bd633293641a69338663814
+evidence_commit: 057b59374d0694d7d6855730ba80860d72d174aa
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -32,6 +32,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
+  - experiments/atencion_armonica/AMENDMENT_OPERATOR_OBJECTIVE_EXECUTION.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -111,10 +112,9 @@ y las auditorías finales cerraron sin hallazgos materiales abiertos. El
 examinará operación geométrica, target y decisión aprendida sobre artefactos
 en CPU, sin otro entrenamiento adaptado a estos tests ni promoción.
 Su [implementación](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-incluye protocolo, ejecutor y optimizaciones auditados, 107 pruebas CPU,
-inventario2048 y cuatro perfiles con reproducción exacta. La proyección
-sigue excediendo el presupuesto: corresponde revisar carga real y costos
-fijos, sin barrido ni replay completos todavía.
+incluye protocolo, ejecutor y revisión operativa auditados, con 134 pruebas
+CPU. La enmienda explícita de costo y presupuesto habilita el barrido completo
+y replay; el goal sigue abierto hasta obtener y auditar su resultado científico.
 
 ## Leyenda
 

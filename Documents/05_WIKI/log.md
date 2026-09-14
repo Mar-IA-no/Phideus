@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — ejecutor completo habilitado tras revisión explícita
+
+La enmienda y el runtime pasaron auditoría y 134 pruebas. Conservan los
+artefactos científicos y el consumo histórico; revisan el límite operativo
+sin reiniciarlo y separan los cierres nuevos del recovery legacy. El siguiente
+resultado requerido es el diagnóstico completo con replay y auditorías, no
+otro perfil. Fuente: `057b59374d0694d7d6855730ba80860d72d174aa`.
+
 ## 2026-09-14 — carga real del diagnóstico inventariada
 
 Se autenticaron las 2048 escenas sin extraer factores ni ejecutar diagnóstico.
