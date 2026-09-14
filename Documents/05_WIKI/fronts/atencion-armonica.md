@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: e61b4886405d281427e8952eaf9c9dbd06a321a9
+evidence_commit: 87f4bd6ffb8b18ea4002c04a477a5f0fd0ac995c
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -53,6 +53,7 @@ source_paths:
   - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -169,11 +170,12 @@ ARI de Extendida en el primario es evidencia de sistema, no identificación
 causal del módulo que falla. No se entrenará otro lector sobre estos tests.
 El [protocolo ejecutable](../../../experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md)
 ya pasó auditoría independiente. El [estado de implementación](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-registra 66 pruebas CPU pasadas y auditoría del núcleo, fuentes, escenas,
-agregación y conexión al corpus. Los headers de cuatro tests se autenticaron,
-sin extraer factores. Ejecutor, auditoría operativa, inventario, perfil, barrido
-y replay siguen pendientes. Es avance de
-implementación, no evidencia experimental nueva ni cierre del diagnóstico.
+registra 83 pruebas CPU pasadas y auditoría de implementación, incluido el
+ejecutor. El [perfil fijo](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md)
+completó inventario de 2048 recibos y cuatro escenas, con 13.815751 s
+acumulados. La proyección conservadora supera los 30 minutos permitidos:
+el barrido y replay no se iniciaron. Sigue revisión de costo sobre los
+compactos guardados, sin cambiar el roster ni inferir alineación desde el perfil.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

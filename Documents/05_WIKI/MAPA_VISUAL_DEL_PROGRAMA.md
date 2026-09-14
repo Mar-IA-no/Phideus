@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: e61b4886405d281427e8952eaf9c9dbd06a321a9
+evidence_commit: 87f4bd6ffb8b18ea4002c04a477a5f0fd0ac995c
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -29,6 +29,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -108,8 +109,9 @@ y las auditorías finales cerraron sin hallazgos materiales abiertos. El
 examinará operación geométrica, target y decisión aprendida sobre artefactos
 en CPU, sin otro entrenamiento adaptado a estos tests ni promoción.
 Su [implementación](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-incluye protocolo, núcleo y conexión al corpus auditados. El ejecutor completo,
-su auditoría, el perfil y el barrido siguen pendientes.
+incluye protocolo y ejecutor auditados, 83 pruebas CPU, inventario2048 y
+cuatro perfiles. La proyección excede el presupuesto: sigue revisión de costo,
+sin barrido ni replay completos.
 
 ## Leyenda
 

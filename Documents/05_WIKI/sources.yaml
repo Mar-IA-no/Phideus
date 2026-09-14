@@ -370,8 +370,16 @@ sources:
     title: Estado del diagnóstico operador–objetivo
     path: experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
     authority: implementation_status
-    evidence_regime: audited_protocol_and_unit_tested_core_not_roster_evidence
+    evidence_regime: audited_runner_and_fixed_profile_not_complete_roster_evidence
     mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-OPERATOR-OBJECTIVE-PROFILE
+    title: Perfil fijo de costo del diagnóstico operador–objetivo
+    path: experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
+    authority: authenticated_operational_profile
+    evidence_regime: four_fixed_scenes_and_inventory2048_forecast_exceeds_budget_no_full_roster
+    mutable: false
     fronts: [AA, PPU]
 
   - id: SRC-EPISTEMOLOGY

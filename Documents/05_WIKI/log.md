@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-14 — ejecutor auditado y perfil de costo
+
+Se incorpora el perfil fijo: 83 pruebas CPU, inventario2048 y cuatro escenas
+procesadas, sin barrido. La proyección excede el presupuesto y lleva a revisar
+costo sobre compactos; no hay resultado de alineación ni cierre del goal.
+Fuente: `87f4bd6ffb8b18ea4002c04a477a5f0fd0ac995c`.
+
 ## 2026-09-14 — conexión al corpus auditada, ejecución todavía pendiente
 
 Se actualiza la frontera de implementación: cinco módulos auditados, headers

@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: e61b4886405d281427e8952eaf9c9dbd06a321a9
+evidence_commit: 87f4bd6ffb8b18ea4002c04a477a5f0fd0ac995c
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -35,6 +35,7 @@ source_paths:
   - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/PROTOCOL_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -219,10 +220,12 @@ el diagnóstico es retrospectivo y no autoriza adaptar heads a estos tests.
 Su protocolo ejecutable ya pasó auditoría independiente
 (`SRC-AA-OPERATOR-OBJECTIVE-PROTOCOL`). Núcleo, puertos, ensamblado, agregación
 y conexión al corpus pasaron auditoría independiente, con headers de los cuatro
-tests autenticados. La suite actual incluye archivos/presupuesto y pasa 66
-pruebas CPU; faltan ejecutor, auditoría operativa, inventario, perfil, barrido
-y replay (`SRC-AA-OPERATOR-OBJECTIVE-STATUS`). No hay resultados nuevos del
-roster ni cierre de este goal.
+tests autenticados. El ejecutor ya pasó reauditoría y la suite tiene 83
+pruebas CPU pasadas (`SRC-AA-OPERATOR-OBJECTIVE-STATUS`). Inventario2048 y
+cuatro perfiles se completaron en 13.815751 s acumulados; la proyección
+conservadora de 10943.721359 s supera el límite de 1800 s
+(`SRC-AA-OPERATOR-OBJECTIVE-PROFILE`). Sigue revisión de costo sobre compactos,
+sin barrido/replay completo ni resultado de alineación del roster. Goal incompleto.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde

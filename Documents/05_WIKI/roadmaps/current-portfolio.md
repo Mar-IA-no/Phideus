@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: e61b4886405d281427e8952eaf9c9dbd06a321a9
+evidence_commit: 87f4bd6ffb8b18ea4002c04a477a5f0fd0ac995c
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -33,6 +33,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -166,10 +167,11 @@ separa orden geométrico, target, regresión de componentes, decisión y cobertu
 sobre artefactos preservados en CPU. No es otro entrenamiento ni una atribución
 causal de la brecha con Extendida, que sigue siendo referencia de sistema.
 El [estado actual](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-incluye protocolo, núcleo, fuentes, escenas, agregación y conexión al corpus
-auditados. La suite actual pasa 66 pruebas CPU; sigue el ejecutor, después
-auditoría operativa, inventario y perfil antes del barrido;
-no se ha ejecutado todavía el roster diagnóstico.
+incluye protocolo e implementación auditados y 83 pruebas CPU pasadas.
+El [perfil](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md)
+autenticó 2048 recibos y procesó las cuatro escenas fijadas; su proyección
+supera el presupuesto temporal. Sigue revisión de costo, sin reducir el
+roster ni ampliar tiempo en silencio; barrido y replay siguen sin ejecutar.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de
