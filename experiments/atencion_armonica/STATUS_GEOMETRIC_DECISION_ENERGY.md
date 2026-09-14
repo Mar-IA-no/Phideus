@@ -1,6 +1,6 @@
 # Energía geométrica para la decisión — estado de implementación
 
-2026-09-14. Diseño concreto e implementación parcial; campaña no iniciada.
+2026-09-14. Preparación OPEN completa; entrenamiento científico no iniciado.
 
 El [protocolo](PROTOCOL_GEOMETRIC_DECISION_ENERGY.md), auditado antes de la
 campaña, fija cuatro rutas por dos pérdidas: Inyección, Geométrica,
@@ -30,7 +30,17 @@ rutas, formatos y exclusión de roles test. La auditoría del adaptador también
 comprobó el roster completo mediante fixtures, el peso igual por escena de la
 escala y la conservación del diagnóstico desacoplado. Una lectura sobre
 un shard TRAIN y los tres backbones pasó sin abrir targets. Esto no equivale
-a adaptar todo el corpus ni a congelar la nueva escala.
+a adaptar todo el corpus ni a congelar la nueva escala. La ejecución posterior
+del [operador de preparación](prepare_geometric_decision_open.py), ya auditado,
+completó las 27 entradas sobre las 4096 escenas TRAIN y 512 de calibración en
+50,708750 s. El cierre local autenticado tiene SHA256
+`70f5996408403ade1e83f67fd84441cd983001dd9ba789ff3f3ab29047adcb6f`.
+La escala TRAIN es `7,5314913344363035`, con 4036 escenas elegibles y 60 sin
+candidatos; estas últimas permanecen en el roster sin recibir peso artificial.
+El recibo de escala tiene SHA256
+`25da9bd505efb0b594e88755f0e20c0018919646a4149e8d1b6faae19e26bd8e`.
+La ejecución no abrió targets ni repitió ajustes o forwards. El consumo OPEN
+acumulado, incluido el smoke anterior, es 54,502751 s de su tope de 1800 s.
 
 El [runner de una celda](../../src/atencion_armonica/geometric_decision_cell.py),
 su kernel y su store ya fueron auditados. Conservan estados de modelo,
@@ -47,7 +57,7 @@ están implementados y auditados con pruebas mecánicas de sus puertos.
 El selector exige las nueve celdas por brazo y las diez épocas elegibles;
 no elige una semilla o backbone ganador.
 
-Permanecen pendientes ejecutar la adaptación completa, completar el supervisor,
+Permanecen pendientes completar el supervisor de las 72 celdas,
 perfil CPU/GPU, admisión de recursos, entrenamiento, selección calibrada real,
 freeze prospectivo, tests nuevos, probes, replay y auditorías finales.
 La GPU está disponible, pero no se usó en este corte de implementación.
