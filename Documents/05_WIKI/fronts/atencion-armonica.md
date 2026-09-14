@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: e2e9233c04814a2f7f061cef0111d12de3ac0564
+evidence_commit: bbf0b71f39aa8aaae5e3235a2bbe9056557b0eaa
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -204,12 +204,16 @@ forwards; el selector está implementado y auditado. Los
 también están completos, con recuperación exacta CUDA comprobada y costos
 separados de cabeza, fitter y carga. El
 [estado](../../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
-registra ahora la campaña de 72 entrenamientos iniciada en CUDA, con supervisor
-y admisión auditados. El operador de selección común también quedó auditado;
-su perfil y ejecución reales esperan el cierre completo del entrenamiento.
+registra los 72 entrenamientos completos en CUDA y la selección CPU sobre
+720 calibraciones, mediante operadores previamente auditados. Se mantiene una
+época por variante y las nueve celdas por variante; no se elige una semilla
+ganadora. El entrenamiento consumió 4912,186859 s y la selección 109,324164 s.
 El ensamblado y almacén observables también están auditados: fits recuperables
 desde factores, entradas compartidas y linaje autenticado original–roundtrip.
-Sus 25 pruebas CPU no sustituyen el freeze ni la evaluación prospectiva.
+Sus pruebas CPU y las del ensamblador recuperable, exclusiones y archivo de
+cabezas no sustituyen el freeze ni la evaluación prospectiva. Los defectos
+de identidad detectados en la preparación se corrigieron y reauditaron antes
+de usarla con tests nuevos.
 Tests, probes y evaluación prospectiva siguen pendientes. No hay ventaja
 experimental demostrada ni promoción arquitectónica.
 

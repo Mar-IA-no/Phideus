@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: e2e9233c04814a2f7f061cef0111d12de3ac0564
+evidence_commit: bbf0b71f39aa8aaae5e3235a2bbe9056557b0eaa
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -253,15 +253,23 @@ con precisión igualada. La preparación OPEN está completa y autenticada;
 el selector está implementado y auditado. Los perfiles CPU/CUDA están completos,
 incluida recuperación exacta CUDA; consumieron 71,594984 s de perfil y no
 entrenaron celdas científicas (`SRC-AA-GEOMETRIC-DECISION-PROFILE`). La proyección
-amortizada favoreció CUDA para la cabeza y el supervisor auditado ya inició
-la campaña completa de 72 celdas. El operador de selección común, su perfil
-CPU y la reautenticación de checkpoints también están implementados y
-auditados, pero esperan ejecución tras el cierre del entrenamiento.
+amortizada favoreció CUDA para la cabeza. El supervisor auditado completó
+72x50épocas en4912,186859s; training/completeSHA
+deb1b7c6b7059255fa08a313f3b45278ddd525077e41d89a3dab3aaa18c8ca81.
+Selector CPU real109,324164s; 720calibraciones; selection/selectionSHA
+a0e8912bab71ed7b79745d802477962b6fcb472e44eb2cf53ead54c726d35abc.
+Épocas MSE/Decisión: Inyección45/30, Geométrica40/45,
+Desacoplada45/40, Local50/45. Ninguna semilla ganadora.
+Perfilselector4,909168s, perfilacumulado76,504152s. No repetir training/selección.
 El ensamblado observable y su store también cerraron auditoría y 25 pruebas
 CPU: schemas de factores sin supervisión, replay exacto de fits desde factores,
 fuentes originales autenticadas y probes con linaje y coordenadas preservados.
 El freeze/productor futuro conserva la autoridad sobre los draws; estos puertos
 no abren tests ni demuestran generalización.
+El ensamblador recuperable, extensión de exclusiones y archivo de144estados
+initial/selected están auditados como puertos; catálogo real y exportación
+admitida aún pendientes. Dos defectos de identidad del ensamblador quedaron
+resueltos y reauditados antes de la ejecución prospectiva.
 Tests nuevos, probes y evaluación prospectiva siguen pendientes. La corrección
 inicial nula hereda una regla de decisión, no demuestra aprendizaje.
 No hay promoción científica ni evidencia física externa añadida.

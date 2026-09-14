@@ -2,6 +2,23 @@
 
 ---
 
+## Energía geométrica: entrenamiento y selección completos (2026-09-14)
+
+El [contraste de operación geométrica y pérdida](../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
+completó los 72 entrenamientos de 50 épocas y fijó una época por variante
+mediante calibración, manteniendo todas las inicializaciones y backbones.
+El entrenamiento consumió aproximadamente 82 minutos en CUDA; la selección
+reutilizó las salidas guardadas y terminó en 109 segundos CPU. Estos cierres
+permiten preparar la evaluación prospectiva, pero todavía no responden si
+la ruta geométrica aporta generalización.
+
+El ensamblado recuperable de escenas, la extensión de exclusiones y el
+archivo numérico de modelos pasaron auditoría de sus interfaces. Se corrigieron
+dos defectos de identidad antes de la ejecución prospectiva: JSON no canónico
+que fallaba después del cálculo y metadatos mutables expuestos a callbacks.
+Los tests nuevos permanecen sin abrir. Sigue conservar los modelos admitidos,
+completar el freeze y evaluar escenas nuevas, transformaciones y replay.
+
 ## Operación y objetivo: diagnóstico completo y relevo prospectivo (2026-09-14)
 
 El [diagnóstico](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
