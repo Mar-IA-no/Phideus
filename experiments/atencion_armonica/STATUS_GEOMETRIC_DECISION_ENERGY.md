@@ -19,7 +19,8 @@ implementa mínimo de ramas disponibles, escala RMS por escena, donantes,
 selector de empates por firma y roundtrip de cuantización/recentrado. Las
 [pruebas del núcleo](test_geometric_decision_core.py) incluyen coóptimos,
 aritmética del target, gradientes, padding, donantes singleton, universo vacío
-y transporte. Su auditoría independiente está en cierre; no constituye
+y transporte. Su auditoría independiente cerró sin findings abiertos en ese
+alcance; no constituye
 admisión del runner futuro ni evidencia de rendimiento experimental.
 
 El [adaptador OPEN](../../src/atencion_armonica/geometric_decision_open.py)
