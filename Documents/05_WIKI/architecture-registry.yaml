@@ -10,7 +10,7 @@ architectures:
   - id: harmonic-decision-geometric-energy
     name: Energía geométrica para la decisión
     status: candidate
-    priority: open_prepared_backend_profiles_and_campaign_pending
+    priority: open_and_cpu_cuda_profiles_complete_campaign_supervisor_pending
     primitive: explicit geometric fit operation retained in the global partition decision, contrasted separately from the learning objective
     evidence_for: classical Extended chooses better VI minima than learned heads in the deformed-family diagnostic despite lower global Kendall correlation
     evidence_against: arithmetic head implemented but no new campaign executed; diagnostic does not identify representation versus loss or optimization; stratified reversal is not causal
@@ -19,9 +19,10 @@ architectures:
       - experiments/atencion_armonica/PLAN_GEOMETRIC_DECISION_ENERGY.md
       - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
       - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
+      - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
       - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
       - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
-    interpretation: fixed formula with audited core and recoverable cell; preparation and selection implemented, full campaign pending; not an architectural promotion or learned physical geometry
+    interpretation: fixed formula with audited core and recoverable cell; OPEN and CPU CUDA profiles complete with exact CUDA recovery, full campaign pending; not an architectural promotion or learned physical geometry
   - id: harmonic-generative-evidence-reader
     name: Lector con evidencia generativa
     status: candidate

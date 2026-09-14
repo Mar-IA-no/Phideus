@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — perfiles CPU/CUDA completos
+
+Los perfiles de cabeza y fitter terminaron, incluida recuperación exacta CUDA,
+sin iniciar la campaña científica. Se preservan costos, fuentes y diferencia
+entre la primitiva del fitter y la pipeline completa. La proyección amortizada
+favorece CUDA para la cabeza; falta integrar y auditar el supervisor y ejecutar
+el contraste. Fuente: `39215f627891ddd073626a2c6673b05206eef80c`.
+
 ## 2026-09-14 — preparación OPEN completa
 
 El operador auditado completó la adaptación de TRAIN/calibración, preservando

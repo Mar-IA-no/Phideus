@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 59c11dd2c0e171c39c277241d74450b193ab7c5e
+evidence_commit: 39215f627891ddd073626a2c6673b05206eef80c
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -43,6 +43,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -249,8 +250,11 @@ y núcleo, adaptador y runner recuperable de una celda auditados
 (`SRC-AA-GEOMETRIC-DECISION-STATUS`): cuatro rutas
 por dos losses, mismos ocho inputs en los controles no Local y bypass explícito
 con precisión igualada. La preparación OPEN está completa y autenticada;
-el selector está implementado y auditado. Perfiles de backend, integración
-del entrenamiento y campaña siguen pendientes. La corrección
+el selector está implementado y auditado. Los perfiles CPU/CUDA están completos,
+incluida recuperación exacta CUDA; consumieron 71,594984 s de perfil y no
+entrenaron celdas científicas (`SRC-AA-GEOMETRIC-DECISION-PROFILE`). La proyección
+amortizada favorece CUDA para la cabeza, pendiente de admisión del supervisor.
+Integración del entrenamiento y campaña siguen pendientes. La corrección
 inicial nula hereda una regla de decisión, no demuestra aprendizaje.
 No hay promoción científica ni evidencia física externa añadida.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja

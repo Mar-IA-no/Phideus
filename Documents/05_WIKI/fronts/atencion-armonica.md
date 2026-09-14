@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 59c11dd2c0e171c39c277241d74450b193ab7c5e
+evidence_commit: 39215f627891ddd073626a2c6673b05206eef80c
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -62,6 +62,7 @@ source_paths:
   - experiments/atencion_armonica/PLAN_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -198,7 +199,10 @@ correspondencia desacoplada, Local y referencia clásica. El
 [protocolo concreto](../../../experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md)
 y el núcleo aritmético, el adaptador y el runner recuperable de una celda ya
 fueron auditados. La preparación OPEN ya se ejecutó completa, sin refits ni
-forwards; el selector está implementado y auditado. El
+forwards; el selector está implementado y auditado. Los
+[perfiles CPU/CUDA](../../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md)
+también están completos, con recuperación exacta CUDA comprobada y costos
+separados de cabeza, fitter y carga. El
 [estado](../../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
 separa esos resultados operativos del entrenamiento y pipeline todavía pendientes;
 no hay nueva campaña iniciada ni ventaja experimental demostrada.

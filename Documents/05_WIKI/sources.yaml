@@ -443,7 +443,15 @@ sources:
     title: Implementación de energía geométrica para la decisión
     path: experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
     authority: implementation_status
-    evidence_regime: audited_recoverable_cell_complete_open_adaptation_no_scientific_training
+    evidence_regime: audited_recoverable_cell_complete_open_and_cpu_cuda_profiles_no_scientific_training
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-GEOMETRIC-DECISION-PROFILE
+    title: Perfiles CPU CUDA de energía geométrica
+    path: experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
+    authority: measured_resource_profile
+    evidence_regime: open_only_resource_profiles_exact_cuda_recovery_no_scientific_training
     mutable: true
     fronts: [AA, PPU]
 
