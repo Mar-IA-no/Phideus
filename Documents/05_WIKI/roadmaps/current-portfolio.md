@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 1b7b9fc2bc7450f6366ebfb587578e9b47452b4d
+evidence_commit: e61b4886405d281427e8952eaf9c9dbd06a321a9
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -166,9 +166,9 @@ separa orden geométrico, target, regresión de componentes, decisión y cobertu
 sobre artefactos preservados en CPU. No es otro entrenamiento ni una atribución
 causal de la brecha con Extendida, que sigue siendo referencia de sistema.
 El [estado actual](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
-es protocolo auditado y módulos de núcleo, fuentes, escenas y agregación con
-44 pruebas CPU pasadas. Sigue la integración al roster y el ejecutor, después
-auditoría de implementación y perfil antes del barrido;
+incluye protocolo, núcleo, fuentes, escenas, agregación y conexión al corpus
+auditados. La suite actual pasa 66 pruebas CPU; sigue el ejecutor, después
+auditoría operativa, inventario y perfil antes del barrido;
 no se ha ejecutado todavía el roster diagnóstico.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.

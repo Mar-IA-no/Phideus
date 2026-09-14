@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — conexión al corpus auditada, ejecución todavía pendiente
+
+Se actualiza la frontera de implementación: cinco módulos auditados, headers
+de cuatro tests autenticados y 66 pruebas conjuntas CPU. Archivos/presupuesto
+posteriores no heredan esa auditoría; falta el ejecutor y su revisión antes
+de inventario/perfil/barrido. No hay evidencia experimental nueva. Fuente:
+`e61b4886405d281427e8952eaf9c9dbd06a321a9`.
+
 ## 2026-09-14 — puertos de fuentes y diagnóstico por escena implementados
 
 El estado enlazado incorpora lectura/extracción, ensamblado por escena y
