@@ -26,12 +26,29 @@ admisión del runner futuro ni evidencia de rendimiento experimental.
 El [adaptador OPEN](../../src/atencion_armonica/geometric_decision_open.py)
 lee los agregados ya autenticados sin modificar sus stores. Sus
 [pruebas de frontera](test_geometric_decision_open.py) cubren recibos,
-rutas, formatos y exclusión de roles test. Una comprobación de lectura sobre
+rutas, formatos y exclusión de roles test. La auditoría del adaptador también
+comprobó el roster completo mediante fixtures, el peso igual por escena de la
+escala y la conservación del diagnóstico desacoplado. Una lectura sobre
 un shard TRAIN y los tres backbones pasó sin abrir targets. Esto no equivale
 a adaptar todo el corpus ni a congelar la nueva escala.
 
-Permanecen pendientes la adaptación completa, estados recuperables y runner,
-perfil CPU/GPU, admisión de recursos, entrenamiento, selección calibrada,
+El [runner de una celda](../../src/atencion_armonica/geometric_decision_cell.py),
+su kernel y su store ya fueron auditados. Conservan estados de modelo,
+optimizador y generadores aleatorios, checkpoints recuperables y salidas
+firmadas float64 de calibración al inicio y cada cinco épocas. Las
+[pruebas de recuperación](test_geometric_decision_cell.py) completan 50 épocas
+con fixtures de soporte elegible pequeño y comprueban igualdad exacta frente
+a una ejecución interrumpida. No son entrenamientos científicos. La prueba
+positiva de recuperación CUDA sigue pendiente del perfil del backend elegido.
+
+La [preparación durable](../../src/atencion_armonica/geometric_decision_corpus.py)
+y el [selector de época](../../src/atencion_armonica/geometric_decision_selection.py)
+están implementados con pruebas mecánicas, todavía sin auditoría de integración.
+El selector exige las nueve celdas por brazo y las diez épocas elegibles;
+no elige una semilla o backbone ganador.
+
+Permanecen pendientes ejecutar la adaptación completa, completar el supervisor,
+perfil CPU/GPU, admisión de recursos, entrenamiento, selección calibrada real,
 freeze prospectivo, tests nuevos, probes, replay y auditorías finales.
 La GPU está disponible, pero no se usó en este corte de implementación.
 

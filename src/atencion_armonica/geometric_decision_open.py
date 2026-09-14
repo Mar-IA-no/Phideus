@@ -98,7 +98,8 @@ class OpenSource:
 
     def observable_shard(self, split, shard, *, check):
         self._role(split, shard)
-        result = {"split": split, "shard": shard, "raw": {}, "inputs": {}, "source_refs": {}}
+        result = {"split": split, "shard": shard, "raw": {}, "inputs": {}, "source_refs": {},
+                  "raw_sham": {}, "decoupled_evidence": {}}
         first = None
         for cp in ge.CHECKPOINTS:
             check()
@@ -122,6 +123,8 @@ class OpenSource:
                     raise ValueError("OPEN backbones do not share supervision identity")
             result["raw"][cp] = decoded["rows"]
             result["inputs"][cp] = delivered["inputs"]["generative"]
+            result["raw_sham"][cp] = delivered["sham"]
+            result["decoupled_evidence"][cp] = [r["evidence"] for r in delivered["inputs"]["decoupled"]]
             result["source_refs"][str(cp)] = {"prepared_shard": shard_ref, "raw": index["raw"][str(cp)],
                 "delivered_index": entry_ref, "delivered_arrays": entry["inputs"]}
         check()
@@ -167,10 +170,16 @@ class OpenSource:
         result = {}
         for cp in ge.CHECKPOINTS:
             rows = []
-            for scene_id, delivered, raw in zip(observable["scene_ids"], observable["inputs"][cp], observable["raw"][cp]):
+            for i, (scene_id, delivered, raw) in enumerate(zip(observable["scene_ids"], observable["inputs"][cp], observable["raw"][cp])):
                 inputs, sham = delivered_interface(delivered, raw, scale=scale["scale"],
                     split_seed=OPEN_SPLITS[split][1], scene_id=scene_id)
-                rows.append({"scene_id": scene_id, "inputs": inputs, "sham": sham})
+                preserved = observable["decoupled_evidence"][cp][i]
+                donors = np.asarray(sham["six_channel_sham"]["donors"], np.int64)
+                if (encoded(sham["six_channel_sham"]) != encoded(observable["raw_sham"][cp][i])
+                        or not np.array_equal(delivered["evidence"][donors], preserved)):
+                    raise ValueError("new interface sham differs from preserved delivered diagnostics")
+                rows.append({"scene_id": scene_id, "inputs": inputs, "sham": sham,
+                             "diagnostics": {"decoupled_six": preserved.copy()}})
             if len(rows) != 512:
                 raise ValueError("interface requires the complete observable shard")
             result[cp] = rows
