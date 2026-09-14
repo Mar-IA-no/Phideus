@@ -1,11 +1,11 @@
 # Energía geométrica para la decisión — estado de implementación
 
-2026-09-14. Preparación OPEN y perfiles CPU/CUDA completos; entrenamiento científico no iniciado.
+2026-09-14. Preparación OPEN y perfiles CPU/CUDA completos; campaña de entrenamiento iniciada en CUDA, todavía sin cierre completo.
 
 El [protocolo](PROTOCOL_GEOMETRIC_DECISION_ENERGY.md), auditado antes de la
 campaña, fija cuatro rutas por dos pérdidas: Inyección, Geométrica,
 Desacoplada y Local, cada una con MSE o surrogate de decisión. Son 72
-entrenamientos previstos, no ejecutados. La comparación separa la ruta
+entrenamientos en el roster de la campaña activa. La comparación separa la ruta
 geométrica en la decisión del objetivo de aprendizaje.
 
 La [cabeza común](../../src/atencion_armonica/geometric_decision_model.py)
@@ -58,12 +58,25 @@ La [preparación durable](../../src/atencion_armonica/geometric_decision_corpus.
 y el [selector de época](../../src/atencion_armonica/geometric_decision_selection.py)
 están implementados y auditados con pruebas mecánicas de sus puertos.
 El selector exige las nueve celdas por brazo y las diez épocas elegibles;
-no elige una semilla o backbone ganador.
+no elige una semilla o backbone ganador. El
+[operador de selección](select_geometric_decision.py) y su
+[perfil CPU específico](../../src/atencion_armonica/geometric_decision_selection_profile.py)
+también quedaron implementados y auditados. Reautentican el cierre integral
+de cada celda, su estado final y los once checkpoints de calibración;
+no aceptan un output parcial como finalización. Su ejecución real sigue
+pendiente del cierre del entrenamiento y del perfil de selección.
 
-Permanecen pendientes completar el supervisor de las 72 celdas,
-admisión de recursos, entrenamiento, selección calibrada real,
-freeze prospectivo, tests nuevos, probes, replay y auditorías finales.
-La GPU se usó sólo en los perfiles; no hay resultados científicos nuevos.
+El [supervisor completo](train_geometric_decision.py), auditado junto con la
+admisión y proyección de recursos, ya inició las 72 celdas en CUDA. Reutiliza
+una carga por backbone y conserva las celdas completas sin reentrenarlas al
+recuperar. El [plan de ejecución](PLAN_GEOMETRIC_DECISION_CAMPAIGN.md) mantiene
+las 50 épocas, semillas, pérdidas y controles del protocolo. El inicio de la
+campaña no equivale a su cierre ni permite interpretar ventajas entre brazos.
+
+Permanecen pendientes el cierre de los 72 entrenamientos, perfil y selección
+calibrada real, freeze prospectivo, tests nuevos, probes, replay y auditorías
+finales. Los tests nuevos no se abrieron; todavía no hay resultados del
+contraste prospectivo que permitan evaluar generalización.
 
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,
