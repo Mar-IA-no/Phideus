@@ -2,6 +2,19 @@
 
 ---
 
+## Operación y objetivo: protocolo auditado y núcleo inicial (2026-09-14)
+
+El [nuevo diagnóstico](../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+ya tiene protocolo auditado y un núcleo numérico con 18 pruebas CPU pasadas.
+La revisión precisó qué recibió realmente la cabeza, el orden canónico de
+las etiquetas, la suma float32 y el soporte de las comparaciones. El mínimo
+UB clásico no se toma como sustituto de todo el canal generativo ni de la loss.
+
+Todavía no se ejecutó el diagnóstico sobre el roster. Faltan adaptador,
+ejecutor, auditoría de implementación, perfil y presupuesto antes de las
+2048 escenas y el replay. El goal permanece activo; las pruebas del núcleo
+no sustituyen evidencia experimental ni habilitan promoción.
+
 ## Evidencia generativa: contraste completo y relevo geométrico (2026-09-14)
 
 El [contraste generativo](../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
