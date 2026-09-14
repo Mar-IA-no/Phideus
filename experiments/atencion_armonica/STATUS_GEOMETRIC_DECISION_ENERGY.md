@@ -43,7 +43,7 @@ positiva de recuperación CUDA sigue pendiente del perfil del backend elegido.
 
 La [preparación durable](../../src/atencion_armonica/geometric_decision_corpus.py)
 y el [selector de época](../../src/atencion_armonica/geometric_decision_selection.py)
-están implementados con pruebas mecánicas, todavía sin auditoría de integración.
+están implementados y auditados con pruebas mecánicas de sus puertos.
 El selector exige las nueve celdas por brazo y las diez épocas elegibles;
 no elige una semilla o backbone ganador.
 
