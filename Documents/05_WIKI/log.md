@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — entrenamiento recuperable implementado
+
+El adaptador y el runner de una celda cierran sus auditorías técnicas. La
+implementación preserva checkpoints recuperables y salidas iniciales y por
+época; preparación durable y selector tienen pruebas mecánicas. No hay
+campaña nueva ni evidencia comparativa añadida. Fuente:
+`c66f7d94ff94080e8edc2564ba9581d33f38c6be`.
+
 ## 2026-09-14 — contrato y núcleo de energía geométrica
 
 Se enlazan el protocolo concreto y el estado de implementación. Contrato y

@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: a6477eddc88ab600ff855d888f05aef30f14eeb9
+evidence_commit: c66f7d94ff94080e8edc2564ba9581d33f38c6be
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -245,9 +245,11 @@ El relevo debe ser prospectivo, separando operación geométrica en la decisión
 y loss, no sólo otra cabeza ni tuning sobre tests abiertos. Representación,
 optimización, época seleccionada y loss siguen sin atribución causal.
 Ese relevo ya tiene contrato concreto (`SRC-AA-GEOMETRIC-DECISION-PROTOCOL`)
-y núcleo aritmético auditado (`SRC-AA-GEOMETRIC-DECISION-STATUS`): cuatro rutas
+y núcleo, adaptador y runner recuperable de una celda auditados
+(`SRC-AA-GEOMETRIC-DECISION-STATUS`): cuatro rutas
 por dos losses, mismos ocho inputs en los controles no Local y bypass explícito
-con precisión igualada. Pipeline y campaña siguen pendientes; la corrección
+con precisión igualada. Preparación durable y selector están implementados;
+integración y campaña siguen pendientes. La corrección
 inicial nula hereda una regla de decisión, no demuestra aprendizaje.
 No hay promoción científica ni evidencia física externa añadida.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
