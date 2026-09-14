@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 7dd87df5b9fcbf840e03d1364b86c6738fb7869e
+evidence_commit: bea5f7de479f572f981ea955e747494461ff1a78
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -30,6 +30,8 @@ source_paths:
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -134,14 +136,14 @@ Pares y Desacoplada, sin ventaja clara frente a Local; en familia deformada
 pierde frente a los tres. Las auditorías finales cerraron sin hallazgos
 materiales abiertos. El [diagnóstico de fuentes rivales](../../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
 completó 96 escenas y replays: ajuste, cobertura e identidad se separan, sin
-una explicación uniforme del error por márgenes pequeños. La siguiente
-ablación debe aislar evidencia generativa sobre cabeza y pérdida comunes,
+una explicación uniforme del error por márgenes pequeños. La ablación posterior
+aisló evidencia generativa sobre cabeza y pérdida comunes,
 con ausencia y desacople como controles. Comparar `argmin J` con los lectores
 preservados cambia objetivos, acceso y complejidad: es referencia de sistema,
 no atribución causal a geometría. Los priors del sampler siguen siendo supuestos.
 El [diseño inicial](../../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
 ya tiene un [protocolo separado](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md)
-y una implementación parcial. El
+y una implementación completa. El
 [estado operativo](../../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
 registra perfiles CPU/GPU, preparación de train/calibración y carga real
 del corpus completados, con proyección de recursos comprobada. Los 27
@@ -153,9 +155,15 @@ comparación incorrecta entre tuplas y listas JSON detuvo la etapa antes de
 ajustes, predicciones o evaluación. La reparación de serialización ya fue
 auditada y la campaña se reanudó sin repetir esos cálculos. IID, mayor
 inarmonicidad y polifonía completaron predicción, evaluación y replay.
-Familia deformada se reanudó el 2026-09-14 con GPU habilitada y conserva
-sus artefactos y presupuesto. Corresponde completar ese test y las auditorías
-finales; los resultados disponibles son parciales y descriptivos.
+Familia deformada se reanudó el 2026-09-14 y también completó las tres etapas;
+las auditorías finales cerraron sin hallazgos materiales abiertos. El
+[resultado](../../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+es mixto: Generativa mejora ARI frente a Desacoplada en el primario deformado,
+sin ventaja clara frente a Local; pierde frente a Desacoplada en polifonía.
+El [siguiente diagnóstico](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+separa orden geométrico, target, regresión de componentes, decisión y cobertura
+sobre artefactos preservados en CPU. No es otro entrenamiento ni una atribución
+causal de la brecha con Extendida, que sigue siendo referencia de sistema.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de
@@ -178,7 +186,7 @@ alineación; sus sucesores se eligen por lo aprendido.
 | 1 | Escalón 2: P2 vs P3 | P2/P3 completos | Diagnóstico CKA/probes y lectura del null | Usuario |
 | paralelo | Gate 6 Exp C | Artefactos downstream disponibles | Evidencia de utilidad de features congeladas | Usuario |
 | decisión | Voz Expresiva | Cierre EN↔ZH completo | Elegir Fase 1.2, dominio naturalista o cierre | Usuario |
-| ciclo geométrico | Atención Armónica | Diagnóstico de rivales: 96 escenas y replays completos | Ablación de evidencia generativa con cabeza y loss comunes; Stage B/CQT siguen alternativas | Ejecución autónoma; promoción y GO/NO-GO: usuario |
+| ciclo geométrico | Atención Armónica | Evidencia generativa: 27 entrenamientos y cuatro tests con replay, resultado mixto | Diagnóstico de operación geométrica y objetivo; Stage B/CQT siguen alternativas | Ejecución autónoma; promoción y GO/NO-GO: usuario |
 | reactivación | Escalón 3 | P0, P1, P2, P4, P5 y P6 completos; P3 abierto | Elegir P3, replicación, activation o transferencia | Usuario |
 | proyección | Escalón 4 | Método transferible y diseño aprobado | Abrir protocolo fisiológico | Usuario |
 | base acumulativa cerrada | Olas 1–60 | Corpus estratificado, tres líneas preservadas y gate de mapeo ejecutado; el factorial común vigente no conserva una unidad, observación, target y stack decisional comunes. M5 sí valida la separación de fases y autoridad | La bibliografía deja de ser corriente autónoma; EIV queda referencia externa y el router espera evidencia afirmativa de una primitive | Diseño y evidencia: Codex; promoción y GO/NO-GO: usuario |
@@ -208,7 +216,7 @@ autónomo. Las demás filas son alternativas preservadas, no una cola obligatori
 | Gate 6 | hipótesis explícita sobre Exp C | insistir con `Transkun+A4` ya cerrado |
 | Voz | decisión entre N-strict y habla naturalista | presentar ESD como habla espontánea |
 | E3 | mejor brazo o experimento discriminante nuevo | repetir P6 puro sin cambio de hipótesis |
-| AA | rivales observables completos; diseño de ablación de evidencia generativa con cabeza y loss comunes | inferir aprendibilidad desde el oracle, escalar el residual sin ventaja incremental o volver al tuning de τ |
+| AA | contraste generativo completo; diagnóstico CPU de operación, target y decisión | inferir aprendibilidad desde el oracle, entrenar sobre tests abiertos o volver al tuning de τ |
 | PPU/NHG | tracks exactos separados de unidades/Buckingham, composición/ciclos, conservación/equivalencia, compatibilidad local-global, geometrías estadísticas/de medidas, ley/solver, wiring/constitución, identificabilidad/certificación, projectivity, semiring, cociente de forma, realizabilidad conforme, autoridad set-valued y transformación garantizada; Olas 50–51 separan conjunto identificado y decisión, pero descartan como prioritaria la factorización two-stage simple sin autoridad adicional | confundir adimensionalidad, similitud, balance, constitución, residual, obstrucción, Fisher/Aitchison, costo/mecanismo, energía/simplécticidad, wiring/semántica, predicción/causalidad, equivariance/projectivity, PWL/tropicalidad, distancia/correspondencia, invariante local/realizabilidad global, conjunto poblacional/aproximación/inferencia, soundness/precisión, output/autoridad o proposal/repair |
 | E4 | dataset, modalidades, baseline y controles predeclarados | abrir por analogía sin ground truth adecuado |
 
@@ -297,6 +305,6 @@ set-valued avanzó hasta un runner auditado sobre histórico abierto. EIV
 permanece como referencia externa y el router, diferido. En ese corte se
 planteó congelar el paquete prospectivo antes de cualquier draw. El rebase
 posterior dejó esa extensión pausada e incompleta: no es el próximo goal
-vigente. El ciclo actual ya completó el diagnóstico de fuentes rivales y
-continúa hacia una ablación de evidencia generativa sobre cabeza y pérdida
-comunes, sin promoción científica.
+vigente. El ciclo actual ya completó el contraste de evidencia generativa
+sobre cabeza y pérdida comunes y continúa hacia un diagnóstico de operación
+geométrica y objetivo de aprendizaje, sin promoción científica.

@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 7dd87df5b9fcbf840e03d1364b86c6738fb7869e
+evidence_commit: bea5f7de479f572f981ea955e747494461ff1a78
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -26,6 +26,8 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -95,17 +97,15 @@ mejora el primario frente a Pares y Desacoplada, no claramente frente a Local,
 y pierde frente a los tres bajo familia deformada. Las auditorías finales
 cerraron sin hallazgos materiales abiertos. El [diagnóstico de rivales](../../experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md)
 completó 96 escenas y replays: ajuste de familia, cobertura e identidad no
-son equivalentes. La continuidad debe aislar evidencia generativa con cabeza
-y pérdida comunes, sin atribuir a geometría los priors del banco sintético.
-El [contraste generativo](../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
-completó la preparación y carga del corpus después de perfilar CPU/GPU y
-almacenamiento. Los 27 entrenamientos y la selección por calibración están
-completos; la auditoría confirmó época 50 para los tres brazos. La campaña
-de tests se reanudó tras dos reparaciones de integración auditadas. La enmienda
-JSON conserva las 512 escenas IID, sus features, tres forwards y el tiempo
-consumido. IID, mayor inarmonicidad y polifonía completaron evaluación y replay;
-familia deformada se reanudó el 2026-09-14 desde su pausa recuperable con
-GPU habilitada. Faltan ese test y las auditorías finales.
+son equivalentes. El [contraste generativo](../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+completó 27 entrenamientos y cuatro tests con replay, manteniendo cabeza y
+pérdida comunes. En el primario deformado, la alineación del canal ayuda
+frente al desacople, sin ventaja clara de ARI sobre Local; en polifonía
+pierde frente a Desacoplada. Los fallos y recuperaciones están preservados,
+y las auditorías finales cerraron sin hallazgos materiales abiertos. El
+[siguiente diagnóstico](../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+examinará operación geométrica, target y decisión aprendida sobre artefactos
+en CPU, sin otro entrenamiento adaptado a estos tests ni promoción.
 
 ## Leyenda
 
@@ -154,7 +154,7 @@ flowchart LR
 | Escalón 2 | P2 y P3 sostienen un null descriptor-guided | Diagnóstico representacional P2 vs P3 | Foco |
 | Voz Expresiva | N-adapt transfiere EN↔ZH; N-strict no | Diagnosticar N-strict o pasar a habla naturalista | Decisión |
 | Escalón 3 | P5-cqtshift es el mejor brazo OOD actual; P6 puro no gana | Replicación, activation o transferencia | Reactivable |
-| Atención Armónica | Fuentes rivales: 96 escenas y replays; fases 0–0.6 preservadas | Ablación de evidencia generativa bajo cabeza/loss comunes | Ajuste, cobertura e identidad separados; sin promoción |
+| Atención Armónica | Evidencia generativa: 27 entrenamientos y cuatro tests con replay; fases 0–0.6 preservadas | Diagnóstico CPU de operación geométrica, target y decisión | Resultado mixto, sin promoción |
 | PPU / geometría proporcional | Preflight set-valued histórico cerrado; extensión física incompleta | Corpus y mecanismos como evidencia del ciclo geométrico; no continuar envolvente por inercia | Extensión física pausada |
 | Escalón 4 | Existe como hipótesis fisiológica | Falta diseño experimental | Proyección |
 
@@ -178,10 +178,11 @@ flowchart TD
     NOW --> E2D["Cerrar diagnóstico P2 vs P3"]
     NOW --> G6C["Completar o cerrar Gate 6 Exp C"]
     NOW --> VED{"Voz: ¿diagnóstico o dominio naturalista?"}
-    NOW --> GEO["Preflight de compatibilidad completo<br/>runner y medición GPU antes de training"]
+    NOW --> GEO["Evidencia generativa completa<br/>27 entrenamientos · cuatro tests y replays"]
+    GEO --> ALIGN["Siguiente diagnóstico CPU<br/>orden geométrico · target · decisión"]
     GEO -.-> AAD{"Alternativas AA preservadas"}
     NOW --> E3D{"E3: ¿replicación, activation o transferencia?"}
-    NOW --> GTD{"PPU: ¿la composición proporcional explícita aporta?"}
+    NOW -.-> GTD{"Antecedentes PPU preservados<br/>composición proporcional explícita"}
 
     VED --> VE12["Fase 1.2 N-strict"]
     VED --> MSP["MSP-Podcast / habla naturalista"]

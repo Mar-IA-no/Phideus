@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 7dd87df5b9fcbf840e03d1364b86c6738fb7869e
+evidence_commit: bea5f7de479f572f981ea955e747494461ff1a78
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -30,6 +30,9 @@ source_paths:
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_METRICS.csv
+  - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -174,7 +177,7 @@ pasan sólo de 18 a 19 entre 23 escenas con candidatos; una de las 24 no tiene
 salida. En mayor beta, la plantada ajusta mejor en las 24 y falta del universo
 observable en dos. Se separan ajuste, cobertura e identidad: ni las cotas de
 grilla prueban identificabilidad global ni los priors del sampler son leyes
-físicas. La próxima ablación debe mantener cabeza y pérdida comunes para
+físicas. La ablación posterior mantuvo cabeza y pérdida comunes para
 aislar evidencia generativa correcta frente a ausencia/desacople; `argmin J`
 queda como referencia de sistema, no contraste causal de arquitectura.
 El [diseño inicial](../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
@@ -195,8 +198,22 @@ o evaluación. La enmienda explícita de serialización pasó auditoría indepen
 y 45 pruebas CPU; la inferencia IID se reanudó conservando ambos fallos,
 artefactos y tiempo consumido. IID, mayor inarmonicidad y polifonía completaron
 predicción, evaluación y replay; familia deformada se reanudó el 2026-09-14
-con GPU habilitada, desde los artefactos de su pausa recuperable. Ese test y las
-auditorías finales siguen pendientes.
+con GPU habilitada y también cerró. El supervisor terminó con salida 0 y
+7101.919 segundos acumulados; auditorías finales completas, sin hallazgos
+materiales abiertos dentro de su alcance.
+El [resultado completo](../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+(`SRC-AA-GENERATIVE-EVIDENCE-RESULTS`) es mixto: en el primario deformado,
+Generativa−Desacoplada ARI +0.006858, IC97.5% [0.002706, 0.011171];
+Generativa−Local +0.002957 [−0.000668, 0.007134], sin ventaja clara.
+Polifonía es adversa frente a Desacoplada. Los soportes son 505/512, 497/512,
+451/512 y 484/512; las nueve celdas se promedian dentro de escena, no se
+tratan como réplicas independientes. Las 676 filas publicadas conservan trece
+métricas, contrastes y referencias (`SRC-AA-GENERATIVE-EVIDENCE-METRICS`).
+El [siguiente diseño](../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+(`SRC-AA-OPERATOR-OBJECTIVE-PLAN`) reutilizará artefactos en CPU para separar
+orden geométrico frente a target, regresión de entropías, ranking aprendido
+y cobertura. La ventaja de Extendida como sistema no localiza una causa;
+el diagnóstico es retrospectivo y no autoriza adaptar heads a estos tests.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
@@ -992,7 +1009,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `E2` | Speech ↔ EGG | `focus_active` | P2 y P3 completos; ningún descriptor supera al baseline correspondiente; null bajo encoder pequeño y WavLM frozen | Comparación `P2 vs P3`: CKA, probes y lectura representacional |
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
-| `AA` | Atención Armónica | `focus_active` | Fuentes rivales: 96 escenas y replays; ajuste, cobertura e identidad separados | Ablación de evidencia generativa bajo cabeza/loss comunes; Stage B y CQT preservados |
+| `AA` | Atención Armónica | `focus_active` | Evidencia generativa: 27 entrenamientos y cuatro tests con replay, resultado mixto | Diagnóstico de operación geométrica, target y decisión; Stage B y CQT preservados |
 | `PPU` | Arquitectura proporcional | `physical_extension_paused_incomplete` | Preflight set-valued histórico conservado; extensión física sin cierre | Corpus y mecanismos como evidencia del nuevo ciclo geométrico; no retomar paquete ni router por inercia |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
@@ -1249,9 +1266,9 @@ El registro completo, con tipo y regla de resolución, está en
 
 ## Orden de lectura de decisiones abiertas
 
-1. Ciclo geométrico: fuentes rivales con 96 escenas y replays completos;
-   aislar evidencia generativa bajo cabeza y pérdida comunes, sin promover
-   una arquitectura ni convertir tests abiertos en confirmación independiente.
+1. Ciclo geométrico: contraste generativo completo con resultado mixto;
+   diagnosticar operación, target y decisión en CPU, sin promover una
+   arquitectura ni convertir tests abiertos en confirmación independiente.
 2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
 3. `G6C`: mantener separado como pregunta downstream residual.
 4. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio

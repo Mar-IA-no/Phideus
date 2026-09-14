@@ -322,7 +322,7 @@ sources:
     title: Protocolo del lector con evidencia generativa
     path: experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
     authority: prospective_executable_protocol
-    evidence_regime: common_head_joint_evidence_stratified_sham_27_trainings_four_fresh_tests_not_executed
+    evidence_regime: frozen_prospective_design_common_head_joint_evidence_stratified_sham_27_trainings_four_fresh_tests
     mutable: false
     fronts: [AA, PPU]
 
@@ -330,7 +330,31 @@ sources:
     title: Estado de ejecución del lector con evidencia generativa
     path: experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
     authority: operational_status_snapshot
-    evidence_regime: training_and_selection_complete_three_tests_replayed_primary_resumed_final_audits_pending
+    evidence_regime: 27_trainings_four_tests_replayed_independent_final_audits_complete
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-GENERATIVE-EVIDENCE-RESULTS
+    title: Evidencia generativa, resultado mixto y límites
+    path: experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
+    authority: controlled_synthetic_experiment_report
+    evidence_regime: 27_trainings_four_fresh_tests_paired_scene_intervals_system_references_exact_replays
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-GENERATIVE-EVIDENCE-METRICS
+    title: Métricas del contraste generativo
+    path: experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_METRICS.csv
+    authority: authenticated_summary_export
+    evidence_regime: 676_metric_contrast_reference_rows_with_support_and_source_hashes
+    mutable: false
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-OPERATOR-OBJECTIVE-PLAN
+    title: Alineación entre operación geométrica y objetivo
+    path: experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
+    authority: initial_successor_design
+    evidence_regime: retrospective_cpu_diagnostic_design_requires_executable_protocol
     mutable: true
     fronts: [AA, PPU]
 

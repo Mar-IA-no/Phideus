@@ -1,5 +1,5 @@
 schema_version: 1
-updated: 2026-09-09
+updated: 2026-09-14
 policy:
   promotion_authority: user
   external_research: experiment_blocking_only
@@ -10,18 +10,20 @@ architectures:
   - id: harmonic-generative-evidence-reader
     name: Lector con evidencia generativa
     status: candidate
-    priority: three_replayed_tests_complete_primary_resumed
+    priority: four_tests_replayed_independent_audits_complete_operator_objective_diagnostic_next
     primitive: common invariant partition head with aligned versus absent or decoupled generative evidence
     learned_components: [partition head with common split and merge entropy regression loss]
     frozen_components: [three historical pair networks, observable candidate algorithm, explicit generative fitter]
-    evidence_for: finite rival diagnosis separated fit and coverage and produced an observable joint-fit operation
-    evidence_against: IID, higher-beta and polyphony evaluations and replays complete; primary deformed-family contrast and final audits pending; sampler priors limit physical authority
-    next_experiment: finish the resumed primary deformed-family test from preserved artifacts and cumulative budget, then complete replay and final audits
+    evidence_for: 27 trainings and four fresh tests with replay; aligned channel improves primary deformed-family ARI versus decoupled evidence
+    evidence_against: no clear primary ARI advantage over Local; lower polyphony ARI than Decoupled; classical Extended system stronger in primary but not a matched causal comparison; synthetic priors limit authority
+    next_experiment: retrospective CPU diagnosis of geometric-score versus target ranking, entropy-component prediction, decision regret and candidate coverage; no post-test head tuning
     source_paths:
       - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
       - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
       - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
       - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
+      - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
+      - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
       - src/atencion_armonica/generative_evidence_model.py
     interpretation: incremental evidence intervention at common head and loss; not novel neural geometry or promoted architecture
   - id: harmonic-explicit-generative-reader
@@ -33,10 +35,11 @@ architectures:
     external_components: [candidate pool union and bounded neighbors, sampler support, finite grid fitter]
     evidence_for: 96 retrospective scenes and exact replays; extended family reduces deformed residual
     evidence_against: fit does not identify membership; limited pool coverage; no matched neural comparison or natural-harmony validation
-    next_experiment: preserve as system reference while testing its evidence in a matched learned head
+    next_experiment: compare its candidate ordering against the normalized entropy target and learned reader ordering on preserved outputs
     source_paths:
       - experiments/atencion_armonica/PROTOCOL_OBSERVABLE_SOURCE_RIVALS.md
       - experiments/atencion_armonica/RESULTS_OBSERVABLE_SOURCE_RIVALS.md
+      - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
     interpretation: computable operation under known synthetic law; not a calibrated posterior or identifiability certificate
   - id: harmonic-learned-partition-reader
     name: Lector aprendido de particiones
@@ -47,7 +50,7 @@ architectures:
     frozen_components: [three historical descriptor-guided pair networks, candidate pool algorithm]
     evidence_for: 36 trainings and four fresh tests; shared improves primary polyphony ARI over learned pairs and decoupled controls
     evidence_against: no clear primary advantage over local compatibility; shared has lower ARI than all three learned controls under deformed family; oracle gap does not prove learnability
-    next_experiment: preserve local compatibility as a strong baseline for matched generative-evidence ablation; observability diagnosis now complete
+    next_experiment: preserve local compatibility as a strong baseline while diagnosing operator versus target alignment; matched generative-evidence campaign complete
     source_paths:
       - experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md
       - experiments/atencion_armonica/PLAN_LEARNED_PARTITION_READER.md

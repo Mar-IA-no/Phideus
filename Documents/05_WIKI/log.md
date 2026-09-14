@@ -1,5 +1,16 @@
 # Log de la wiki
 
+## 2026-09-14 — contraste generativo cerrado y relevo operador–objetivo
+
+Los 27 entrenamientos, cuatro tests y replays terminaron; las auditorías
+independientes de evidencia y alineación cerraron sin hallazgos materiales
+abiertos. Se incorporan informe, tabla de métricas y siguiente diseño CPU.
+El primario favorece al canal alineado frente al desacople, sin ventaja clara
+frente a Local; polifonía es adversa frente al desacople. Se conservan los
+límites sintéticos, los controles y las alternativas, sin promoción.
+Se corrigieron diagrama, régimen registral y estado de evidencia antiguos.
+Fuente: contenido en `bea5f7de479f572f981ea955e747494461ff1a78`.
+
 ## 2026-09-14 — primario reanudado desde la pausa recuperable
 
 La inferencia de familia deformada se reanudó con disponibilidad de GPU

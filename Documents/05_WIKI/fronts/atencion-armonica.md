@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 7dd87df5b9fcbf840e03d1364b86c6738fb7869e
+evidence_commit: bea5f7de479f572f981ea955e747494461ff1a78
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -48,6 +48,9 @@ source_paths:
   - experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md
   - experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md
+  - experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_METRICS.csv
+  - experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -58,7 +61,7 @@ depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
 experiment_status: mixed
-evidence_status: synthetic_loss_reader_tests_and_retrospective_rival_diagnostic_with_exact_replays
+evidence_status: synthetic_loss_and_reader_tests_including_matched_generative_evidence_with_exact_replays
 decision_status: pending_analysis
 ---
 
@@ -136,30 +139,32 @@ conservan los intentos incompletos, las correcciones de validación y la enmiend
 explícita de RAM, sin cambiar modelos, selección ni muestras. El próximo
 movimiento debe distinguir ambigüedad de la observación y limitaciones del
 lector: un oracle dentro del pool no demuestra aprendibilidad, y un residual
-pequeño no identifica una fuente física. La siguiente ablación debe mantener
-cabeza y pérdida comunes y variar evidencia generativa correcta, ausente o
+pequeño no identifica una fuente física. La ablación posterior mantuvo
+cabeza y pérdida comunes y varió evidencia generativa correcta, ausente o
 desacoplada. El ajuste clásico es una referencia de sistema, no un contraste
 causal de arquitectura; rangos y cardinalidades del sampler no son invariantes
 físicos ni validación de HIT. El [diseño inicial](../../../experiments/atencion_armonica/PLAN_GENERATIVE_EVIDENCE_READER.md)
 ya se desarrolló en un [protocolo separado](../../../experiments/atencion_armonica/PROTOCOL_GENERATIVE_EVIDENCE_READER.md).
-El [estado de ejecución](../../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
-separa la implementación de sus resultados: el perfil CPU/GPU y de
-almacenamiento, la preparación de train/calibración y la carga real del
-corpus entregado ya terminaron. La proyección de recursos fue comprobada
-y los 27 entrenamientos de 50 épocas terminaron. La selección por calibración
-cerró y fue auditada: época 50 para los tres brazos, sobre soporte común
-503/512 y sin escoger un checkpoint o una semilla ganadores. El freeze cerró
-antes de generar las 512 escenas IID, pero la primera inferencia se detuvo
-por un error de integración del almacén. Su recuperación auditada preservó
-esas escenas y permitió guardar features y tres forwards; después se detuvo
-por una comparación incorrecta de tuplas en memoria con listas JSON. La enmienda
-explícita de serialización ya fue auditada, con 45 pruebas CPU independientes,
-y la inferencia IID se reanudó desde ese prefijo. IID, mayor inarmonicidad y
-polifonía completaron predicción, evaluación y replay; familia deformada y las
-auditorías finales siguen pendientes. La inferencia del último test se reanudó
-el 2026-09-14 con GPU habilitada, preservando ajustes y presupuesto acumulado.
-La selección OPEN y
-las pruebas mecánicas no acreditan una ventaja de generalización.
+El [resultado generativo](../../../experiments/atencion_armonica/RESULTS_GENERATIVE_EVIDENCE_READER.md)
+completó 27 entrenamientos y cuatro tests con replay. La selección OPEN eligió
+época 50 por brazo, sin escoger checkpoint o semilla ganadores. El primario
+deformado favorece Generativa frente a Desacoplada en ARI: +0.006858,
+IC97.5% [0.002706, 0.011171]. Frente a Local, +0.002957
+[−0.000668, 0.007134] no establece una ventaja clara. En polifonía,
+Generativa pierde frente a Desacoplada. Los intervalos son pareados por escena,
+condicionados a las nueve celdas entrenadas; no son nueve réplicas independientes.
+La cobertura es 505/512, 497/512, 451/512 y 484/512, sin ARI imputado a ausencias.
+El [estado operativo](../../../experiments/atencion_armonica/STATUS_GENERATIVE_EVIDENCE_READER.md)
+conserva fallos, enmienda JSON posterior al draw, pausa y 7101.919 segundos
+acumulados del supervisor. Los cuatro tests y las auditorías finales ya cerraron,
+sin hallazgos materiales abiertos dentro del alcance revisado. No hay promoción
+ni autoridad física añadida por draws sintéticos.
+
+El [siguiente diseño](../../../experiments/atencion_armonica/PLAN_OPERATOR_OBJECTIVE_ALIGNMENT.md)
+diagnosticará en CPU la relación entre orden geométrico, target y ranking
+aprendido, separando regresión de componentes, oracles y cobertura. La mayor
+ARI de Extendida en el primario es evidencia de sistema, no identificación
+causal del módulo que falla. No se entrenará otro lector sobre estos tests.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
