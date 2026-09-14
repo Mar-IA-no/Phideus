@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 2766187ca3801aa69dd92abe52a183dced0b800d
+evidence_commit: 5a6953ea789f69982bd633293641a69338663814
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -35,6 +35,7 @@ source_paths:
   - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -177,6 +178,10 @@ El [cache posterior](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJ
 preserva los cuatro bundles y pasa 92 pruebas conjuntas, pero la proyección
 continúa fuera del límite. Sigue revisar costo restante y continuidad del
 runtime; no otra campaña neuronal por inercia.
+La [optimización de medias y codec](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md)
+preserva la equivalencia pero tampoco habilita barrido. El próximo corte
+revisa la proyección por carga real y costos fijos, sin recortar el objetivo
+ni ampliar presupuesto en silencio.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de

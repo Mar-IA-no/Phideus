@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 2766187ca3801aa69dd92abe52a183dced0b800d
+evidence_commit: 5a6953ea789f69982bd633293641a69338663814
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -37,6 +37,7 @@ source_paths:
   - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -231,6 +232,12 @@ El cache posterior fue auditado y medido: cuatro bundles byte-idénticos,
 92 pruebas CPU pasadas y 15.821776 s acumulados. La misma fórmula proyecta
 8023.686073 s; sigue sin caber. Se preservan v1 y presupuesto mientras se
 revisan serialización y costo restante (`SRC-AA-OPERATOR-OBJECTIVE-CACHE-PROFILE`).
+El corte posterior de medias/codec conserva bytes y recibos, con 107 pruebas
+pasadas y 16.400343 s acumulados. Proyecta 6251.429694 s: sigue sin caber.
+La admisión actual amplifica por pares también los gastos de publicación;
+el próximo paso es una revisión explícita de carga real, costos fijos y
+continuidad del runtime (`SRC-AA-OPERATOR-OBJECTIVE-FAST-PROFILE`), no más
+optimización local sin evaluar su suficiencia. No hay roster ni replay completos.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja
 de generalización.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde

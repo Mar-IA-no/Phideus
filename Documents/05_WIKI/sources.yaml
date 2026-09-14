@@ -390,6 +390,14 @@ sources:
     mutable: false
     fronts: [AA, PPU]
 
+  - id: SRC-AA-OPERATOR-OBJECTIVE-FAST-PROFILE
+    title: Medias y codec exactos del diagnóstico operador–objetivo
+    path: experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
+    authority: authenticated_operational_profile
+    evidence_regime: four_fixed_compacts_exact_bytes_and_receipts_cost_model_review_required
+    mutable: false
+    fronts: [AA, PPU]
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md

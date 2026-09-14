@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-14 — medias y codec exactos; revisión de la proyección
+
+El segundo corte preservó las cuatro escenas y pasó 107 pruebas. El perfil
+sigue sin habilitar barrido; corresponde revisar explícitamente carga real,
+costos fijos y continuidad del runtime, no encadenar caches por inercia.
+Fuente: `5a6953ea789f69982bd633293641a69338663814`.
+
 ## 2026-09-14 — cache equivalente y perfil separado
 
 La revisión cacheada preservó los cuatro bundles; la suite conjunta pasa

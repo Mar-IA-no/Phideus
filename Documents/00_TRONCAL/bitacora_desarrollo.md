@@ -2,6 +2,17 @@
 
 ---
 
+## Operación y objetivo: revisar la proyección, no sólo el código (2026-09-14)
+
+El [corte de medias y codec](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md)
+pasó auditoría y reprodujo los cuatro bundles con 107 pruebas conjuntas.
+Su medición sigue sin habilitar el barrido. La revisión mostró una limitación
+de la admisión: el modelo amplifica también publicación y guardas por pares
+de candidatos. El siguiente paso es corregir explícitamente la proyección
+por carga real y costos fijos, manteniendo los límites y el objetivo completo.
+No hubo nuevos entrenamientos, fuentes extraídas ni evidencia científica de
+alineación; el trabajo operativo debe permitir obtenerla, no sustituirla.
+
 ## Operación y objetivo: cache equivalente, revisión de costo abierta (2026-09-14)
 
 El [cache del diagnóstico](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md)

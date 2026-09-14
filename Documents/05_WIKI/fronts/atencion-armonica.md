@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 2766187ca3801aa69dd92abe52a183dced0b800d
+evidence_commit: 5a6953ea789f69982bd633293641a69338663814
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -55,6 +55,7 @@ source_paths:
   - experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -183,6 +184,11 @@ conservó los bytes completos de las cuatro escenas y llevó la suite a 92
 pruebas CPU. La proyección sigue excediendo el límite; el siguiente corte
 revisa serialización y costo restante antes de habilitar un runtime completo.
 No hubo nuevo entrenamiento ni uso de GPU.
+
+El [corte de medias y codec](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md)
+también preservó las cuatro escenas, con 107 pruebas pasadas. Su proyección
+sigue excediendo el límite: el próximo paso revisa carga real y costos fijos
+mediante una enmienda operativa, antes del barrido y su replay.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
