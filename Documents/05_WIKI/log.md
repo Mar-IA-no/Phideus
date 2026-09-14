@@ -1,5 +1,11 @@
 # Log de la wiki
 
+## 2026-09-14 — carga real del diagnóstico inventariada
+
+Se autenticaron las 2048 escenas sin extraer factores ni ejecutar diagnóstico.
+El inventario permite revisar la admisión por carga observada; no habilita
+por sí solo el barrido. Fuente: `c7833b53b573fac992ecd72654847682d61d940d`.
+
 ## 2026-09-14 — medias y codec exactos; revisión de la proyección
 
 El segundo corte preservó las cuatro escenas y pasó 107 pruebas. El perfil

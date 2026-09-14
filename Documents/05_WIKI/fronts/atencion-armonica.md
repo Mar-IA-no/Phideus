@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 5a6953ea789f69982bd633293641a69338663814
+evidence_commit: c7833b53b573fac992ecd72654847682d61d940d
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -56,6 +56,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_CACHE_PROFILE.md
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md
+  - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -189,6 +190,12 @@ El [corte de medias y codec](../../../experiments/atencion_armonica/RESULTS_OPER
 también preservó las cuatro escenas, con 107 pruebas pasadas. Su proyección
 sigue excediendo el límite: el próximo paso revisa carga real y costos fijos
 mediante una enmienda operativa, antes del barrido y su replay.
+
+El [inventario completo de carga](../../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md)
+ya autenticó 2048 escenas y 113167 candidatos. La carga observada de pares
+es aproximadamente la mitad del supuesto inicial. El siguiente corte debe
+resolver admisión y ejecución completa; el inventario no es todavía un
+resultado sobre correspondencia geométrica.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

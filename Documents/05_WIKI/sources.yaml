@@ -398,6 +398,14 @@ sources:
     mutable: false
     fronts: [AA, PPU]
 
+  - id: SRC-AA-OPERATOR-OBJECTIVE-WORKLOAD
+    title: Carga observada del diagnóstico completo
+    path: experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md
+    authority: authenticated_observed_workload
+    evidence_regime: all_2048_scenes_candidate_offsets_and_partitions_no_diagnostic_execution
+    mutable: false
+    fronts: [AA, PPU]
+
   - id: SRC-EPISTEMOLOGY
     title: Marco epistemológico de Phideus
     path: MARCO_EPISTEMOLOGICO_PHIDEUS.md

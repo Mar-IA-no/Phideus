@@ -2,6 +2,15 @@
 
 ---
 
+## Operación y objetivo: carga real inventariada (2026-09-14)
+
+El [inventario autenticado](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_WORKLOAD.md)
+cubre las 2048 escenas y conserva las vacías. La carga de pares observada
+es aproximadamente la mitad de la supuesta por la proyección inicial.
+El trabajo pendiente es resolver explícitamente la admisión y ejecutar el
+diagnóstico con replay, no prolongar las optimizaciones preliminares. El
+inventario no aporta todavía evidencia de correspondencia geométrica.
+
 ## Operación y objetivo: revisar la proyección, no sólo el código (2026-09-14)
 
 El [corte de medias y codec](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_FAST_PROFILE.md)
