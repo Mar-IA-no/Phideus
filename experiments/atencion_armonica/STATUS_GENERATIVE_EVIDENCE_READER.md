@@ -1,14 +1,14 @@
 # Lector con evidencia generativa: estado de ejecución
 
-2026-09-09. La campaña completó sus 27 entrenamientos y la selección por
+2026-09-14. La campaña completó sus 27 entrenamientos y la selección por
 calibración. La recuperación del almacén preservó las 512 escenas IID, pero
 la primera etapa de predicción volvió a detenerse por una comparación
 incorrecta entre estructuras en memoria y su representación JSON. La corrección
 explícita ya fue auditada y la campaña se reanudó desde los artefactos
 conservados. IID, mayor inarmonicidad y polifonía completaron predicción,
-evaluación y replay. Familia deformada, el escenario primario, quedó pausada
-de forma recuperable por disponibilidad de GPU. No hay ejecución activa;
-faltan ese test y las auditorías finales de evidencia y alineación.
+evaluación y replay. Familia deformada, el escenario primario, se reanudó
+desde su pausa recuperable con GPU disponible verificada. La inferencia está
+activa; faltan ese test y las auditorías finales de evidencia y alineación.
 
 El [protocolo](PROTOCOL_GENERATIVE_EVIDENCE_READER.md) mantiene tres brazos
 —Local, Generativa y Desacoplada— con cabeza y pérdida comunes, 27
@@ -101,9 +101,11 @@ Los resultados de estos tres escenarios son descriptivos y parciales; el
 primario de familia deformada sigue pendiente. La campaña conserva el
 presupuesto acumulado. La inferencia del último test cerró con estado
 `PAUSED_RECOVERABLE` y salida 75, conservando los datos y ajustes ya guardados.
-El supervisor también terminó; no relanza CUDA mientras está suspendida.
-La reanudación requiere disponibilidad autorizada de GPU y mantiene el mismo
-protocolo, sin sustituir la etapa por una corrida CPU larga ni repetir los
+El supervisor también terminó durante la suspensión. El 2026-09-14 se reanudó
+con GPU habilitada y libre verificada, desde el mismo manifiesto y sin cambiar
+el protocolo. El intento de reanudación parte de 5203.610 segundos acumulados
+y conserva 23 ajustes y 22 registros observables del último test, además de
+sus 512 escenas, features y tres forwards ya guardados. No se repiten los
 tres tests completos. El cierre y las auditorías finales siguen pendientes.
 Base, Extendida e Histórico son referencias de sistema, no brazos de capacidad
 igualada. No hay promoción arquitectónica ni una conclusión nueva sobre HIT.
