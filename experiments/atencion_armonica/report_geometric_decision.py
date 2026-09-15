@@ -17,6 +17,7 @@ from pathlib import Path
 import numpy as np
 
 from experiments.atencion_armonica.run_geometric_decision_fresh import completed_operation, bounded_operation
+from experiments.atencion_armonica import run_geometric_decision_postseal as postseal
 from experiments.atencion_armonica.prepare_geometric_decision_open import ROOT, PROTOCOL, PROTOCOL_SHA, reference, code_snapshot
 from experiments.atencion_armonica.profile_geometric_decision import CONTROL_BINDING
 from src.atencion_armonica.geometric_decision_open import ReadOnlyStore
@@ -32,6 +33,7 @@ PLAN = "experiments/atencion_armonica/PLAN_GEOMETRIC_DECISION_FINAL_REPORT.md"
 
 def sources():
     return sorted([*code_snapshot(), reference(OPERATOR), reference(PLAN),
+        reference(postseal.OPERATOR), reference(postseal.PLAN),
         reference("experiments/atencion_armonica/run_geometric_decision_fresh.py")], key=lambda r: r["path"])
 
 
@@ -51,6 +53,14 @@ def completed_inputs(control):
                 or output["manifest"] != start["manifest"] or output["test_freeze"] != freeze_ref
                 or output["root"] != str(BASES[0]/"evaluation")):
             raise ValueError("report requires the same completed frozen evaluation")
+    execution_contract = evaluate[3]["execution_contract"]
+    if any(row[3]["execution_contract"] != execution_contract or row[4]["execution_contract"] != execution_contract
+            for row in (evaluate, replay)):
+        raise ValueError("evaluation and replay use different execution contracts")
+    postseal.validate_contract(control, execution_contract, freeze_ref)
+    recovery = postseal.frozen_op.admitted_observable_replay(control, fresh[0], freeze_ref, seal_ref)
+    if evaluate[3]["observable_replay_finish"] is not None or replay[3]["observable_replay_finish"] != recovery:
+        raise ValueError("metric report lacks the exact observable recovery")
     if evaluate[4]["complete"] != replay[4]["complete"]:
         raise ValueError("metric replay differs from original completion")
     binding = {"test_freeze": freeze_ref, "prediction_seal": seal_ref}
@@ -64,7 +74,8 @@ def completed_inputs(control):
         raise ValueError("report requires four complete scenario evaluations")
     return store, complete, {"fresh_finish": fresh[0], "evaluation_finish": evaluate[0],
         "replay_finish": replay[0], "evaluation_complete": evaluate[4]["complete"],
-        "test_freeze": freeze_ref, "prediction_seal": seal_ref}
+        "test_freeze": freeze_ref, "prediction_seal": seal_ref, "execution_contract": execution_contract,
+        "observable_replay_finish": recovery}
 
 
 def sham_summary(evaluation, targets, *, check):
