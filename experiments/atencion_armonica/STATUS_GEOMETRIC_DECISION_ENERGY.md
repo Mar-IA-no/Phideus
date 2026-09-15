@@ -1,6 +1,6 @@
 # Energía geométrica para la decisión — estado de implementación
 
-2026-09-14. Preparación OPEN, perfiles, 72 entrenamientos y selección por calibración completos. Tests prospectivos todavía sin abrir.
+2026-09-14. Preparación OPEN, perfiles de primitivas, 72 entrenamientos, selección y archivo numérico completos. Tests prospectivos todavía sin abrir.
 
 El [protocolo](PROTOCOL_GEOMETRIC_DECISION_ENERGY.md), auditado antes de la
 campaña, fija cuatro rutas por dos pérdidas: Inyección, Geométrica,
@@ -96,7 +96,7 @@ su recibo `control/attempts/0006/finish.json` tiene SHA256
 Ambos pertenecen a `data/atencion_armonica/geometric_decision_energy_v1/`.
 Completar entrenamiento y selección no permite interpretar ventajas entre brazos.
 
-Permanecen pendientes el archivo prospectivo de estados seleccionados,
+Permanecen pendientes el perfil de la pipeline completa,
 freeze prospectivo, tests nuevos, probes, replay y auditorías
 finales. Los tests nuevos no se abrieron; todavía no hay resultados del
 contraste prospectivo que permitan evaluar generalización.
@@ -117,9 +117,27 @@ la extensión de exclusiones y el archivo numérico de cabezas pasaron auditorí
 de sus interfaces. Dos defectos de identidad y recuperación se corrigieron
 antes de usarlos: JSON no canónico se rechaza antes del cálculo y los callbacks
 no pueden modificar los metadatos autenticados por aliasing. Las pruebas de
-estas tres interfaces son mecánicas; todavía no se construyó el catálogo real
-de exclusiones ni se exportaron los estados seleccionados. Su uso exige
-admisión explícita del cierre de selección y del futuro freeze.
+estas tres interfaces son mecánicas. La ejecución posterior del
+[operador CPU de archivo](prepare_geometric_decision_archive.py), auditado y
+admitido desde los cierres COMPLETE, conservó los 144 estados initial/selected
+y extendió las exclusiones con las 2048 observaciones históricas del contraste
+anterior. El inventario reúne 24467 huellas únicas, incluidos antecedentes y
+fixtures; no es un conteo de nuevas escenas experimentales. Consumió
+9,938720 s y no abrió tests nuevos. El cierre `archive/complete.json` bajo la
+raíz experimental tiene SHA256
+`f36a55dcc9dd5c3c25a7429fe044f74511ebd07cc4bde60b873b9ba3c89d7f75`;
+`control/attempts/0009/finish.json`,
+`158fe1bc539f0c31e4baaa6191ba963d3cb6573531f8865dd146c1a933625e1c`.
+El archivo no autoriza draws: el perfil completo y el freeze siguen pendientes.
+
+Los puertos de producción única de observaciones y conservación de predicciones
+también pasaron auditoría y 36 pruebas CPU. La recuperación de los transportes
+revalida arrays, permutaciones, energía y diagnósticos sin ejecutar el modelo;
+el roster de primeras cuatro escenas elegibles se recompone antes de usarse.
+Las correcciones mantienen la frontera observable sin campos de supervisión.
+La integración de esos puertos tiene una prueba mecánica de los 144 estados,
+incluido roundtrip y recuperación sin forward ni fitting; todavía no está
+auditada como operador real y no constituye evaluación prospectiva.
 
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,

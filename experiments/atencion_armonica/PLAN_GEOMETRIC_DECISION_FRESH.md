@@ -84,3 +84,18 @@ provenga de un draw admitido pertenece al freeze/productor futuro, no a una
 etiqueta proporcionada por un caller arbitrario. El source conserva una única
 observación JSON canónica para el hash y el retorno. No cambia la hipótesis,
 el roster, las pérdidas ni los presupuestos del protocolo.
+
+## Preparación CPU después de selección
+
+Un operador separado autentica los finishes COMPLETE de entrenamiento y
+selección, exporta los 144 estados numéricos iniciales/seleccionados y verifica
+su roster y correspondencia con las calibraciones. Construye el catálogo
+explícito de fixtures y extiende las exclusiones por la cadena histórica
+cerrada hasta las 2048 observaciones, sin leer sidecars. Comparte lock,
+ledger, guardas y límites; reserva 120 s dentro del presupuesto fresh.
+La reserva cubre cargas CPU pequeñas y lectura/serialización sin modelos,
+forward ni fitting; si no alcanza, se conserva el intento y no se reduce el
+roster ni se repite silenciosamente. Publicar archive/complete no autoriza
+draws: la admisión del perfil completo y el freeze prospectivo son posteriores.
+El catálogo incluye el fixture entero de 16 eventos del diagnóstico anterior,
+además de las coordenadas derivadas del roundtrip y la reconstrucción retirada.
