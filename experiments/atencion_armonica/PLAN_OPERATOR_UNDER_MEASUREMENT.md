@@ -1,7 +1,9 @@
 # Operador geométrico bajo medición
 
-Estado: revisión independiente de diseño incorporada; implementación pendiente
-y tests cerrados. El protocolo adjunto define el contraste;
+Estado: revisión independiente de diseño incorporada; cores y adaptador observable
+implementados con fixtures CPU; ejecutor y tests prospectivos aún cerrados.
+El [estado de implementación](STATUS_OPERATOR_UNDER_MEASUREMENT.md) separa las
+verificaciones mecánicas de la campaña pendiente. El protocolo define el contraste;
 el perfil y la auditoría de implementación preceden a su congelación ejecutable.
 
 ## Pregunta y alcance
