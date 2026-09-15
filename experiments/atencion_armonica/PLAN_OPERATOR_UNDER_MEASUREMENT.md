@@ -69,6 +69,35 @@ y exigir recuperación contabilizada por el supervisor. Lock exclusivo durante
 operaciones propias; ninguna recuperación puede abrir tests ni saltar admisión.
 Fixtures deben interrumpir ambos bordes y comprobar ausencia de re-forward/re-fit.
 
+El supervisor registra intentos numerados por fase, no un presupuesto nuevo
+por escena. Cada intento conserva fase, identidad, reserva, inicio monotónico,
+boot del host, recursos y resultado. Los intentos cerrados aportan duración
+medida; un intento interrumpido sólo puede recuperarse tras adquirir el lock,
+y se carga conservadoramente el intervalo hasta su reconciliación en el mismo
+boot. Un cambio de boot sin evidencia suficiente no autoriza inventar coste.
+La reconciliación es otro recibo inmutable, no una reescritura del intento.
+Recuperar payload íntegro no vuelve a llamar al productor; ausencia de payload
+permite un intento nuevo enlazado sólo después de contabilizar el anterior.
+
+Orden de admisión: perfil CPU/GPU y calibración sobre datos de desarrollo;
+freeze con costes/selección/exclusiones antes de observaciones de test;
+predicciones completas antes de sello; evaluación sólo con sello autenticado;
+replay y auditoría conservan reserva propia. El supervisor verifica fuentes
+pinneadas y recursos al entrar a cada fase y entre unidades. El runner concreto
+valida el roster y los artefactos de cada fase; los tests del supervisor aislado
+no se presentan como prueba de esa integración.
+
+Corrección del control tras revisión: freeze y sello son fases medidas del mismo
+ledger, no publicaciones laterales. Sus payloads sólo adquieren autoridad con un
+intento completo; un payload huérfano es recuperable pero no abre evaluación.
+El freeze liga perfiles y calibración a una única identidad de fuentes y reserva
+el coste completo de su propio intento al comprobar la proyección. El deadline
+incluye preflight y materialización final; la escritura del recibo pequeño de
+cierre queda clasificada como overhead administrativo fuera del tiempo medido.
+Después de un reinicio, la reconciliación exige evidencia inmutable que identifique
+el intento, una duración medida o cota superior y su procedencia; autenticar sus
+bytes no acredita por sí solo la verdad de esa duración.
+
 Sin entrenamiento. Perfil CPU máximo600s para render/detector/matching y
 evaluación; perfil CUDA máximo600s para forward, fitter y36lectores, medidos
 por separado. El fitter histórico ya usa CUDA float64: se conserva ese backend.

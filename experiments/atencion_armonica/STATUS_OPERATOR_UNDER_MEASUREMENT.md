@@ -21,6 +21,9 @@ Implementado:
 - Separación entre emisión observable y sidecar de evaluación en
   `measurement_emission.py`, y carga autenticada de las referencias congeladas
   en `measurement_reuse.py`, sin deserializar checkpoints de backbone.
+- Control de presupuesto acumulado y recuperación en `measurement_control.py`;
+  admisión por identidad de fuentes, congelación y sello como fases medidas en
+  `measurement_admission.py`. Sólo un cierre completo habilita la fase siguiente.
 
 Los tests `test_measurement_primitives.py`, `test_measurement_contract.py`,
 `test_measurement_operator.py` y `test_measurement_reporting.py` usan fixtures
@@ -31,6 +34,12 @@ separada del almacenamiento detectó cuatro defectos de identidad/encapsulación
 y serialización; se corrigieron con regresiones específicas y la revalidación
 independiente confirmó los cuatro cierres. Esto no sustituye la futura auditoría
 del supervisor completo.
+
+La revisión del control encontró cuatro defectos de contabilización, deadline,
+identidad de fuentes y recuperación tras reinicio. Se corrigieron y una revisión
+incremental independiente confirmó los cuatro cierres, con15fixtures oficiales
+y2adicionales. El recorrido OPEN y la conexión de inferencia siguen en desarrollo;
+esa revisión no acredita su integración ni constituye un perfil de recursos real.
 
 Secuencia restante:
 
