@@ -1,23 +1,63 @@
 # Energía geométrica para la decisión — estado de implementación
 
-2026-09-14. Preparación, perfiles, 72 entrenamientos, selección y archivo completos. Contraste prospectivo en ejecución; respuestas de test todavía sin consultar.
+2026-09-15. Los 72 entrenamientos, la selección, los 144 estados archivados,
+las 2048 escenas prospectivas, evaluación, recuperación y reporte de datos
+están completos. Los resultados ya fueron consultados después del sello y
+del replay. La verificación técnica ejecutable, las revisiones independientes
+y su integración documental están completas.
 
 El supervisor integrado y la enmienda de contabilidad cerraron su auditoría
 técnica antes de ejecutar. La suite CPU completa pasó 285 pruebas. La admisión
 real terminó en 5,178484 s y congeló cuatro escenarios de 512 escenas, los
-144 estados iniciales/seleccionados, fuentes y recursos. El intento `0013`
-está ejecutando observables y recuperación pre-sello con reserva de 15864 s.
-La recuperación post-sello conserva su reserva propia dentro de fresh;
-evaluación y replay de métricas comparten 2570 s. No hay resultados científicos
-del nuevo contraste mientras este recorrido siga incompleto.
+144 estados iniciales/seleccionados, fuentes y recursos. El recorrido posterior
+completó observables, sello, evaluación y ambos replays sin reentrenamiento.
+Los cierres operativos no sustituyen la comprobación independiente de la
+procedencia, los cálculos y la interpretación.
+
+| Etapa terminada | Recibo bajo `control/attempts/` | Tiempo del intento (s) |
+|---|---|---:|
+| Observables prospectivos | `0013/finish.json` | 12227.353831 |
+| Evaluación | `0015/finish.json` | 1212.697706 |
+| Recuperación observable | `0017/finish.json` | 4140.501281 |
+| Replay de métricas | `0018/finish.json` | 1197.365631 |
+| Reporte reproducible | `0019/finish.json` | 125.177389 |
+
+Son tiempos medidos de esos intentos, no el coste acumulado completo. La
+[auditoría final](PLAN_GEOMETRIC_DECISION_FINAL_AUDIT.md) distingue autenticación
+integral, reconstrucción matemática de un corte estructural y recomputación
+de los cuatro primarios. Las correcciones del verificador conservan los
+cortes y los cargos anteriores; no modifican los artefactos experimentales.
+La revisión técnica del cierre real no encontró findings materiales. La
+revisión de horizonte y las correcciones de cobertura del informe están
+integradas. La [lectura de resultados](RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+distingue ventaja relativa, comparación con el clásico inicial y diferencias
+entre escenarios. La revisión de propagación documental resolvió sus findings;
+el contraste queda cerrado dentro de ese alcance, sin arquitectura promovida.
+
+El intento final `0025` completó VERIFY en 614.107661 s de CPU. Su resultado
+`audit-final-coverage-verify/result.json` tiene SHA256
+`1e51936b53709034f9ee47994dbd16825cb16884c10907309a90a46c19794e28`;
+el recibo `control/attempts/0025/finish.json`,
+`9b012d71375260e7bc8498bb5a65f6fc1e7581fa2fa0d703e32410f2ae95b103`.
+El cargo acumulado de auditoría es 2483.276911 s y el total contable de etapas,
+26579.544657 s: incluyen cargos anteriores y una reserva imputada por un intento
+sin finish, no son exclusivamente tiempo medido de corridas completas.
 
 Fuentes bajo `data/atencion_armonica/geometric_decision_energy_v1/`:
 `control/freezes/prospective.json`, SHA256
 `febc010fa6c88651ecf684d97e7fc0d2b8707c4223357df6c81fe7e61f9dd3fe`;
 `control/attempts/0012/finish.json`, SHA256
 `09126495a11ec36969b27e43ccf8fcb9934dde23cd05277ab6fcbc257ed730a2`;
-`control/attempts/0013/start.json`, SHA256
-`86ec5ef33d56880571ddf9db9e1710430ba4ea294a3656644bc21aba06ed5340`.
+`control/attempts/0013/finish.json`, SHA256
+`1765cbaa04191bdfa1083df726aaaf339489d9369dc94a662de9b381225c838f`;
+`report/complete.json`, SHA256
+`c213d59be4f8d805efa6e150784bb8d391fb8387601d2a91dd81d7406a51cd49`.
+
+## Diseño y ejecución conservados
+
+Los párrafos siguientes distinguen las pruebas de interfaces previas a la
+campaña de su ejecución posterior; sus costes parciales no deben sumarse como
+si fueran todos intentos diferentes ni leerse como un estado pendiente actual.
 
 El [protocolo](PROTOCOL_GEOMETRIC_DECISION_ENERGY.md), auditado antes de la
 campaña, fija cuatro rutas por dos pérdidas: Inyección, Geométrica,
@@ -37,8 +77,8 @@ selector de empates por firma y roundtrip de cuantización/recentrado. Las
 [pruebas del núcleo](test_geometric_decision_core.py) incluyen coóptimos,
 aritmética del target, gradientes, padding, donantes singleton, universo vacío
 y transporte. Su auditoría independiente cerró sin findings abiertos en ese
-alcance; no constituye
-admisión del runner futuro ni evidencia de rendimiento experimental.
+alcance; esas pruebas aisladas no constituyen evidencia de rendimiento
+experimental.
 
 El [adaptador OPEN](../../src/atencion_armonica/geometric_decision_open.py)
 lee los agregados ya autenticados sin modificar sus stores. Sus
@@ -113,10 +153,9 @@ su recibo `control/attempts/0006/finish.json` tiene SHA256
 Ambos pertenecen a `data/atencion_armonica/geometric_decision_energy_v1/`.
 Completar entrenamiento y selección no permite interpretar ventajas entre brazos.
 
-La admisión integral y el freeze ya están completos. Permanecen pendientes
-el cierre de los tests nuevos y probes, evaluación, replay y auditorías
-finales. Todavía no hay resultados del contraste prospectivo que permitan
-evaluar generalización.
+La admisión integral, el freeze y el recorrido prospectivo ya están completos.
+La interpretación de generalización está contrastada con la verificación final;
+no depende únicamente de terminar entrenamiento y selección.
 
 El [ensamblado observable](../../src/atencion_armonica/geometric_decision_observables.py)
 y el [almacén de escenas](../../src/atencion_armonica/geometric_decision_scene_store.py)
@@ -127,7 +166,8 @@ repetir la grilla. Los probes enlazan una fuente original autenticada y
 preservan el linaje por evento y las coordenadas del roundtrip. La auditoría
 cerró sus findings dentro de ese alcance. Estos puertos no autorizan draws:
 el freeze y el operador prospectivo deben establecer la procedencia de las
-observaciones y de la normalización. No se ejecutaron todavía con tests nuevos.
+observaciones y de la normalización. Su ejecución posterior forma parte del
+recorrido prospectivo terminado que se resume al inicio.
 
 El [ensamblador recuperable](../../src/atencion_armonica/geometric_decision_pipeline.py),
 la extensión de exclusiones y el archivo numérico de cabezas pasaron auditoría
@@ -145,7 +185,8 @@ raíz experimental tiene SHA256
 `f36a55dcc9dd5c3c25a7429fe044f74511ebd07cc4bde60b873b9ba3c89d7f75`;
 `control/attempts/0009/finish.json`,
 `158fe1bc539f0c31e4baaa6191ba963d3cb6573531f8865dd146c1a933625e1c`.
-El archivo no autoriza draws: la admisión integral y el freeze siguen pendientes.
+El archivo no autorizaba draws por sí solo: la admisión integral y el freeze
+se completaron después, antes de la ejecución prospectiva.
 
 Los puertos de producción única de observaciones y conservación de predicciones
 también pasaron auditoría y 36 pruebas CPU. La recuperación de los transportes
@@ -158,9 +199,9 @@ completó las 16 escenas TRAIN fijadas y cuatro roundtrips, incluidos los 144
 estados y recuperación exacta sin forward ni fitting. Consumió 113,436136 s;
 el ledger acumula 189,940288 / 600 s de perfiles. Sus proyecciones siguen
 siendo parciales: faltan generación, sello y métricas en la admisión completa.
-La extensión de exclusiones de sus coordenadas pasó auditoría como interfaz,
-pero todavía no se ejecutó detrás de la admisión prospectiva. No hay nuevos
-resultados científicos ni cambios de arquitectura.
+La extensión de exclusiones de sus coordenadas pasó auditoría como interfaz
+y después quedó incorporada a la admisión prospectiva. El perfil no constituye
+por sí mismo un resultado de generalización ni un cambio de arquitectura.
 
 El [plan de métricas](PLAN_GEOMETRIC_DECISION_METRICS.md) implementa el
 estimando ya fijado: targets matemáticos y entregados separados, puntuaciones
@@ -175,10 +216,11 @@ El [perfil CPU de cierre](RESULTS_GEOMETRIC_DECISION_PROFILE.md) ya ejecutó
 la evaluación y su replay sobre 16 TRAIN conocidas y cuatro probes, incluidos
 los 144 estados; terminó en 25,693755 s sin nuevos tests. El coste acumulado de
 perfiles es 215,634043/600 s. La proyección original de evaluación/replay excede
-su reserva restante; se prepara una revisión operativa explícita, sin reducir
+su reserva restante; motivó una revisión operativa explícita, sin reducir
 controles ni muestras. La revisión y el supervisor integral se auditaron
 después; la admisión real y el freeze están enlazados al inicio de este estado.
-El contraste está en ejecución, sin resultados de generalización todavía.
+El contraste terminó evaluación, replay y verificación independiente;
+su integración documental se resume al inicio.
 
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,
@@ -187,5 +229,5 @@ resultados de modelos. No hubo entrenamiento ni comparación de arquitecturas
 en ese incidente.
 
 No se promueve una arquitectura. El operador geométrico sigue siendo externo
-y usa una ley sintética conocida; el experimento deberá mostrar si conservar
+y usa una ley sintética conocida; la pregunta del experimento es si conservar
 esa operación en la decisión aporta algo más que entregarla como descriptor.

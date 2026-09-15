@@ -2,6 +2,24 @@
 
 ---
 
+## Energía geométrica: campaña y verificación completas (2026-09-15)
+
+El [contraste](../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+terminó 72 entrenamientos, la evaluación de 2048 escenas nuevas y ambos
+replays. La verificación final completó su alcance: cadena autenticada,
+reconstrucción matemática del corte fijado y cuatro primarios completos.
+Las correcciones del verificador conservaron el corte, los artefactos y la
+contabilidad anteriores; no se repitió el experimento para fabricar un ganador.
+
+El resultado distingue una ventaja relativa de una mejora sobre el punto de
+partida. En familia deformada, el término geométrico ayuda frente a Inyección
+bajo ambas pérdidas, pero el clásico inicial conserva menor regret que su
+corrección aprendida. La interacción no queda acreditada y el patrón cambia
+entre escenarios. La lectura final y su propagación fueron revisadas e integradas.
+El siguiente contraste propuesto examina qué llega de esa geometría a la
+decisión cuando las entradas pasan por audio y detección, antes de emprender
+otra cadena de correctores. La amortización permanece como alternativa.
+
 ## Energía geométrica: contraste prospectivo iniciado (2026-09-14)
 
 El [supervisor](../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)

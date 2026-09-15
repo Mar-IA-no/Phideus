@@ -2,7 +2,7 @@
 
 > Documento estructural del frente. Resume la pregunta científica, el estado metodológico actual y la secuencia de fases prevista sin confundir incubación local con propagación canónica al troncal.
 
-## Rebase vigente — 2026-09-14
+## Rebase vigente — 2026-09-15
 
 Atención Armónica pasa a ser el banco inicial del
 [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
@@ -48,14 +48,46 @@ reutilizó 2048 escenas en CPU y completó su replay. En el primario deformado,
 las cabezas mejoran el orden global según VI frente a Extendida, pero eligen
 peor su mínimo. La diferencia entre oracles VI y ARI es pequeña en este corpus;
 el diagnóstico no identifica representación, optimización o loss como causa.
-El siguiente contraste debe separar operación geométrica y aprendizaje de la
-decisión sobre muestras nuevas, manteniendo controles fuertes y sin tuning
-post-test. La inversión observada dentro de estratos no es causal.
+El [contraste posterior](../../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+ya separó ruta geométrica y loss en 72 entrenamientos y 2048 escenas nuevas,
+con replay y verificación técnica ejecutable completos. La ruta geométrica
+mejora frente a Inyección en el primario deformado bajo ambas pérdidas, pero
+la corrección aprendida no supera allí al clásico inicial. El intervalo de
+interacción incluye cero y las comparaciones cambian entre escenarios.
+La inversión observada dentro de estratos sigue siendo descriptiva, no causal.
 Los priors del generador sintético permanecen explícitos y no adquieren
 autoridad física.
 El contraste cerrado anterior no demuestra una nueva geometría neuronal aprendida.
 No hay arquitectura promovida. Las fases 0–0.6 quedan como histórico
 abierto; pasar el gate per-par no certifica ausencia de todo atajo global.
+
+### Secuencia inmediata y condición de salida
+
+1. Conservar el balance de energía geométrica y sus auditorías integradas,
+   distinguiendo autenticación integral y reconstrucción matemática del corte.
+   No repetir la campaña ni convertir sus tests abiertos en nuevos tests.
+2. Diseñar **operador geométrico bajo medición**: contraste pareado entre la
+   interfaz canónica y audio renderizado con picos detectados, sin retunar el
+   operador ni los lectores sobre tests. La entrada actual ya tiene ruido de
+   2 cents; el diseño debe evitar duplicarlo inadvertidamente.
+3. Ejecutar un banco finito, con desarrollo/calibración separados y protocolo
+   congelado antes de tests. Medir observación, cobertura del universo de
+   candidatos y decisión por separado; comparar particiones sólo donde exista
+   soporte de eventos correspondiente y conservar métricas de extremo a extremo.
+4. Cerrar con una localización de la pérdida de utilidad, o evidencia de que
+   la utilidad sobrevive en las condiciones ensayadas. Ese resultado decidirá
+   si intervenir medición, candidatos u operador aprendido.
+
+No se fija CQT por analogía ni se presenta render como validación física.
+**Ajuste geométrico amortizado** permanece como alternativa, pendiente de
+evidencia de factibilidad y coste; no sustituye al solver por preferencia.
+
+## Marco histórico de Fases 0–0.6
+
+Las secciones numeradas siguientes conservan el diseño y estado del corte
+histórico. Sus expresiones «vigente» o «actual» pertenecen a ese corte; la
+orientación activa es el rebase anterior. El gate histórico no comprobaba
+la ausencia del canal global de amplitudes encontrado posteriormente.
 
 ## §1 Identidad del frente
 

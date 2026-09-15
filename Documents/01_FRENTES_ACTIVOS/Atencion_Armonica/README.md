@@ -2,7 +2,7 @@
 
 > Frente nuevo en incubación local que prueba si una representación explícita de pares con actualización triangular puede capturar estructura armónica global de una mezcla polifónica mejor que un backbone token-only con features armónicas inyectadas.
 
-## Ciclo vigente — geometría, arquitectura y pérdida (2026-09-14)
+## Ciclo vigente — geometría, arquitectura y pérdida (2026-09-15)
 
 El frente es el banco inicial del
 [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md).
@@ -51,8 +51,14 @@ El [diagnóstico CPU de operación y objetivo](../../../experiments/atencion_arm
 completó 2048 escenas y replay: en familia deformada, las cabezas ordenan
 mejor el conjunto según VI, pero Extendida elige mejor su mínimo. No son la
 misma propiedad; tampoco una menor MSE garantiza mejor decisión. El resultado
-orienta un contraste prospectivo de operación geométrica y loss, sin atribuir
-todavía la diferencia a ninguna de ellas. No hay arquitectura promovida. El
+motivó el [contraste de energía geométrica](../../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md),
+ya ejecutado: 72 entrenamientos, 2048 escenas nuevas, replay y verificación
+técnica ejecutable. En deformación, la ruta con ajuste directo mejora frente
+a Inyección bajo ambas pérdidas, pero su corrección aprendida queda peor
+que la referencia clásica inicial. No se acredita interacción especial con
+la loss ni un ganador universal. Las auditorías finales están integradas;
+el siguiente contraste propuesto examina el operador bajo medición,
+separando detección, cobertura y decisión. No hay arquitectura promovida. El
 [roadmap](ROADMAP_ATENCION_ARMONICA.md) distingue este ciclo de las fases
 cerradas y las alternativas Stage B/CQT que permanecen disponibles.
 

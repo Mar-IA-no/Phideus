@@ -68,10 +68,16 @@ a Local; en polifonía pierde frente al desacoplado. El
 [diagnóstico posterior](experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
 completó 2048 escenas y replay: en familia deformada, las cabezas mejoran el
 orden global según el target, pero la regla geométrica clásica elige mejor
-su mínimo. Sigue un contraste prospectivo entre operación y aprendizaje de
-la decisión, sin atribuir todavía la diferencia a una causa. Los priors
-sintéticos no se confunden con geometría natural;
-las fases históricas y alternativas siguen preservadas.
+su mínimo. El [contraste de energía geométrica](experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+ya completó 72 entrenamientos, 2048 escenas nuevas, replay y verificación
+técnica ejecutable. En familia deformada, hacer participar el ajuste en la
+decisión mejora frente a entregarlo sólo como descriptor, bajo ambas pérdidas;
+sin embargo, la corrección aprendida no supera allí al ajuste clásico inicial.
+No se acredita una interacción especial con la loss ni un ganador universal.
+El siguiente contraste propuesto examina qué estructura sobrevive al pasar
+por audio y detección de picos, separando medición, candidatos y decisión.
+Las auditorías técnica y de horizonte están integradas. Los priors sintéticos
+no se confunden con geometría natural; las alternativas siguen preservadas.
 
 | Frente | Dominio | Funcion | Estado |
 |---|---|---|---|
@@ -80,7 +86,7 @@ las fases históricas y alternativas siguen preservadas.
 | **Gate 6 AMT** | Audio -> transcripcion | Validacion downstream de la senal descriptor-guided | **Activo** — `Exp A` y `Exp B` ya cerraron negativamente; `Exp C` queda como línea abierta |
 | **Escalon 2** | Speech <-> EGG | Test directo de HIT: armonia natural del oscilador glotal como organizador cross-modal | **Foco principal** — null mecanistico inicial cerrado; `P3` primera pasada completa, sigue `P2 vs P3` |
 | **Voz Expresiva Phideus** | Voz expresiva | Test de transferencia descriptor-guided sobre `SSL` vocal y estabilidad translingüística | **Activo** — cierre `EN ↔ ZH` ya consolidado: positivo acotado a `N-adapt`, null/negativo en `N-strict` |
-| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco inicial del ciclo geometría + arquitectura + loss; Pairformer y descriptores conservados como candidatos y controles | **Operación y objetivo: diagnóstico completo** — mejor orden global no asegura mejor decisión; relevo prospectivo, sin promoción |
+| **Atencion Armonica** | Agrupamiento armónico polifónico | Banco del ciclo geometría + arquitectura + loss; Pairformer, descriptores y ajuste clásico como candidatos y controles | **Energía geométrica: contraste y auditorías completos** — ventaja relativa en deformación, no mejora frente al clásico inicial; sigue el contraste bajo medición |
 | **Escalon 3** | Audio XY <-> Lissajous | Banco de pruebas sintetico con ground truth determinista para ratios visibles | **Activo** — baseline dual consolidado; primera linea geometrica ya corrida (`P5-cqtshift` mejor brazo OOD actual) |
 | **Escalon 4** | ECG <-> PPG | Expansion a dominio fisiologico | **Proyeccion** |
 

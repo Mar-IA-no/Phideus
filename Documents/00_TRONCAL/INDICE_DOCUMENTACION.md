@@ -264,8 +264,11 @@ generativo posterior completó 27 entrenamientos y cuatro tests con replay:
 primario favorable frente a Desacoplada, sin ventaja clara sobre Local;
 polifonía adversa frente a Desacoplada. El diagnóstico retrospectivo posterior
 completó 2048 escenas y replay: mejor orden global no asegura mejor elección
-del mínimo. Sigue discriminar operación geométrica y aprendizaje de la decisión
-con un contraste prospectivo, no otra adaptación sobre tests abiertos.
+del mínimo. El contraste prospectivo de energía geométrica ya completó 72
+entrenamientos, 2048 escenas nuevas, replay y verificación técnica ejecutable:
+ventaja frente a Inyección en deformación, no mejora frente al clásico inicial.
+El cierre final está integrado y sigue el contraste bajo medición, no otra
+adaptación sobre tests abiertos.
 Las fases `0–0.6` quedan como corte histórico:
 su gate per-par no excluía la solución global por amplitudes documentada
 posteriormente, sin que ello demuestre su uso por las redes.
@@ -279,6 +282,7 @@ posteriormente, sin que ello demuestre su uso por las redes.
 | **Roadmap general** | `Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md` | Contrastes de pérdidas y lectura ejecutados; continuidad por evidencia, fases históricas y alternativas preservadas |
 | **Compatibilidad entre parciales** | `experiments/atencion_armonica/PLAN_SHARED_PARTIAL_COMPATIBILITY.md` | Hipótesis física, datos frequency-only, pérdidas/controles, evaluación y presupuesto congelados |
 | **Resultado del contraste** | `experiments/atencion_armonica/RESULTS_SHARED_PARTIAL_STUDY.md` | Cinco brazos × tres semillas y cinco tests: pérdidas, controles, Brier frente a partición, límites y continuidad |
+| **Energía geométrica para la decisión** | `experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md` | Cuatro rutas por dos losses, 72 entrenamientos, 2048 escenas y replay; ventaja relativa, referencia clásica y siguiente contraste bajo medición |
 | **Coherencia de fuente** | `experiments/atencion_armonica/RESULTS_SHARED_SOURCE_COHERENCE.md` | Diagnóstico CPU de presión en logits y ajuste conjunto; 96 escenas, cobertura, ambigüedad y replay |
 | **Plan del lector estructurado** | `experiments/atencion_armonica/PLAN_SOURCE_STRUCTURED_READER.md` | Protocolo prospectivo congelado de la campaña ya ejecutada; no se reescribe su estado histórico |
 | **Resultado del lector estructurado** | `experiments/atencion_armonica/RESULTS_SOURCE_STRUCTURED_READER.md` | Cuatro tests frescos, factores y controles, incertidumbre, fragmentación, recursos y replay; auditorías de evidencia y alineación completas |

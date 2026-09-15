@@ -1,6 +1,6 @@
 # Catalogo Narrativo de Descriptores de Ratios en Phideus
 
-Fecha de actualizacion: 2026-09-14
+Fecha de actualizacion: 2026-09-15
 Documentos de apoyo:
 - `MARCO_EPISTEMOLOGICO_PHIDEUS.md`
 - `Documents/01_FRENTES_ACTIVOS/BIAS_CONTROL/ROADMAP_BIAS_CONTROL.md`
@@ -56,9 +56,15 @@ El [diagnóstico posterior](../../../experiments/atencion_armonica/RESULTS_OPERA
 separa calidad del orden global y calidad de la decisión: en familia deformada,
 la cabeza mejora la primera frente a la regla clásica, pero no la segunda.
 No basta entonces con que las cotas estén presentes como descriptores ni con
-que mejore su correspondencia agregada con el target. Falta contrastar cómo
-la operación y la pérdida conservan la elección, sin dar por demostrada la
-insuficiencia de la interfaz actual ni crear una nueva familia descriptorial.
+que mejore su correspondencia agregada con el target. El
+[contraste de energía geométrica](../../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+ya muestra una ventaja de la ruta con ajuste directo frente a Inyección bajo
+ambas pérdidas en familia deformada, pero no una mejora de su corrección
+aprendida frente al clásico inicial. Tampoco acredita una interacción especial
+con la loss. No crea una familia descriptorial nueva: distingue información
+suministrada, operación y objetivo. El siguiente contraste propuesto examina
+qué llega de esa estructura a la decisión tras render y detección de picos;
+los descriptores y el ajuste clásico permanecen como controles fuertes.
 
 ## Addendum vivo del corte
 

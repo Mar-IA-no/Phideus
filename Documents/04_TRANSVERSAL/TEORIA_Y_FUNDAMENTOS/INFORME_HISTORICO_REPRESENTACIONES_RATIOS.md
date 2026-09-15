@@ -1,7 +1,7 @@
 # Informe Historico de Representaciones de Ratios en Phideus
 
 **Subtitulo**: de los primeros histogramas al giro epistemologico de la armonia natural  
-**Fecha**: 2026-09-14
+**Fecha**: 2026-09-15
 **Version**: 2.5
 
 ---
@@ -58,6 +58,16 @@ el mínimo. Una correspondencia agregada no garantiza conservar la relación
 que gobierna la decisión. Esto orienta el diseño conjunto de operación y
 pérdida sin identificar todavía cuál explica el error ni modificar los
 descriptores históricos.
+
+El [contraste de energía geométrica](../../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+vuelve experimental esa distinción. En familia deformada, hacer participar
+el ajuste conjunto en la decisión mejora frente a la inyección bajo ambas
+pérdidas, pero la corrección aprendida no supera al clásico inicial. La
+utilidad de una operación proporcionada no equivale a una geometría descubierta
+por la red. El próximo contraste propuesto traslada la pregunta al proceso
+de observación: qué relaciones sobreviven al render y la detección, antes de
+atribuir su pérdida al aprendizaje. No cambia los descriptores históricos ni
+convierte la evidencia sintética en autoridad física.
 
 ## Addendum operativo del corte
 
