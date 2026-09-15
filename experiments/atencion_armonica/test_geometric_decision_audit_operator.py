@@ -119,6 +119,7 @@ def test_projection_uses_measured_basis_explicit_roots_and_independent_kernel_ma
         root = tmp_path / name; root.mkdir(); (root / "x").write_bytes(b"x")
         roots[name] = [{"manifest": {"root": str(root)}, "output": {"root": str(root)}}]
     roots["open"][0]["manifest"]["preparation_binding"] = {"source": {}}
+    del roots["open"][0]["manifest"]["root"]  # Producer OPEN publishes root only in output.
     monkeypatch.setattr(audit, "BASE", tmp_path)
     historical = {"schema": "geometric-decision-historical-reference-inventory-v1",
         "files": 2, "bytes": 30, "external_declared_files": 1,

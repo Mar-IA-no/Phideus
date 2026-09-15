@@ -128,6 +128,12 @@ def expect_schema(value: Any, schema: str, *, label: str) -> dict[str, Any]:
     return value
 
 
+def expect_binding(value: dict[str, Any], expected: dict[str, Any], *, label: str) -> None:
+    """A hashed record must also identify the authenticated store it belongs to."""
+    if value.get("binding") != expected:
+        raise ValueError(f"{label} internal binding differs")
+
+
 def nested_equal(actual: Any, expected: Any, label: str, *, atol: float = core.ATOL) -> None:
     """Exact for discrete/shape/dtype, declared tolerance only for floats."""
     if isinstance(actual, np.ndarray) or isinstance(expected, np.ndarray):
@@ -729,17 +735,20 @@ def walk_historical_open(store: core.AuditStore, prepared_ref: dict[str, Any], d
 
 def verify_open(ledger: dict[str, Any], coverage: core.Coverage, *, check=lambda: None) -> dict[str, Any]:
     row = unique_operation(ledger, "open")
-    if row["manifest"].get("root", row["output"].get("root")) != str(BASE / "open") or row["output"].get("root") != str(BASE / "open"):
+    root = row["output"].get("root")
+    if root != str(BASE / "open") or row["manifest"].get("root", root) != root:
         raise ValueError("open root differs")
     binding = row["manifest"]["preparation_binding"]
-    store = open_bound("open", Path(row["manifest"]["root"]), binding, coverage, check=check)
+    store = open_bound("open", Path(root), binding, coverage, check=check)
     authenticate_sources(binding, check=check)
     complete = expect_schema(store.json(row["output"]["complete"], check=check), "geometric-decision-open-prepared-v1", label="open completion")
+    expect_binding(complete, binding, label="open completion")
     store.json(complete["scale"], check=check)
     if len(complete["entries"]) != 27:
         raise ValueError("open adaptation does not contain 27 entries")
     for entry in complete["entries"]:
         delivered = expect_schema(store.json(entry["index"], check=check), "geometric-decision-delivered-shard-v1", label="open delivered shard")
+        expect_binding(delivered, binding, label="open delivered shard")
         if (delivered["split"] != entry["split"] or delivered["checkpoint_seed"] != entry["checkpoint_seed"]
                 or delivered["shard"] != entry["shard"] or delivered["scale"] != complete["scale"]):
             raise ValueError("open delivered shard identity differs")
@@ -1003,6 +1012,7 @@ def verify_training(ledger: dict[str, Any], coverage: core.Coverage, *, check=la
             raise ValueError("training head profile receipt differs")
     complete_ref = training_row["output"]["complete"]
     complete = expect_schema(store.json(complete_ref, check=check), "geometric-decision-campaign-complete-v1", label="training completion")
+    expect_binding(complete, binding, label="training completion")
     roster = [(cp, arm, seed) for cp in core.CHECKPOINTS for arm in core.ARMS for seed in core.READER_SEEDS]
     if len(complete["cells"]) != 72 or [(r["checkpoint_seed"], r["arm"], r["reader_seed"]) for r in complete["cells"]] != roster:
         raise ValueError("training roster differs from 72 declared cells")
@@ -1039,11 +1049,13 @@ def verify_training(ledger: dict[str, Any], coverage: core.Coverage, *, check=la
                         "arm": arm, "checkpoint_seed": cp, "reader_seed": seed, "device": binding["device"]}
         cell = open_bound("training/" + relative, store.root / relative, cell_binding, coverage, check=check)
         closed = expect_schema(cell.json(entry["complete"], check=check), "geometric-decision-cell-complete-v1", label="cell completion")
+        expect_binding(closed, cell_binding, label="cell completion")
         if closed["last_epoch"] != 50 or len(closed["history"]) != 50 or len(closed["calibration"]) != 11:
             raise ValueError("cell lacks final epoch/history/calibration roster")
         state_refs, previous = {}, None
         for epoch, cref in zip(range(0, 51, 5), closed["calibration"]):
             calibration = expect_schema(cell.json(cref, check=check), "geometric-decision-calibration-v1", label="calibration")
+            expect_binding(calibration, cell_binding, label="calibration")
             if calibration["epoch"] != epoch:
                 raise ValueError("calibration epoch roster differs")
             predictions = cell.arrays(calibration["predictions"], check=check)
@@ -1101,6 +1113,7 @@ def verify_selection(ledger: dict[str, Any], training: dict[str, Any], coverage:
         raise ValueError("selection profile admission receipt differs")
     selected_ref = row["output"]["selection"]
     selected = store.json(selected_ref, check=check)
+    expect_binding(selected, binding, label="selection")
     result = expect_schema(selected["result"], "geometric-decision-calibration-selection-v1", label="selection result")
     target_arrays = store.arrays(selected["targets"], check=check)
     if set(target_arrays) != {"targets", "offsets"} or target_arrays["targets"].dtype != np.float32:
@@ -1160,6 +1173,7 @@ def verify_archive(ledger: dict[str, Any], selection: dict[str, Any], training: 
     store = open_bound("archive", Path(row["manifest"]["root"]), binding, coverage, check=check)
     authenticate_sources(binding, check=check)
     complete = expect_schema(store.json(row["output"]["complete"], check=check), "geometric-decision-archive-complete-v1", label="archive completion")
+    expect_binding(complete, binding, label="archive completion")
     if complete.get("fresh_tests") != "not opened" or complete.get("test_authority") is not False:
         raise ValueError("archive acquired fresh-test authority")
     exclusions = store.json(complete["exclusions"], check=check)
@@ -1177,6 +1191,7 @@ def verify_archive(ledger: dict[str, Any], selection: dict[str, Any], training: 
     for field in ("parent", "closed_campaign", "mechanical_catalog"):
         core.project_reference(ROOT, extension[field], check=check)
     heads = expect_schema(store.json(complete["heads"], check=check), "geometric-decision-head-archive-v1", label="head archive")
+    expect_binding(heads, binding, label="head archive")
     expected = [(cp, arm, seed, stage) for cp in core.CHECKPOINTS for arm in core.ARMS
                 for seed in core.READER_SEEDS for stage in core.STAGES]
     if len(heads["records"]) != 144:
@@ -1187,6 +1202,7 @@ def verify_archive(ledger: dict[str, Any], selection: dict[str, Any], training: 
         "partition2.weight": (2, 32), "partition2.bias": (2,)}
     for ref, identity in zip(heads["records"], expected):
         record = expect_schema(store.json(ref, check=check), "geometric-decision-frozen-head-v1", label="archived head")
+        expect_binding(record, binding, label="archived head")
         cp, arm, seed, stage = identity
         if (record["checkpoint_seed"], record["arm"], record["reader_seed"], record["stage"]) != identity:
             raise ValueError("archived head order/identity differs")
@@ -1231,6 +1247,7 @@ def load_evaluation(ledger: dict[str, Any], precommit: dict[str, Any], coverage:
     binding = {"test_freeze": precommit["freeze_ref"], "prediction_seal": precommit["seal_ref"]}
     store = open_bound("evaluation", Path(evaluate["output"]["root"]), binding, coverage, check=check)
     complete = expect_schema(store.json(evaluate["output"]["complete"], check=check), "geometric-decision-evaluation-complete-v1", label="evaluation completion")
+    expect_binding(complete, binding, label="evaluation completion")
     if complete["original_scenes"] != 2048 or len(complete["results"]) != 4:
         raise ValueError("evaluation completion scope differs")
     seal = core.AuditStore("control", BASE / "control", coverage).json(precommit["seal_ref"], check=check)
@@ -1240,6 +1257,7 @@ def load_evaluation(ledger: dict[str, Any], precommit: dict[str, Any], coverage:
         if row["split"] != split:
             raise ValueError("evaluation split order differs")
         batch = expect_schema(store.json(row["original"], check=check), "geometric-decision-batch-evaluation-v1", label="evaluation batch")
+        expect_binding(batch, binding, label="evaluation batch")
         if batch["scene_ids"] != list(range(512)) or len(batch["targets"]) != 512 or len(batch["heads"]) != 144:
             raise ValueError("evaluation batch roster differs")
         observed = fresh.json(sealed_row["observed"], check=check)
@@ -1288,6 +1306,7 @@ def load_evaluation(ledger: dict[str, Any], precommit: dict[str, Any], coverage:
         transformed = None
         if row["roundtrip"] is not None:
             transformed_batch = expect_schema(store.json(row["roundtrip"], check=check), "geometric-decision-batch-evaluation-v1", label="roundtrip evaluation")
+            expect_binding(transformed_batch, binding, label="roundtrip evaluation")
             derived_observed = observed["roundtrip"]
             derived_sources = fresh.json(derived_observed["sources"], check=check)
             if (transformed_batch["scene_ids"] != observed["roundtrip_scene_ids"]
@@ -1608,6 +1627,8 @@ def reconstruct_cut(precommit: dict[str, Any], ledger: dict[str, Any], evaluatio
 def verify_report(ledger: dict[str, Any], precommit: dict[str, Any], evaluation: dict[str, Any],
                   coverage: core.Coverage, expected_probes: dict[str, Any], *, check=lambda: None) -> dict[str, Any]:
     row = unique_operation(ledger, "post-replay-report")
+    if row["manifest"].get("root") != str(BASE / "report") or row["output"].get("root") != str(BASE / "report"):
+        raise ValueError("report root differs")
     binding = row["manifest"]["code"], row["manifest"]["protocol"]
     authenticate_sources({"code": binding[0], "protocol": binding[1]}, check=check)
     store = core.AuditStore("report", Path(row["output"]["root"]), coverage)
@@ -1615,6 +1636,7 @@ def verify_report(ledger: dict[str, Any], precommit: dict[str, Any], evaluation:
     if actual_binding != {"code": binding[0], "protocol": binding[1]}:
         raise ValueError("report binding differs")
     complete = expect_schema(store.json(precommit["report_result_ref"], check=check), "geometric-decision-report-v1", label="report completion")
+    expect_binding(complete, actual_binding, label="report completion")
     nested_equal(complete["primary"], evaluation["primary"]["summary"], "report primary")
     expected_origins = {"fresh_finish": precommit["terminal_receipts"]["prospective-observables"],
         "evaluation_finish": precommit["terminal_receipts"]["evaluate"],
