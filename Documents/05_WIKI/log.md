@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-14 — evaluación conocida reproducida y coste de cierre
+
+El perfil CPU de cierre completó métricas, replay y costes restantes sobre
+datos conocidos; no abrió tests. La proyección original de evaluación/replay
+no cabe en su reserva restante, por lo que la campaña espera una revisión
+operativa explícita y la auditoría del supervisor, sin recortar controles.
+Fuente: `136151c75f08a13b1c4a67f26313a0d2fd900680`.
+
 ## 2026-09-14 — escenas recuperables y linaje de probes
 
 Con el entrenamiento CUDA aún activo, el ensamblado/store de escenas cerró

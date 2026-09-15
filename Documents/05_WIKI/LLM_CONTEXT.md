@@ -276,10 +276,15 @@ transportes revalidados sinforward, schema cerrado y first-four recompuesto.
 Perfil observable real0010 COMPLETE113,436136s:16TRAIN conocidas+4roundtrips,
 144readouts originales y144derivados, recoveryexactsinmodelo/fit. Reporte
 profiles/observed-cuda-0/result.json SHA28178c62c4526f74b110d1db17edb809376841829c2c2ae1bdcc4eb11cf06b64.
-Perfilacumulado189,940288/600s. ProyecciónPARCIAL con25%:10170,548045s observable,
-5470,924331s recovery; faltan drawIO/sello/métricas y tailfinal0,958818s.
-Extensión de exclusiones de coordenadas perfil auditada como interfaz,
-sin ejecución real todavía. Freeze y operador prospectivo pendientes.
+Perfil CPU cierre0011 COMPLETE25,693755s: productoridéntico/IO, métricas144,
+probes, replays exactos, bootstrapfixture e inventario; ningún test nuevo.
+Reporte profiles/closing-cpu-0/result.json SHA
+dc1e3b20723b91303c1af7916c20497e8a36ec3679aca2d9f731ba8bcbc968b9.
+Perfilacumulado215,634043/600s. Forecast original antestail1,107130s:
+fresh15857,815986s, eval8100,458485s; eval supera7090,675836restantes.
+Revisión operativa/supervisor pendientes, nofreeze. Extensiónexclusiones
+conocidas publicada en perfil, sin autoridad de nuevasobservaciones.
+Sello/evaluación poridentidad yreplay estánimplementados/auditados.
 Dos defectos de identidad del ensamblador quedaron
 resueltos y reauditados antes de la ejecución prospectiva.
 Tests nuevos, probes y evaluación prospectiva siguen pendientes. La corrección

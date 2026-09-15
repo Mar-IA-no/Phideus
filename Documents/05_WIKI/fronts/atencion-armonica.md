@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 5231cdfbdba4bce3392f178c518d7923f223d87d
+evidence_commit: 136151c75f08a13b1c4a67f26313a0d2fd900680
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -220,10 +220,14 @@ en el mismo estado. Los puertos de producción única y predicción también
 pasaron auditoría, con recuperación de transportes sin repetir el modelo.
 El perfil del recorrido observable también terminó, con 16 TRAIN conocidas,
 cuatro roundtrips y recuperación exacta de los 144 estados sin modelos ni
-ajustes. Consumió 113,436136 s; los perfiles acumulan 189,940288 / 600 s. La
-proyección sigue siendo parcial: faltan producción de escenas, sello y métricas
-para admitir el operador prospectivo. El archivo y el perfil no autorizan
-por sí solos nuevas observaciones.
+ajustes. Consumió 113,436136 s. El perfil CPU posterior midió productor/IO de
+las mismas tuplas conocidas, métricas, replay, bootstrap diagnóstico e inventario
+en 25,693755 s. Los perfiles acumulan 215,634043 / 600 s. El sello global y la
+evaluación por identidad de evento están implementados y auditados; la
+proyección completa revela que la asignación original de evaluación/replay
+excede su reserva restante. Falta cerrar la revisión operativa y auditar el
+supervisor integrado, sin reducir muestras ni controles. Estos perfiles no
+autorizan por sí solos nuevas observaciones.
 Tests, probes y evaluación prospectiva siguen pendientes. No hay ventaja
 experimental demostrada ni promoción arquitectónica.
 
