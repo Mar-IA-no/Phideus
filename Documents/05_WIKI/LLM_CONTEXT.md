@@ -4,11 +4,11 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-14
-verified_at: 2026-09-14
-valid_at: 2026-09-14
-recorded_at: 2026-09-14
-evidence_commit: 5231cdfbdba4bce3392f178c518d7923f223d87d
+updated: 2026-09-15
+verified_at: 2026-09-15
+valid_at: 2026-09-15
+recorded_at: 2026-09-15
+evidence_commit: 2b0687d669d02b55b37978d8c16d55c133a0bc02
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -44,6 +44,7 @@ source_paths:
   - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
+  - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/INDICE_DOCUMENTACION.md
@@ -286,17 +287,33 @@ Enmienda contable implementada/auditada: recoveryobservablepostseal+1hash pasa
 afresh, métricas/replay con4hashes enevaluation; no menos trabajo ni mayorcap.
 Suite285PASS. Admisión0012 COMPLETE5,178484s; freezeSHA
 febc010fa6c88651ecf684d97e7fc0d2b8707c4223357df6c81fe7e61f9dd3fe.
-Attempt0013 fresh ENEJECUCIÓN,2048escenas,144estados,4probespor test,
-reserva15864s; recoverypostseal5537s aparte, evaluation2570s compartidos.
-Fuenteestado commitd9c045bc9a2fbf309245d62be2a8632a7857338c.
-Sello/evaluación poridentidad yreplay estánimplementados/auditados.
-Dos defectos de identidad del ensamblador quedaron
-resueltos y reauditados antes de la ejecución prospectiva.
-Falta cierre de tests/probes, evaluación y replay. La corrección
-inicial nula hereda una regla de decisión, no demuestra aprendizaje.
-No hay promoción científica ni evidencia física externa añadida.
-Selección OPEN y pruebas mecánicas no son evidencia de ventaja
-de generalización.
+Campaña prospectiva, evaluación y ambos replays completos. Resultado
+`SRC-AA-GEOMETRIC-DECISION-RESULTS`:72trainings/144estados/2048escenas,
+primario489/512elegibles,23vacías preservadas. Geométrica−Inyección regret_tM:
+MSE−.034945994 IC98.75%[−.042794727,−.027609736]; Decisión−.033541291
+[−.041438760,−.025869350]. Interacción+.001404703
+[−.004363371,+.007390246], no sinergia acreditada ni equivalencia demostrada.
+Geométrica−Desacoplada Decisión−.032555044[−.040392882,−.024923274].
+Bootstrap10000 pareado escena, nueve celdas condicionadas; no nuevas seeds.
+Geométrica-Decisión selected regret.037770442/ARI.870530621 frente a
+clásico/initial.031160505/.884263080 en deformada: ventaja frente a Inyección
+no implica mejora del initial ni mide fidelidad al solver. En los otros tres
+escenarios mejora su media initial pero Local-Decisión tiene menor regret.
+Slices presencia:343pool/41vecinos/128ausente(105elegibles+23vacías); el
+regret ausente usa mejor candidato disponible, no verdad recuperada.
+VERIFY0025 COMPLETE614.107661s; resultSHA
+1e51936b53709034f9ee47994dbd16825cb16884c10907309a90a46c19794e28.
+Autenticación integral, reconstrucción independiente27originales+16derivados,
+primarios completos; no recalculó toda matemática del corpus ni entrenó.
+ReportSHAc213d59be4f8d805efa6e150784bb8d391fb8387601d2a91dd81d7406a51cd49.
+Auditoría ejecutable y revisiones independientes completas e integradas.
+Corte mantenido tras fallos operativos del checker; no retuning.
+16probes×144heads no son2304escenas independientes. Estabilidad numérica no
+invariancia física; entradaq32 centrada ya tiene2centsruido, sinamplitudes/fases.
+Siguiente propuesta: operador bajo medición render→detección, separando
+observación/cobertura/decisión y soporte de eventos. NoCQTautomático, noaudio
+real todavía. Amortización preservada pendiente de factibilidad/coste.
+No promoción científica ni evidencia física externa añadida.
 Las fuentes primarias y sus modelos relacionales subyacentes se revisan desde
 preguntas dirigidas; los descriptores explícitos permanecen controles fuertes.
 El goal requiere un experimento completo y deja que sus resultados determinen
@@ -1090,7 +1107,7 @@ plan operativo: presenta como futuras etapas que ya fueron ejecutadas.
 | `E2` | Speech ↔ EGG | `focus_active` | P2 y P3 completos; ningún descriptor supera al baseline correspondiente; null bajo encoder pequeño y WavLM frozen | Comparación `P2 vs P3`: CKA, probes y lectura representacional |
 | `VE` | Voz Expresiva | `decision_ready` | Cross-language cerrado: positivo en `N-adapt`, null/negativo en `N-strict` | Cerrar Fase 1, diagnosticar `N-strict` o pasar a habla naturalista |
 | `E3` | Audio XY ↔ Lissajous | `reopenable` | P0, P1, P2, P4, P5 y P6 completos; `P2-flat` baseline IID, `P5-cqtshift` mejor brazo OOD, P6 toroidal puro no gana | P3 descriptor×mecanismo, replicación, activation arena o transferencia física |
-| `AA` | Atención Armónica | `focus_active` | Evidencia generativa: 27 entrenamientos y cuatro tests con replay, resultado mixto | Diagnóstico de operación geométrica, target y decisión; Stage B y CQT preservados |
+| `AA` | Atención Armónica | `focus_active` | Energía geométrica: 72 entrenamientos, 2048 escenas, replay y auditorías completos | Próximo contraste bajo medición; amortización, Stage B y CQT preservados |
 | `PPU` | Arquitectura proporcional | `physical_extension_paused_incomplete` | Preflight set-valued histórico conservado; extensión física sin cierre | Corpus y mecanismos como evidencia del nuevo ciclo geométrico; no retomar paquete ni router por inercia |
 | `E4` | ECG ↔ PPG | `projection` | No hay protocolo, baseline ni campaña activa | Diseñar sólo cuando exista una transferencia metodológica justificada |
 | `EIR` | EIR-EMR | `superseded` | Antecedente conceptual absorbido por Voz Expresiva | No mantener como roadmap paralelo |
@@ -1347,10 +1364,10 @@ El registro completo, con tipo y regla de resolución, está en
 
 ## Orden de lectura de decisiones abiertas
 
-1. Ciclo geométrico: contraste generativo y diagnóstico operador–objetivo
-   completos; completar la campaña de energía geométrica para la decisión,
-   ya iniciada en CUDA, y su evaluación prospectiva, sin promover arquitectura ni convertir
-   tests abiertos en confirmación independiente.
+1. Ciclo geométrico: conservar el cierre de energía geométrica, cuya campaña,
+   replay y auditorías ya terminaron; diseñar el contraste bajo
+   medición según el resultado, sin promover arquitectura ni convertir tests
+   abiertos en confirmación independiente.
 2. `E2`: conservar la comparación `P2 vs P3` como frente cross-modal.
 3. `G6C`: mantener separado como pregunta downstream residual.
 4. `VE`: requiere elección estratégica del usuario entre diagnóstico y cambio

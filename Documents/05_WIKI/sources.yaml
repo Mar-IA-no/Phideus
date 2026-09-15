@@ -1,6 +1,6 @@
 schema_version: 1
-updated: 2026-09-08
-evidence_commit: 474b78237ef39bdf3fc1fb1a37c5517fe2bb1f8b
+updated: 2026-09-15
+evidence_commit: 2b0687d669d02b55b37978d8c16d55c133a0bc02
 snapshot_note: >-
   Olas 26-60 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -443,7 +443,7 @@ sources:
     title: Implementación de energía geométrica para la decisión
     path: experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
     authority: implementation_status
-    evidence_regime: complete_training_selection_archive_observed_profile_no_fresh_results
+    evidence_regime: complete_training_selection_fresh_evaluation_replay_and_independent_audits
     mutable: true
     fronts: [AA, PPU]
 
@@ -452,6 +452,14 @@ sources:
     path: experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
     authority: measured_resource_profile
     evidence_regime: open_only_primitive_and_observed_profiles_exact_recovery_partial_forecast_no_fresh_tests
+    mutable: true
+    fronts: [AA, PPU]
+
+  - id: SRC-AA-GEOMETRIC-DECISION-RESULTS
+    title: Geometría en la decisión, ventaja relativa sin ganador universal
+    path: experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md
+    authority: prospective_operation_by_loss_experiment_report
+    evidence_regime: 72_trainings_2048_fresh_scenes_exact_replay_scene_conditioned_primary_intervals_and_independent_technical_audit
     mutable: true
     fronts: [AA, PPU]
 

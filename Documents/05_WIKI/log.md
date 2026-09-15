@@ -1,5 +1,14 @@
 # Log de la wiki
 
+## 2026-09-15 — energía geométrica: resultado y relevo bajo medición
+
+Se integran el contraste de 72 entrenamientos y 2048 escenas, replay,
+auditoría técnica y revisión de horizonte. La ventaja frente a Inyección
+en deformación no se confunde con mejora del clásico inicial ni con geometría
+física aprendida. El registro conserva las rutas y añade medición/amortización
+como candidatas distintas, con evidencia y límites. Fuente de contenido:
+`2b0687d669d02b55b37978d8c16d55c133a0bc02`.
+
 ## 2026-09-14 — contraste prospectivo congelado y en ejecución
 
 Supervisor y enmienda de contabilidad auditados, admisión real completa y

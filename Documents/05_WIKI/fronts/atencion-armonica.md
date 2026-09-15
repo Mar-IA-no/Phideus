@@ -4,11 +4,11 @@ id: front-atencion-armonica
 kind: front
 page_status: current
 front_status: focus_active
-updated: 2026-09-14
-verified_at: 2026-09-14
-valid_at: 2026-09-14
-recorded_at: 2026-09-14
-evidence_commit: d9c045bc9a2fbf309245d62be2a8632a7857338c
+updated: 2026-09-15
+verified_at: 2026-09-15
+valid_at: 2026-09-15
+recorded_at: 2026-09-15
+evidence_commit: 2b0687d669d02b55b37978d8c16d55c133a0bc02
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -63,6 +63,7 @@ source_paths:
   - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
+  - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md
   - src/atencion_armonica/generative_evidence_model.py
   - experiments/atencion_armonica/AMENDMENT_LEARNED_PARTITION_NUMERICAL_GUARD.md
   - src/atencion_armonica/learned_partition_reuse.py
@@ -72,8 +73,8 @@ source_paths:
 depends_on: []
 tangents: [front-escalon-3, ppu-natural-harmonic-geometry]
 architecture_status: candidate
-experiment_status: mixed
-evidence_status: synthetic_loss_and_reader_tests_including_matched_generative_evidence_with_exact_replays
+experiment_status: phase_closed
+evidence_status: synthetic_operation_by_loss_tests_with_replay_full_provenance_and_structural_cut_math_audit
 decision_status: pending_analysis
 ---
 
@@ -86,7 +87,7 @@ fuentes polifónicas. Los picos son nodos; los estados de par describen posible
 pertenencia común; el triangle update propaga consistencia a través de terceros
 picos; un clusterer convierte la matriz de relaciones en una partición.
 
-## Estado real
+## Antecedente: Fases 0–0.6
 
 Fases 0, 0.5 y 0.6 están cerradas. El pair-state es el salto principal.
 Comparado con B-local param-matched, el triangle no domina IID ni OOD-regime,
@@ -229,15 +230,39 @@ excedía su reserva restante. Una enmienda explícita asignó la recuperación
 observable post-sello al mismo stage que la previa, conservando todo el
 trabajo y los límites numéricos. Supervisor y enmienda cerraron la auditoría
 técnica; la suite CPU pasó 285 pruebas. La admisión real y el freeze están
-completos y el contraste sobre 2048 escenas está en ejecución. Las respuestas
-siguen sin consultar hasta el sello global. Faltan cierre observable,
-evaluación, replay y auditorías finales. No hay ventaja experimental
-demostrada ni promoción arquitectónica.
+completos. El [resultado de energía geométrica](../../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+ya contiene las 2048 escenas nuevas, evaluación, ambos replays y verificación
+técnica ejecutable completa; las revisiones finales están integradas.
+No se repitió entrenamiento ni se cambió la selección después de abrir tests.
+
+En familia deformada, sobre 489/512 escenas elegibles, Geométrica reduce el
+regret frente a Inyección con MSE (−.034946; IC98.75% [−.042795,−.027610])
+y con Decisión (−.033541; [−.041439,−.025869]). La interacción incluye cero
+(+.001405; [−.004363,+.007390]); no acredita una sinergia especial ni prueba
+equivalencia. Frente a Desacoplada, Geométrica-Decisión también tiene menor
+regret (−.032555; [−.040393,−.024923]). Son intervalos pareados por escena,
+condicionados a nueve celdas por variante, no nueve réplicas independientes.
+
+La referencia initial cambia la interpretación: Geométrica-Decisión da regret
+.037770 frente a .031161 del clásico/geométrico inicial. La media final queda
+peor en ese escenario bajo esta receta; no es un contraste causal adicional
+ni fidelidad a elecciones del solver. En IID, beta y polifonía mejora su media
+inicial, pero Local-Decisión tiene menor regret medio. La utilidad no es
+uniforme. El control desacoplado altera el bypass, no elimina toda geometría.
+
+La auditoría autenticó la cadena completa y reconstruyó matemáticamente un
+corte fijado de 27 originales y 16 derivados, además de los cuatro primarios
+completos. Los probes son 16 escenas, no 2304 réplicas: su estabilidad no
+demuestra invariancia física aprendida. La geometría sigue en el fitter
+externo; la entrada sintética ya tiene ruido de 2 cents y no viene de audio.
+No hay promoción de arquitectura.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 
 | Camino | Qué aísla |
 |---|---|
+| Operador geométrico bajo medición | Próximo contraste propuesto: qué utilidad sobrevive a render/detección, separando observación, candidatos y decisión; no impone CQT ni valida física por ser sintético |
+| Ajuste geométrico amortizado | Alternativa preservada: aprender variables/operaciones del ajuste, pendiente de evidencia de factibilidad, robustez y coste |
 | Stage B: cabeza de `k/partición` | Si el cuello residual puede aprenderse sobre Pairformer congelado |
 | Fase 1a: render→CQT→picos | Si la ventaja sobrevive a errores de detección manteniendo GT exacto |
 

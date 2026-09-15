@@ -4,11 +4,11 @@ id: phideus-human-visual-map
 kind: map
 page_status: current
 front_status: transversal
-updated: 2026-09-14
-verified_at: 2026-09-14
-valid_at: 2026-09-14
-recorded_at: 2026-09-14
-evidence_commit: a6477eddc88ab600ff855d888f05aef30f14eeb9
+updated: 2026-09-15
+verified_at: 2026-09-15
+valid_at: 2026-09-15
+recorded_at: 2026-09-15
+evidence_commit: 2b0687d669d02b55b37978d8c16d55c133a0bc02
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -36,6 +36,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/01_FRENTES_ACTIVOS/
@@ -114,9 +115,13 @@ y las auditorías finales cerraron sin hallazgos materiales abiertos. El
 [diagnóstico de operación y objetivo](../../experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
 completó 2048 escenas y replay: mejor orden global según VI no asegura mejor
 elección del mínimo. En familia deformada, Extendida conserva mejor la decisión
-que las cabezas. El relevo separa operación geométrica y loss sobre muestras
-nuevas: [contrato y núcleo implementado](../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md),
-con campaña pendiente y sin adaptación a esos tests ni promoción.
+que las cabezas. El [relevo de energía geométrica](../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+ya completó 72 entrenamientos, 2048 escenas nuevas, replay y verificación
+técnica ejecutable. En deformada, el ajuste directo mejora frente a Inyección
+bajo ambas losses, pero no mejora su referencia clásica inicial tras aprender
+la corrección. No hay interacción acreditada ni ganador universal. El cierre
+final está integrado; sigue el contraste bajo medición, con observación,
+cobertura y decisión separadas. Amortización queda como alternativa, no mandato.
 
 ## Leyenda
 

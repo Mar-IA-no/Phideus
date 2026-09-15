@@ -1,5 +1,5 @@
 schema_version: 1
-updated: 2026-09-14
+updated: 2026-09-15
 policy:
   promotion_authority: user
   external_research: experiment_blocking_only
@@ -10,19 +10,44 @@ architectures:
   - id: harmonic-decision-geometric-energy
     name: Energía geométrica para la decisión
     status: candidate
-    priority: open_and_cpu_cuda_profiles_complete_campaign_supervisor_pending
+    priority: experiment_replay_and_independent_reviews_complete
     primitive: explicit geometric fit operation retained in the global partition decision, contrasted separately from the learning objective
-    evidence_for: classical Extended chooses better VI minima than learned heads in the deformed-family diagnostic despite lower global Kendall correlation
-    evidence_against: arithmetic head implemented but no new campaign executed; diagnostic does not identify representation versus loss or optimization; stratified reversal is not causal
-    next_experiment: prospective operation-by-objective contrast with equal observable access, explicit-descriptor and classical controls, geometric transformation checks and fresh tests
+    evidence_for: 72 trainings and 2048 fresh scenes with replay; geometric route has lower primary deformed-family regret than injection under both losses and than decoupled under decision loss
+    evidence_against: selected geometric decision head has higher primary regret than its classical initial reference; interaction interval includes zero; Local has lower mean regret in the other three scenarios; prior and optimization trajectory not separately identified
+    next_experiment: test fixed geometric operator under measurement, separating observation correspondence, candidate coverage and decision; preserve explicit descriptors and classical reference
     source_paths:
       - experiments/atencion_armonica/PLAN_GEOMETRIC_DECISION_ENERGY.md
       - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
       - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
       - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
+      - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md
       - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
       - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
-    interpretation: fixed formula with audited core and recoverable cell; OPEN and CPU CUDA profiles complete with exact CUDA recovery, full campaign pending; not an architectural promotion or learned physical geometry
+    interpretation: explicit external geometry with learned correction and scene-conditioned uncertainty; relative advantage is not improvement over the initial rule or learned physical geometry; no promotion
+  - id: harmonic-operator-under-measurement
+    name: Operador geométrico bajo medición
+    status: candidate
+    priority: proposed_next_finite_contrast_after_current_closure
+    primitive: paired canonical-frequency and rendered-audio peak observations with fixed operator and readout definitions
+    evidence_for: classical operator remains strong in deformed-family decisions; current campaign does not test detection from audio
+    evidence_against: not implemented or evaluated; missing and spurious events break ordinary partition comparability; rendering remains synthetic
+    next_experiment: preregister sensor and event correspondence, measure observation, candidate coverage and end-to-end decision without post-test retuning or automatically choosing CQT
+    source_paths:
+      - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md
+      - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
+    interpretation: diagnostic system candidate, not promoted architecture or physical validation; current canonical inputs already include 2-cent noise
+  - id: harmonic-amortized-geometric-fit
+    name: Ajuste geométrico amortizado
+    status: candidate
+    priority: preserved_alternative_pending_measurement_and_cost_evidence
+    primitive: learn variables or operations of the joint fit rather than only a residual correction to its score
+    evidence_for: explicit geometric fit is a strong decision reference worth retaining as comparator
+    evidence_against: no feasibility, speed advantage or out-of-distribution quality demonstrated; solver output is not physical ground truth
+    next_experiment: identify a geometric variable and compare approximation, decision fidelity and cost against the solver if measurement and resource evidence justify this branch
+    source_paths:
+      - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md
+      - Documents/01_FRENTES_ACTIVOS/Atencion_Armonica/ROADMAP_ATENCION_ARMONICA.md
+    interpretation: recoverable alternative, not an automatic successor or a replacement for explicit descriptors
   - id: harmonic-generative-evidence-reader
     name: Lector con evidencia generativa
     status: candidate

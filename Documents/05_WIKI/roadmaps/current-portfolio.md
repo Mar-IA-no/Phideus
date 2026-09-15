@@ -4,11 +4,11 @@ id: phideus-current-portfolio
 kind: roadmap
 page_status: current
 front_status: transversal
-updated: 2026-09-14
-verified_at: 2026-09-14
-valid_at: 2026-09-14
-recorded_at: 2026-09-14
-evidence_commit: a6477eddc88ab600ff855d888f05aef30f14eeb9
+updated: 2026-09-15
+verified_at: 2026-09-15
+valid_at: 2026-09-15
+recorded_at: 2026-09-15
+evidence_commit: 2b0687d669d02b55b37978d8c16d55c133a0bc02
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -40,6 +40,7 @@ source_paths:
   - experiments/atencion_armonica/RESULTS_OPERATOR_OBJECTIVE_ALIGNMENT.md
   - experiments/atencion_armonica/PROTOCOL_GEOMETRIC_DECISION_ENERGY.md
   - experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
+  - experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md
   - README.md
   - Documents/00_TRONCAL/Proyecto_Estado_Actual.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PLAN_AVANCE_TRIPLESCALONETA_v1.1.md
@@ -175,10 +176,15 @@ Extendida. Oracles, cobertura, regresión y estratos delimitan explicaciones,
 sin identificar una causa. La auditoría técnica final autenticó el cierre
 y reextrajo16escenas; el [estado](../../../experiments/atencion_armonica/STATUS_OPERATOR_OBJECTIVE_ALIGNMENT.md)
 conserva1350.970249s acumulados y la enmienda explícita del presupuesto.
-El siguiente experimento separa operación geométrica y aprendizaje de la
-decisión sobre muestras nuevas, manteniendo descriptores y clásico como
-controles. Tiene [protocolo y núcleo auditados](../../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md),
-pero pipeline completa y campaña pendientes; no es otra evaluación post-hoc.
+El [experimento posterior](../../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)
+ya separó ruta geométrica y loss en 72 entrenamientos y 2048 escenas nuevas,
+con replay y verificación técnica ejecutable completos. En deformación,
+Geométrica mejora frente a Inyección bajo ambas losses, pero la corrección
+aprendida no supera al clásico inicial. La interacción no está acreditada
+y las comparaciones cambian por escenario. La integración final está completa;
+el siguiente contraste propuesto es operador bajo medición, sin retuning sobre
+tests, separando observación, cobertura y decisión. La amortización queda
+preservada hasta tener evidencia de factibilidad y coste.
 La extensión física set-valued queda pausada e incompleta, no
 convertida en el siguiente paso por haber cerrado su preflight anterior.
 Cada goal requiere evidencia experimental y auditorías técnica y de
@@ -321,5 +327,6 @@ permanece como referencia externa y el router, diferido. En ese corte se
 planteó congelar el paquete prospectivo antes de cualquier draw. El rebase
 posterior dejó esa extensión pausada e incompleta: no es el próximo goal
 vigente. El ciclo actual completó el contraste de evidencia generativa y el
-diagnóstico de operación y objetivo; implementa ahora su contraste prospectivo
-de energía geométrica para la decisión, sin promoción científica.
+diagnóstico de operación y objetivo; el contraste prospectivo de energía
+geométrica terminó campaña, replay y auditorías. Su cierre está integrado y
+sigue el diagnóstico bajo medición, sin promoción científica.
