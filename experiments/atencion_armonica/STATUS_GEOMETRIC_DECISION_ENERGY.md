@@ -149,9 +149,18 @@ El [plan de métricas](PLAN_GEOMETRIC_DECISION_METRICS.md) implementa el
 estimando ya fijado: targets matemáticos y entregados separados, puntuaciones
 firmadas float64 y bootstrap pareado por escena. Su núcleo y el adaptador de
 admisión del perfil pasaron auditoría de sus interfaces y 18 pruebas CPU;
-la suite conjunta completó 247 pruebas. Falta conectar la evaluación al sello
-global y a los labels por identidad de evento: estos núcleos no habilitan
-leer truth de los tests.
+la suite conjunta de ese corte completó 247 pruebas. La integración posterior
+del sello global y de la evaluación por identidad de evento pasó auditoría
+y pruebas mecánicas. Exige los cuatro batches completos antes de leer respuestas
+y conserva replay exacto sin reparar resultados ausentes.
+
+El [perfil CPU de cierre](RESULTS_GEOMETRIC_DECISION_PROFILE.md) ya ejecutó
+la evaluación y su replay sobre 16 TRAIN conocidas y cuatro probes, incluidos
+los 144 estados; terminó en 25,693755 s sin nuevos tests. El coste acumulado de
+perfiles es 215,634043/600 s. La proyección original de evaluación/replay excede
+su reserva restante; se prepara una revisión operativa explícita, sin reducir
+controles ni muestras. El supervisor integral está implementado pero todavía
+bajo auditoría. No hay freeze prospectivo ni resultados de generalización.
 
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,

@@ -2,6 +2,17 @@
 
 ---
 
+## Energía geométrica: métricas reproducidas y presupuesto completo (2026-09-14)
+
+La evaluación y su recuperación exacta ya se midieron sobre escenas conocidas,
+sin abrir tests nuevos. El [perfil CPU](../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md)
+terminó en unos 26 segundos después de corregir y reauditar la protección de
+recursos durante la admisión inicial. La medición mostró que la asignación
+original de evaluación/replay necesita una revisión antes de ejecutar la
+campaña; no se recortan muestras, variantes ni verificaciones. El siguiente
+paso es cerrar esa asignación y el supervisor integrado para evaluar los
+modelos ya entrenados sobre 2048 escenas nuevas.
+
 ## Energía geométrica: recorrido observable medido (2026-09-14)
 
 El [perfil completo sobre escenas conocidas](../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md)

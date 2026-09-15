@@ -100,3 +100,38 @@ El coste acumulado de perfiles, incluido el selector, es **189,940288 / 600 s**.
 Sigue completar el presupuesto restante, extender las exclusiones con las
 coordenadas del perfil y congelar la ejecución prospectiva. El goal permanece
 abierto hasta completar tests, evaluación, replay y auditorías finales.
+
+## Evaluación y cierre del perfil CPU
+
+El [operador CPU](profile_geometric_decision_closing.py), corregido y auditado
+antes de ejecutarse, completó el intento `0011` en **25,693755 s**. Reutilizó
+las mismas 16 escenas TRAIN y cuatro probes; reconstruyó sólo las tuplas ya
+conocidas y comprobó igualdad exacta de observaciones y respuestas. No creó
+tests. Las métricas de los 144 estados y sus estratos se reprodujeron exactamente
+desde archivos, tanto para originales como para probes.
+
+| Fase | Segundos |
+|---|---:|
+| Admisión y setup | 0,375389 |
+| Lectura/reconstrucción de verdad conocida | 0,025640 |
+| Productor e IO de tuplas conocidas | 0,205225 |
+| Métricas originales / replay | 7,359000 / 6,829589 |
+| Métricas probes / replay | 2,846908 / 2,550117 |
+| Bootstrap sobre fixture repetido, no evidencia científica | 1,519616 |
+| Inventario del árbol observable | 0,381669 |
+
+El pico RSS fue 910499840 bytes y el volumen medido antes del informe final,
+30193718 bytes. El ledger acumula **215,634043 / 600 s** de perfiles. La
+proyección completa original, antes de añadir el tail de 1,107130 s, es
+15857,815986 s fresh y 8100,458485 s evaluación/replay, con margen del 25%.
+La segunda excede los 7090,675836 s restantes de su etapa. Por ello no habilita
+los tests: se prepara una revisión explícita de contabilidad de recuperación
+observable, manteniendo el trabajo y los límites totales. El supervisor y esa
+revisión todavía requieren validación; no hay resultados prospectivos.
+
+Fuentes bajo la misma raíz experimental:
+
+- `profiles/closing-cpu-0/result.json`, SHA256
+  `dc1e3b20723b91303c1af7916c20497e8a36ec3679aca2d9f731ba8bcbc968b9`.
+- `control/attempts/0011/finish.json`, SHA256
+  `4f08e8fbd6252c087acac654928f2e7aefdf4075a6e132e3735ec1df5fb8e615`.
