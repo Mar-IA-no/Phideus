@@ -155,6 +155,31 @@ def test_open_passes_resolved_output_root_to_store(tmp_path, monkeypatch, manife
         assert seen == [("open", Path(root), binding)]
 
 
+@pytest.mark.parametrize("mutation", ("none", "string_order", "duplicate", "missing", "content", "symlink"))
+def test_profile_inventory_keeps_producer_path_order_and_authenticates(tmp_path, mutation):
+    child = publish(tmp_path, "a/child.json", {"fixture": "child"})
+    sibling = publish(tmp_path, "a.json", {"fixture": "sibling"})
+    refs = [child, sibling]  # Path sort, not lexicographic full relative string.
+    assert [p.relative_to(tmp_path).as_posix() for p in sorted(tmp_path.rglob("*")) if p.is_file()] == [r["path"] for r in refs]
+    assert sorted(r["path"] for r in refs) != [r["path"] for r in refs]
+    if mutation == "string_order":
+        refs = [sibling, child]
+    elif mutation == "duplicate":
+        refs = [child, child]
+    elif mutation == "missing":
+        refs = [child]
+    elif mutation == "content":
+        (tmp_path / "a.json").write_text("changed")
+    elif mutation == "symlink":
+        (tmp_path / "extra.json").symlink_to("a.json")
+    inventory = {"root": str(tmp_path), "files": refs}
+    if mutation == "none":
+        audit.verify_profile_inventory(inventory, tmp_path, core.Coverage())
+    else:
+        with pytest.raises(ValueError):
+            audit.verify_profile_inventory(inventory, tmp_path, core.Coverage())
+
+
 @pytest.mark.parametrize("mutation", ("valid", "wrong", "missing"))
 def test_open_delivered_child_binding_is_checked_before_payload(tmp_path, monkeypatch, mutation):
     monkeypatch.setattr(audit, "BASE", tmp_path)

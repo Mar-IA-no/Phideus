@@ -759,6 +759,28 @@ def verify_open(ledger: dict[str, Any], coverage: core.Coverage, *, check=lambda
     return {"store": store, "complete_ref": row["output"]["complete"], "binding": binding}
 
 
+def verify_profile_inventory(inventory: dict[str, Any], root: Path, coverage: core.Coverage,
+                             *, check=lambda: None) -> None:
+    # file_inventory sorts Path components before serializing relative strings.
+    # Sorting the serialized strings instead gives a different order around
+    # sibling directories and suffixes (a/child.json precedes a.json as Paths).
+    current_paths = []
+    for path in sorted(root.rglob("*")):
+        check()
+        if path.is_symlink():
+            raise ValueError("closing profile inventory contains a symlink")
+        if path.is_dir():
+            continue
+        if not path.is_file() or path.suffix not in (".json", ".npz", ".gz"):
+            raise ValueError("closing profile inventory contains an unknown artifact")
+        current_paths.append(path.relative_to(root).as_posix())
+    if inventory.get("root") != str(root) or [ref["path"] for ref in inventory["files"]] != current_paths:
+        raise ValueError("closing profile observed inventory roster differs")
+    store = core.AuditStore("profile-observed-inventory", root, coverage)
+    for ref in inventory["files"]:
+        store.authenticate(ref, kind="profile-inventory", check=check)
+
+
 def authenticate_owned_tree(store: core.AuditStore, *, check=lambda: None) -> dict[str, int]:
     """Authenticate every artifact in an exact single-purpose profile root."""
     counts = {"json": 0, "npz": 0, "opaque": 0}
@@ -930,14 +952,7 @@ def verify_profiles(ledger: dict[str, Any], coverage: core.Coverage, *, check=la
                     store.json(receipt[field], check=check)
             inventory = store.json(profile["observable_inventory"], check=check)
             observed_root = BASE / "profiles/observed-cuda-0"
-            observed_profile = core.AuditStore("profile-observed-inventory", observed_root, coverage)
-            current_paths = sorted(path.relative_to(observed_root).as_posix()
-                                   for path in observed_root.rglob("*") if path.is_file() and not path.is_symlink())
-            if (inventory.get("root") != str(observed_root)
-                    or [ref["path"] for ref in inventory["files"]] != current_paths):
-                raise ValueError("closing profile observed inventory roster differs")
-            for ref in inventory["files"]:
-                observed_profile.authenticate(ref, kind="profile-inventory", check=check)
+            verify_profile_inventory(inventory, observed_root, coverage, check=check)
             store.json(profile["exclusions"], check=check)
         result[operation] = authenticate_owned_tree(store, check=check)
     profile_roots = {
