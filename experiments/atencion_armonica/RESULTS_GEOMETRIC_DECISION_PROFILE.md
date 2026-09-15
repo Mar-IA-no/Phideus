@@ -1,7 +1,12 @@
 # Perfiles de energía geométrica para la decisión
 
-2026-09-14. Preparación del perfil y cuatro combinaciones CPU/CUDA completas;
-ningún entrenamiento científico iniciado. Código de ejecución: `50ac5b39c63ac960536891538da514721f307031`.
+2026-09-14. Perfiles de primitivas y del recorrido observable completos;
+los tests prospectivos siguen sin abrir. El entrenamiento posterior a los
+primeros perfiles está documentado en el [estado](STATUS_GEOMETRIC_DECISION_ENERGY.md).
+
+## Perfil inicial de primitivas
+
+Código de ejecución: `50ac5b39c63ac960536891538da514721f307031`.
 
 El [operador](profile_geometric_decision.py), auditado antes de ejecutar,
 reutilizó OPEN y la escala congelada. Midió una carga completa del primer
@@ -48,6 +53,50 @@ La preparación se cierra en `0001/finish.json`, SHA256
 Cada caso conserva tiempos individuales, snapshots y outputs; el fitter
 conserva workloads y factores completos. No hubo sampler ni nuevos tests.
 
-Sigue completar y auditar el supervisor, congelar la admisión de entrenamiento
-y ejecutar las 72 corridas. Estos perfiles no aportan evidencia a favor de una
-arquitectura y no cierran el goal.
+Estos perfiles precedieron al supervisor y a las 72 corridas, ya completadas.
+No aportan por sí solos evidencia a favor de una arquitectura.
+
+## Recorrido observable y recuperación
+
+El [operador del recorrido completo](profile_geometric_decision_observed.py),
+auditado antes de ejecutar, terminó el intento `0010` en **113,436136 s**.
+Usó las primeras 16 escenas TRAIN ya conocidas y los roundtrips de las cuatro
+primeras elegibles. Completó features, tres backbones, candidatos, ajustes
+compartidos, cuatro referencias clásicas y los 144 estados iniciales/seleccionados.
+Conservó transportes de representación y una segunda pipeline sobre cada probe.
+La recuperación devolvió exactamente el mismo recibo sin ejecutar modelos ni
+ajustes. No se generaron escenas de test ni se abrieron sus respuestas.
+
+| Medición | Segundos |
+|---|---:|
+| Observables originales: features, backbones, candidatos y ajustes | 43,116771 |
+| Referencias clásicas originales | 8,848362 |
+| Readouts originales y transportes | 11,122933 |
+| Observables de los cuatro roundtrips | 8,866914 |
+| Referencias clásicas de los roundtrips | 1,333576 |
+| Readouts de los roundtrips | 1,695074 |
+| Recuperación observable completa | 34,097760 |
+
+El perfil registra 522190848 bytes de pico reservado CUDA, 1628557312 bytes
+de RSS y 56703389 bytes de artefactos antes del informe final. Estos picos
+no son cotas para todas las escenas OOD. La proyección parcial con margen
+del 25% es **10170,548045 s** de recorrido observable, **5470,924331 s** de
+recuperación y **9072542240 bytes**. Sobrecuenta los probes y transportes al
+extrapolar desde bloques pequeños. No incluye todavía producción/serialización
+de escenas nuevas, sello global ni métricas/bootstrap. El tramo final de
+publicación y verificación añade 0,958818 s medidos al perfil y debe incorporarse
+a la admisión total. Esta proyección no autoriza por sí sola los tests.
+
+Fuentes bajo la raíz experimental:
+
+- `profiles/observed-cuda-0/result.json`, SHA256
+  `28178c62c4526f74b110d1db17edb809376841829c2c2ae1bdcc4eb11cf06b64`.
+- `profiles/observed-cuda-0/observed/observable-complete.json`, original y
+  recovery, SHA256 `024a71330754271d167df0f6ba2b23990176f7fd99e99f7bfa580e40c41ff933`.
+- `control/attempts/0010/finish.json`, SHA256
+  `e05314b43451bb3993b9e01124c0d970684c974152dfe3537366c171cffd30d3`.
+
+El coste acumulado de perfiles, incluido el selector, es **189,940288 / 600 s**.
+Sigue completar el presupuesto restante, extender las exclusiones con las
+coordenadas del perfil y congelar la ejecución prospectiva. El goal permanece
+abierto hasta completar tests, evaluación, replay y auditorías finales.

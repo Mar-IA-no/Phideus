@@ -9,6 +9,7 @@ from __future__ import annotations
 from copy import deepcopy
 
 from .geometric_decision_archive_admission import verify_heads
+from .geometric_decision_classical import preserve_classical
 from .geometric_decision_observables import roundtrip_observation
 from .geometric_decision_pipeline import prepare_sources, prepare_inputs
 from .geometric_decision_predictions import input_batch, preserve_prediction, preserve_transport
@@ -29,15 +30,15 @@ def observed_batch(store, folder, split, observations, *, expected_seed, observa
     return source, inputs, cache
 
 
-def readout_roster(store, folder, cache, head_store, heads, *, device, runtime, transport, check):
+def readout_roster(store, folder, cache, head_store, heads, *, device, runtime, transport, check, allow_compute=True):
     """The complete ordered 144-member roster, never a caller-selected subset."""
     outputs = []
     for head_ref in heads:
         check()
         prediction = preserve_prediction(store, folder+"/predictions", cache, head_store, head_ref,
-            device=device, runtime=runtime, check=check)
+            device=device, runtime=runtime, check=check, allow_compute=allow_compute)
         probe = (preserve_transport(store, folder+"/transport", cache, prediction, head_store,
-                                   check=check) if transport else None)
+                                   check=check, allow_compute=allow_compute) if transport else None)
         outputs.append({"head": head_ref, "prediction": prediction, "transport": probe})
     return outputs
 
@@ -45,7 +46,7 @@ def readout_roster(store, folder, cache, head_store, heads, *, device, runtime, 
 def run_observed(store, folder, split, observations, *, expected_seed, observation_origin,
                  checkpoints, runtime, forward, normalizers, normalization_ref, scale,
                  fit_origin, fit_candidates, head_store, archive_ref, selection_store,
-                 selection_ref, device, check):
+                 selection_ref, device, check, measure=None, recovery_only=False):
     """Original batch + all readouts + first-four full roundtrip pipelines.
 
     Caller supplies observations already admitted by OPEN provenance or the
@@ -54,28 +55,38 @@ def run_observed(store, folder, split, observations, *, expected_seed, observati
     Interruption preserves lower-stage receipts; recovery traverses/revalidates
     those stages without repeating completed forwards or geometric fits.
     """
-    verify_heads(head_store, archive_ref, selection_store, selection_ref, check=check)
+    measure = measure or (lambda name, operation: operation())
+    measure("archive", lambda: verify_heads(head_store, archive_ref, selection_store, selection_ref, check=check))
     heads = deepcopy(head_store.json(archive_ref)["records"])
     observations = deepcopy(observations)
     args = dict(expected_seed=expected_seed, checkpoints=deepcopy(checkpoints), runtime=deepcopy(runtime),
         forward=forward, normalizers=deepcopy(normalizers), normalization_ref=deepcopy(normalization_ref),
         scale=scale, fit_origin=deepcopy(fit_origin), fit_candidates=fit_candidates, check=check)
-    original_source, original_inputs, cache = observed_batch(store, folder+"/original", split,
-        observations, observation_origin=deepcopy(observation_origin), **args)
+    if recovery_only:
+        def forbidden(*args, **kwargs):
+            raise RuntimeError("read-only recovery cannot forward or fit")
+        args.update(forward=forbidden, fit_candidates=forbidden)
+    original_source, original_inputs, cache = measure("original-observable", lambda: observed_batch(
+        store, folder+"/original", split, observations, observation_origin=deepcopy(observation_origin), **args))
     # Save this list before callbacks can access the cached inputs.
     indices = tuple(cache["probe_indices"])
     source_records = store.json(original_source)["sources"]
     parents = [source_records[i] for i in indices]
     derived = [roundtrip_observation(observations[i], expected_seed=expected_seed)["observation"] for i in indices]
-    original = readout_roster(store, folder+"/original", cache, head_store, heads,
-        device=device, runtime=runtime, transport=True, check=check)
+    classical = measure("original-classical", lambda: preserve_classical(store, folder+"/original/classical", cache, check=check))
+    original = measure("original-readout", lambda: readout_roster(store, folder+"/original", cache, head_store, heads,
+        device=device, runtime=runtime, transport=True, check=check, allow_compute=not recovery_only))
     roundtrip = None
     if derived:
-        source, inputs, transformed = observed_batch(store, folder+"/roundtrip", split, derived,
-            observation_origin={"kind": "roundtrip", "parents": parents}, **args)
-        outputs = readout_roster(store, folder+"/roundtrip", transformed, head_store, heads,
-            device=device, runtime=runtime, transport=False, check=check)
-        roundtrip = {"sources": source, "inputs": inputs, "records": outputs}
+        source, inputs, transformed = measure("roundtrip-observable", lambda: observed_batch(
+            store, folder+"/roundtrip", split, derived,
+            observation_origin={"kind": "roundtrip", "parents": parents}, **args))
+        derived_classical = measure("roundtrip-classical", lambda: preserve_classical(
+            store, folder+"/roundtrip/classical", transformed, check=check))
+        outputs = measure("roundtrip-readout", lambda: readout_roster(
+            store, folder+"/roundtrip", transformed, head_store, heads,
+            device=device, runtime=runtime, transport=False, check=check, allow_compute=not recovery_only))
+        roundtrip = {"sources": source, "inputs": inputs, "records": outputs, "classical": derived_classical}
     check()
     # No head subset, late substitution or metadata mutation can be committed.
     if encoded(head_store.json(archive_ref)["records"]) != encoded(heads):
@@ -84,6 +95,6 @@ def run_observed(store, folder, split, observations, *, expected_seed, observati
         "schema": "geometric-decision-observed-run-v1", "binding": store.binding,
         "split": split, "split_seed": expected_seed, "scene_ids": [o["scene_id"] for o in observations],
         "archive": archive_ref, "archive_binding": head_store.binding, "archive_root": str(head_store.root),
-        "sources": original_source, "inputs": original_inputs, "records": original,
+        "sources": original_source, "inputs": original_inputs, "records": original, "classical": classical,
         "roundtrip_scene_ids": [observations[i]["scene_id"] for i in indices], "roundtrip": roundtrip,
         "truth_access": False, "global_seal": False})

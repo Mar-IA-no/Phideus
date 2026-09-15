@@ -2,6 +2,16 @@
 
 ---
 
+## Energía geométrica: recorrido observable medido (2026-09-14)
+
+El [perfil completo sobre escenas conocidas](../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md)
+terminó en unos 113 segundos y recuperó exactamente sus resultados sin repetir
+redes ni ajustes. Incluye los modelos iniciales y seleccionados, referencias
+clásicas, transportes y una segunda pipeline sobre coordenadas transformadas.
+La evidencia resuelve la viabilidad técnica de ese recorrido acotado, no la
+ventaja de una arquitectura. Los tests nuevos siguen sin abrir; la preparación
+actual completa sus métricas y presupuesto antes del congelamiento prospectivo.
+
 ## Energía geométrica: archivo completo y recuperación observable (2026-09-14)
 
 El [estado experimental](../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)

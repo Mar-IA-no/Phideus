@@ -183,3 +183,17 @@ def test_probe_roster_recomputed_before_model_or_publication(bundle, monkeypatch
     monkeypatch.setattr(store, "publish_json", forbidden)
     with pytest.raises(ValueError, match="first four eligible"):
         module.preserve_transport(store, "transport", cache, ref, heads, check=lambda: None)
+
+
+def test_read_only_recovery_cannot_fill_missing_head_or_probe(bundle, monkeypatch):
+    store, heads, cache = bundle
+    head_ref = head(heads)
+    args = dict(device="cpu", runtime={"fixture": "CPU"}, check=lambda: None)
+    ref = module.preserve_prediction(store, "original", cache, heads, head_ref, **args)
+    def forbidden(*args, **kwargs):
+        raise AssertionError("read-only recovery must not build a model")
+    monkeypatch.setattr(module, "archived_model", forbidden)
+    with pytest.raises(RuntimeError, match="missing prediction"):
+        module.preserve_prediction(store, "missing", cache, heads, head_ref, **args, allow_compute=False)
+    with pytest.raises(RuntimeError, match="missing transport"):
+        module.preserve_transport(store, "missing", cache, ref, heads, check=lambda: None, allow_compute=False)

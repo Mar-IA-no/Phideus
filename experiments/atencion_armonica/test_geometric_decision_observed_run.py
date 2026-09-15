@@ -59,11 +59,13 @@ def test_complete_observable_traversal_and_recovery(inputs, archive, monkeypatch
     assert [r["head"] for r in record["roundtrip"]["records"]] == expected
     assert all(r["transport"] is not None for r in record["records"])
     assert all(r["transport"] is None for r in record["roundtrip"]["records"])
+    assert len(store.json(record["classical"])["records"]) == 1
+    assert len(store.json(record["roundtrip"]["classical"])["records"]) == 1
     def forbidden(*args, **kwargs):
         raise AssertionError("complete traversal recovery must not execute models or fit")
     monkeypatch.setattr(predictions, "archived_model", forbidden)
     assert module.run_observed(store, "batch", "iid", observations,
-        **{**kwargs, "forward": forbidden, "fit_candidates": forbidden}) == ref
+        **{**kwargs, "forward": forbidden, "fit_candidates": forbidden}, recovery_only=True) == ref
 
 
 def test_incomplete_head_roster_rejected_before_any_forward(inputs, archive):

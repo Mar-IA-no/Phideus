@@ -89,7 +89,7 @@ def checked_prediction(arrays, rows, raw, *, route, initial):
     return choices
 
 
-def preserve_prediction(store, folder, cache, head_store, head_ref, *, device, runtime, check):
+def preserve_prediction(store, folder, cache, head_store, head_ref, *, device, runtime, check, allow_compute=True):
     """Reuse exact outputs; an orphan payload stops before a new forward."""
     if cache["binding"] != store.binding or not isinstance(runtime, dict) or not runtime:
         raise ValueError("prediction cache/runtime lacks explicit provenance")
@@ -117,6 +117,8 @@ def preserve_prediction(store, folder, cache, head_store, head_ref, *, device, r
         return ref
     if store.path(prefix+".npz").exists():
         raise RuntimeError("unreceipted prediction; reconcile before any re-forward")
+    if not allow_compute:
+        raise RuntimeError("missing prediction during read-only recovery")
     _, model = archived_model(head_store, head_ref, device=device)
     arrays = predict(model, rows, device=device, check=check)
     choices = checked_prediction(arrays, rows, raw, route=route, initial=stage == "initial")
@@ -190,7 +192,7 @@ def checked_transport(arrays, row, raw, batched, *, route, initial):
         "singleton_vs_batch_same_exact_choice": before == choose_energy(batched.sum(-1, dtype=np.float64), ps)}
 
 
-def preserve_transport(store, folder, cache, prediction_ref, head_store, *, check):
+def preserve_transport(store, folder, cache, prediction_ref, head_store, *, check, allow_compute=True):
     """Save transported coordinates and distinguish singleton/batched numerics.
 
     Must be called for all initial/selected heads before the global seal.
@@ -234,6 +236,8 @@ def preserve_transport(store, folder, cache, prediction_ref, head_store, *, chec
             continue
         if store.path(prefix+".npz").exists():
             raise RuntimeError("unreceipted transport; no silent re-forward")
+        if not allow_compute:
+            raise RuntimeError("missing transport during read-only recovery")
         if model is None:
             _, model = archived_model(head_store, prediction["head"], device=prediction["device"])
         result = transport_prediction(model, cache["rows"][cp][i], cache["raw"][cp][i]["partitions"],

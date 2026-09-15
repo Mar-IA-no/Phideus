@@ -1,6 +1,6 @@
 # Energía geométrica para la decisión — estado de implementación
 
-2026-09-14. Preparación OPEN, perfiles de primitivas, 72 entrenamientos, selección y archivo numérico completos. Tests prospectivos todavía sin abrir.
+2026-09-14. Preparación OPEN, perfiles de primitivas y recorrido observable, 72 entrenamientos, selección y archivo numérico completos. Tests prospectivos todavía sin abrir.
 
 El [protocolo](PROTOCOL_GEOMETRIC_DECISION_ENERGY.md), auditado antes de la
 campaña, fija cuatro rutas por dos pérdidas: Inyección, Geométrica,
@@ -96,7 +96,7 @@ su recibo `control/attempts/0006/finish.json` tiene SHA256
 Ambos pertenecen a `data/atencion_armonica/geometric_decision_energy_v1/`.
 Completar entrenamiento y selección no permite interpretar ventajas entre brazos.
 
-Permanecen pendientes el perfil de la pipeline completa,
+Permanecen pendientes la admisión integral de recursos,
 freeze prospectivo, tests nuevos, probes, replay y auditorías
 finales. Los tests nuevos no se abrieron; todavía no hay resultados del
 contraste prospectivo que permitan evaluar generalización.
@@ -128,16 +128,30 @@ raíz experimental tiene SHA256
 `f36a55dcc9dd5c3c25a7429fe044f74511ebd07cc4bde60b873b9ba3c89d7f75`;
 `control/attempts/0009/finish.json`,
 `158fe1bc539f0c31e4baaa6191ba963d3cb6573531f8865dd146c1a933625e1c`.
-El archivo no autoriza draws: el perfil completo y el freeze siguen pendientes.
+El archivo no autoriza draws: la admisión integral y el freeze siguen pendientes.
 
 Los puertos de producción única de observaciones y conservación de predicciones
 también pasaron auditoría y 36 pruebas CPU. La recuperación de los transportes
 revalida arrays, permutaciones, energía y diagnósticos sin ejecutar el modelo;
 el roster de primeras cuatro escenas elegibles se recompone antes de usarse.
 Las correcciones mantienen la frontera observable sin campos de supervisión.
-La integración de esos puertos tiene una prueba mecánica de los 144 estados,
-incluido roundtrip y recuperación sin forward ni fitting; todavía no está
-auditada como operador real y no constituye evaluación prospectiva.
+La integración de esos puertos y la referencia clásica raw UB pasaron auditoría
+antes del perfil real. El [perfil observable](RESULTS_GEOMETRIC_DECISION_PROFILE.md)
+completó las 16 escenas TRAIN fijadas y cuatro roundtrips, incluidos los 144
+estados y recuperación exacta sin forward ni fitting. Consumió 113,436136 s;
+el ledger acumula 189,940288 / 600 s de perfiles. Sus proyecciones siguen
+siendo parciales: faltan generación, sello y métricas en la admisión completa.
+La extensión de exclusiones de sus coordenadas pasó auditoría como interfaz,
+pero todavía no se ejecutó detrás de la admisión prospectiva. No hay nuevos
+resultados científicos ni cambios de arquitectura.
+
+El [plan de métricas](PLAN_GEOMETRIC_DECISION_METRICS.md) implementa el
+estimando ya fijado: targets matemáticos y entregados separados, puntuaciones
+firmadas float64 y bootstrap pareado por escena. Su núcleo y el adaptador de
+admisión del perfil pasaron auditoría de sus interfaces y 18 pruebas CPU;
+la suite conjunta completó 247 pruebas. Falta conectar la evaluación al sello
+global y a los labels por identidad de evento: estos núcleos no habilitan
+leer truth de los tests.
 
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,
