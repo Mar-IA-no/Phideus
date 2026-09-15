@@ -24,6 +24,13 @@ Implementado:
 - Control de presupuesto acumulado y recuperación en `measurement_control.py`;
   admisión por identidad de fuentes, congelación y sello como fases medidas en
   `measurement_admission.py`. Sólo un cierre completo habilita la fase siguiente.
+- Persistencia de entradas y outputs de inferencia en `measurement_payload.py`
+  y `measurement_prediction.py`; servicio CUDA explícito en `measurement_cuda.py`.
+  Cada output GPU conserva su ejecución productora, incluso tras recuperación.
+- Recorridos OPEN de emisión/detección, calibración y perfil en
+  `measurement_open.py`, `measurement_calibration.py` y `measurement_profile.py`;
+  snapshot de fuentes y guards en `measurement_snapshot.py` y
+  `measurement_resources.py`. Su conexión global todavía está en implementación.
 
 Los tests `test_measurement_primitives.py`, `test_measurement_contract.py`,
 `test_measurement_operator.py` y `test_measurement_reporting.py` usan fixtures
@@ -41,10 +48,18 @@ incremental independiente confirmó los cuatro cierres, con15fixtures oficiales
 y2adicionales. El recorrido OPEN y la conexión de inferencia siguen en desarrollo;
 esa revisión no acredita su integración ni constituye un perfil de recursos real.
 
+La revisión independiente de inferencia encontró dos defectos de procedencia
+CUDA y ciclo de vida del dispositivo. La revisión incremental confirmó sus
+correcciones, incluyendo recuperación sin nueva ejecución y cleanup dentro de la
+fase tras timeout o fallo parcial de inicialización. La suite conjunta alcanza
+92pruebas CPU: escenas manuales, outputs neuronales simulados y ajustes5×5
+pequeños. Ninguna de esas pruebas usa los modelos reales ni la grilla experimental
+CUDA257×65. El ejecutable sólo expone snapshot y perfil CPU; aún no se ejecutaron.
+
 Secuencia restante:
 
-1. Completar ejecutor recuperable, autenticación de referencias, separación de
-   puertos y preservación de todos los artefactos. Probar interrupciones y replay.
+1. Conectar perfiles y calibración al ejecutor; completar exclusiones, proyección
+   de coste acumulado, observación/predicción de test y evaluación/replay global.
 2. Auditar esa integración antes de perfilar desarrollo y calibrar el detector.
 3. Medir CPU/GPU y publicar presupuesto/manifest congelado antes del test.
 4. Ejecutar las512escenas pareadas, sellar predicciones y evaluar después.

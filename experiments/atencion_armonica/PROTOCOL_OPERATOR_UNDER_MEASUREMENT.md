@@ -98,7 +98,8 @@ Port de inferencia sin acceso a fuentes verdaderas ni matching de evaluación.
 Identidad externa de cada unidad: (role,scenario,condition,scene_id,split_seed),
 con referencias separadas a emisión, waveform, detección e identidad del kernel.
 Orden canónico: roles development/calibration/test; escenarios según§1;
-condiciones canonical/nominal/short/noisy; scene_id ascendente dentro de escenario.
+scene_id ascendente dentro de escenario; para cada escena, condiciones
+canonical/nominal/short/noisy, según `measurement_contract.unit_roster`.
 Celdas por ruta Inyección/Geométrica/Desacoplada/Local, backbone ascendente y
 reader seed ascendente. El kernel conserva su esquema mínimo. Cómputo deduplicado
 por hash exige receipt many-to-one explícito: nunca colapsar filas pareadas.
