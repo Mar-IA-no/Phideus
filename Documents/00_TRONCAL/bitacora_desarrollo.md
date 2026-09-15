@@ -2,6 +2,16 @@
 
 ---
 
+## Energía geométrica: contraste prospectivo iniciado (2026-09-14)
+
+El [supervisor](../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
+cerró su auditoría técnica y comenzó el contraste sobre 2048 escenas nuevas.
+La configuración y las reservas quedaron congeladas antes del primer draw;
+las respuestas siguen separadas de la producción de predicciones. La revisión
+contable asigna ambas recuperaciones observables al mismo frente de cómputo,
+sin eliminar trabajo ni ampliar los límites totales. Todavía no hay métricas
+de generalización: primero deben completarse y sellarse todos los escenarios.
+
 ## Energía geométrica: métricas reproducidas y presupuesto completo (2026-09-14)
 
 La evaluación y su recuperación exacta ya se midieron sobre escenas conocidas,

@@ -1,6 +1,23 @@
 # Energía geométrica para la decisión — estado de implementación
 
-2026-09-14. Preparación OPEN, perfiles de primitivas y recorrido observable, 72 entrenamientos, selección y archivo numérico completos. Tests prospectivos todavía sin abrir.
+2026-09-14. Preparación, perfiles, 72 entrenamientos, selección y archivo completos. Contraste prospectivo en ejecución; respuestas de test todavía sin consultar.
+
+El supervisor integrado y la enmienda de contabilidad cerraron su auditoría
+técnica antes de ejecutar. La suite CPU completa pasó 285 pruebas. La admisión
+real terminó en 5,178484 s y congeló cuatro escenarios de 512 escenas, los
+144 estados iniciales/seleccionados, fuentes y recursos. El intento `0013`
+está ejecutando observables y recuperación pre-sello con reserva de 15864 s.
+La recuperación post-sello conserva su reserva propia dentro de fresh;
+evaluación y replay de métricas comparten 2570 s. No hay resultados científicos
+del nuevo contraste mientras este recorrido siga incompleto.
+
+Fuentes bajo `data/atencion_armonica/geometric_decision_energy_v1/`:
+`control/freezes/prospective.json`, SHA256
+`febc010fa6c88651ecf684d97e7fc0d2b8707c4223357df6c81fe7e61f9dd3fe`;
+`control/attempts/0012/finish.json`, SHA256
+`09126495a11ec36969b27e43ccf8fcb9934dde23cd05277ab6fcbc257ed730a2`;
+`control/attempts/0013/start.json`, SHA256
+`86ec5ef33d56880571ddf9db9e1710430ba4ea294a3656644bc21aba06ed5340`.
 
 El [protocolo](PROTOCOL_GEOMETRIC_DECISION_ENERGY.md), auditado antes de la
 campaña, fija cuatro rutas por dos pérdidas: Inyección, Geométrica,
@@ -96,10 +113,10 @@ su recibo `control/attempts/0006/finish.json` tiene SHA256
 Ambos pertenecen a `data/atencion_armonica/geometric_decision_energy_v1/`.
 Completar entrenamiento y selección no permite interpretar ventajas entre brazos.
 
-Permanecen pendientes la admisión integral de recursos,
-freeze prospectivo, tests nuevos, probes, replay y auditorías
-finales. Los tests nuevos no se abrieron; todavía no hay resultados del
-contraste prospectivo que permitan evaluar generalización.
+La admisión integral y el freeze ya están completos. Permanecen pendientes
+el cierre de los tests nuevos y probes, evaluación, replay y auditorías
+finales. Todavía no hay resultados del contraste prospectivo que permitan
+evaluar generalización.
 
 El [ensamblado observable](../../src/atencion_armonica/geometric_decision_observables.py)
 y el [almacén de escenas](../../src/atencion_armonica/geometric_decision_scene_store.py)
@@ -159,8 +176,9 @@ la evaluación y su replay sobre 16 TRAIN conocidas y cuatro probes, incluidos
 los 144 estados; terminó en 25,693755 s sin nuevos tests. El coste acumulado de
 perfiles es 215,634043/600 s. La proyección original de evaluación/replay excede
 su reserva restante; se prepara una revisión operativa explícita, sin reducir
-controles ni muestras. El supervisor integral está implementado pero todavía
-bajo auditoría. No hay freeze prospectivo ni resultados de generalización.
+controles ni muestras. La revisión y el supervisor integral se auditaron
+después; la admisión real y el freeze están enlazados al inicio de este estado.
+El contraste está en ejecución, sin resultados de generalización todavía.
 
 El protocolo conserva la corrección anterior al freeze de una seed IID
 abierta durante una comprobación de diseño: queda retirada y excluida,
