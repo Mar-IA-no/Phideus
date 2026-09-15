@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: bbf0b71f39aa8aaae5e3235a2bbe9056557b0eaa
+evidence_commit: 21f68c17e229580a30f5d7a86e7e160fdacdcc27
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -214,6 +214,12 @@ Sus pruebas CPU y las del ensamblador recuperable, exclusiones y archivo de
 cabezas no sustituyen el freeze ni la evaluación prospectiva. Los defectos
 de identidad detectados en la preparación se corrigieron y reauditaron antes
 de usarla con tests nuevos.
+El operador CPU posterior conservó los 144 estados iniciales/seleccionados y
+construyó el inventario de exclusiones en 9,938720 s; su cierre está enlazado
+en el mismo estado. Los puertos de producción única y predicción también
+pasaron auditoría, con recuperación de transportes sin repetir el modelo.
+Faltan perfil completo y admisión del operador prospectivo; el archivo de
+estados no autoriza por sí solo nuevas observaciones.
 Tests, probes y evaluación prospectiva siguen pendientes. No hay ventaja
 experimental demostrada ni promoción arquitectónica.
 

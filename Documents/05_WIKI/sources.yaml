@@ -443,7 +443,7 @@ sources:
     title: Implementación de energía geométrica para la decisión
     path: experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
     authority: implementation_status
-    evidence_regime: complete_open_profiles_active_cuda_training_audited_selection_not_executed_no_fresh_results
+    evidence_regime: complete_training_selection_archive_audited_observable_ports_no_fresh_results
     mutable: true
     fronts: [AA, PPU]
 

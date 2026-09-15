@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: bbf0b71f39aa8aaae5e3235a2bbe9056557b0eaa
+evidence_commit: 21f68c17e229580a30f5d7a86e7e160fdacdcc27
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -267,8 +267,14 @@ fuentes originales autenticadas y probes con linaje y coordenadas preservados.
 El freeze/productor futuro conserva la autoridad sobre los draws; estos puertos
 no abren tests ni demuestran generalización.
 El ensamblador recuperable, extensión de exclusiones y archivo de144estados
-initial/selected están auditados como puertos; catálogo real y exportación
-admitida aún pendientes. Dos defectos de identidad del ensamblador quedaron
+initial/selected están auditados como puertos. El operador CPU admitido ya
+archivó los144estados y construyó catálogo/exclusiones:24467huellas únicas,
+2048observaciones históricas adicionales,9,938720s; archive/completeSHA
+f36a55dcc9dd5c3c25a7429fe044f74511ebd07cc4bde60b873b9ba3c89d7f75.
+No autoriza draws. Puertos de draw/predicción auditados con36pruebasCPU;
+transportes revalidados sinforward, schema cerrado y first-four recompuesto.
+Perfil completo, freeze y operador prospectivo todavía pendientes.
+Dos defectos de identidad del ensamblador quedaron
 resueltos y reauditados antes de la ejecución prospectiva.
 Tests nuevos, probes y evaluación prospectiva siguen pendientes. La corrección
 inicial nula hereda una regla de decisión, no demuestra aprendizaje.

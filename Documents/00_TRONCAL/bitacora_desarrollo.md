@@ -2,6 +2,19 @@
 
 ---
 
+## Energía geométrica: archivo completo y recuperación observable (2026-09-14)
+
+El [estado experimental](../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
+incorpora el archivo CPU de los 144 estados iniciales y seleccionados y las
+exclusiones de observaciones anteriores. La operación, previamente auditada,
+terminó en unos diez segundos sin abrir tests nuevos ni repetir entrenamiento.
+También se corrigió y reauditó la recuperación de predicciones: los probes
+guardados deben conservar sus permutaciones y diagnósticos, y no pueden
+omitir escenas elegibles por una lista de caché incompleta. La integración
+mecánica ya recorre todos los estados y un roundtrip, con recuperación sin
+repetir redes ni ajustes. Sigue medir y admitir el recorrido completo antes
+de la evaluación prospectiva; no hay todavía resultados de generalización.
+
 ## Energía geométrica: entrenamiento y selección completos (2026-09-14)
 
 El [contraste de operación geométrica y pérdida](../../experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md)
