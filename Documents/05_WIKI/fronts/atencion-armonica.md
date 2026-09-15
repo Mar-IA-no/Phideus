@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 21f68c17e229580a30f5d7a86e7e160fdacdcc27
+evidence_commit: 5231cdfbdba4bce3392f178c518d7923f223d87d
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -218,8 +218,12 @@ El operador CPU posterior conservó los 144 estados iniciales/seleccionados y
 construyó el inventario de exclusiones en 9,938720 s; su cierre está enlazado
 en el mismo estado. Los puertos de producción única y predicción también
 pasaron auditoría, con recuperación de transportes sin repetir el modelo.
-Faltan perfil completo y admisión del operador prospectivo; el archivo de
-estados no autoriza por sí solo nuevas observaciones.
+El perfil del recorrido observable también terminó, con 16 TRAIN conocidas,
+cuatro roundtrips y recuperación exacta de los 144 estados sin modelos ni
+ajustes. Consumió 113,436136 s; los perfiles acumulan 189,940288 / 600 s. La
+proyección sigue siendo parcial: faltan producción de escenas, sello y métricas
+para admitir el operador prospectivo. El archivo y el perfil no autorizan
+por sí solos nuevas observaciones.
 Tests, probes y evaluación prospectiva siguen pendientes. No hay ventaja
 experimental demostrada ni promoción arquitectónica.
 

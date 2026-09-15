@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 21f68c17e229580a30f5d7a86e7e160fdacdcc27
+evidence_commit: 5231cdfbdba4bce3392f178c518d7923f223d87d
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -273,7 +273,13 @@ archivó los144estados y construyó catálogo/exclusiones:24467huellas únicas,
 f36a55dcc9dd5c3c25a7429fe044f74511ebd07cc4bde60b873b9ba3c89d7f75.
 No autoriza draws. Puertos de draw/predicción auditados con36pruebasCPU;
 transportes revalidados sinforward, schema cerrado y first-four recompuesto.
-Perfil completo, freeze y operador prospectivo todavía pendientes.
+Perfil observable real0010 COMPLETE113,436136s:16TRAIN conocidas+4roundtrips,
+144readouts originales y144derivados, recoveryexactsinmodelo/fit. Reporte
+profiles/observed-cuda-0/result.json SHA28178c62c4526f74b110d1db17edb809376841829c2c2ae1bdcc4eb11cf06b64.
+Perfilacumulado189,940288/600s. ProyecciónPARCIAL con25%:10170,548045s observable,
+5470,924331s recovery; faltan drawIO/sello/métricas y tailfinal0,958818s.
+Extensión de exclusiones de coordenadas perfil auditada como interfaz,
+sin ejecución real todavía. Freeze y operador prospectivo pendientes.
 Dos defectos de identidad del ensamblador quedaron
 resueltos y reauditados antes de la ejecución prospectiva.
 Tests nuevos, probes y evaluación prospectiva siguen pendientes. La corrección

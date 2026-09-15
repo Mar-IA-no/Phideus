@@ -443,7 +443,7 @@ sources:
     title: Implementación de energía geométrica para la decisión
     path: experiments/atencion_armonica/STATUS_GEOMETRIC_DECISION_ENERGY.md
     authority: implementation_status
-    evidence_regime: complete_training_selection_archive_audited_observable_ports_no_fresh_results
+    evidence_regime: complete_training_selection_archive_observed_profile_no_fresh_results
     mutable: true
     fronts: [AA, PPU]
 
@@ -451,7 +451,7 @@ sources:
     title: Perfiles CPU CUDA de energía geométrica
     path: experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_PROFILE.md
     authority: measured_resource_profile
-    evidence_regime: open_only_resource_profiles_exact_cuda_recovery_no_scientific_training
+    evidence_regime: open_only_primitive_and_observed_profiles_exact_recovery_partial_forecast_no_fresh_tests
     mutable: true
     fronts: [AA, PPU]
 
