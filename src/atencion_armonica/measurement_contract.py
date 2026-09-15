@@ -91,7 +91,7 @@ Units and raw costs are retained in the result. No F, coverage or reader score
 port. The caller authenticates detection-cost construction and seals this result.
 """
     expected = unit_roster("calibration", audio_only=True)
-    if units != expected:
+    if digest(units) != digest(expected):
         raise ValueError("calibration unit order or completeness differs")
     values = np.asarray(costs)
     if (values.dtype != np.float64 or values.shape != (9, 192)

@@ -15,12 +15,22 @@ Implementado:
   a eventos en `measurement_contract.py`.
 - Adaptador observable a los kernels congelados en `measurement_operator.py`.
 - Cuatro contrastes primarios y bootstrap pareado en `measurement_reporting.py`.
+- Publicación atómica por etapa, recuperación de payloads y recibos de intentos
+  en `measurement_store.py` y `measurement_stage.py`; no constituyen todavía
+  el supervisor de admisión y presupuesto de campaña.
+- Separación entre emisión observable y sidecar de evaluación en
+  `measurement_emission.py`, y carga autenticada de las referencias congeladas
+  en `measurement_reuse.py`, sin deserializar checkpoints de backbone.
 
 Los tests `test_measurement_primitives.py`, `test_measurement_contract.py`,
 `test_measurement_operator.py` y `test_measurement_reporting.py` usan fixtures
 mecánicos, no escenas prospectivas. Una revisión independiente posterior a la
 implementación examinó íntegramente sensor, métricas y sus fixtures sin findings
-materiales. Su alcance no incluye el ejecutor, la persistencia ni el sello global.
+materiales. Su alcance no incluye el ejecutor ni el sello global. Una revisión
+separada del almacenamiento detectó cuatro defectos de identidad/encapsulación
+y serialización; se corrigieron con regresiones específicas y la revalidación
+independiente confirmó los cuatro cierres. Esto no sustituye la futura auditoría
+del supervisor completo.
 
 Secuencia restante:
 

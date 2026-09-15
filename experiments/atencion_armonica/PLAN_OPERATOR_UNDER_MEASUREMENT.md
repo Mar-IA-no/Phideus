@@ -59,6 +59,16 @@ universos vacíos son resultados de la interfaz y permanecen en el análisis.
 
 ## Presupuesto y recuperación
 
+Implementación del almacenamiento: raíz propia `operator_under_measurement_v1`,
+sin ampliar el allowlist de stores históricos. Reutilizar publicación atómica
+sin sobrescritura; ligar cada etapa a binding, operación, entradas autenticadas
+y configuración. Un único payload contiene metadata y arrays; el recibo de cierre
+se publica después. Si falta sólo ese recibo, reconstruirlo del payload íntegro
+sin repetir cálculo. Si el cálculo no dejó payload, conservar el intento fallido
+y exigir recuperación contabilizada por el supervisor. Lock exclusivo durante
+operaciones propias; ninguna recuperación puede abrir tests ni saltar admisión.
+Fixtures deben interrumpir ambos bordes y comprobar ausencia de re-forward/re-fit.
+
 Sin entrenamiento. Perfil CPU máximo600s para render/detector/matching y
 evaluación; perfil CUDA máximo600s para forward, fitter y36lectores, medidos
 por separado. El fitter histórico ya usa CUDA float64: se conserva ese backend.

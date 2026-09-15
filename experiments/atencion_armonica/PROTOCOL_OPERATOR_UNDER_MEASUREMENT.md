@@ -15,9 +15,12 @@ Semillas por orden iid/ood_beta/ood_polyphony/deformed_family:
 | Calibración detector |2026091511,2026091512,2026091513,2026091514|64|
 | Test |2026091531,2026091532,2026091533,2026091534|512|
 
-Verificar antes del freeze que semillas/observaciones no reutilizan datasets
-anteriores. No reemplazar escenas duplicadas silenciosamente. Runtime/config,
-source hashes y exclusiones se fijan en manifest antes de generar tests.
+Antes del freeze, verificar semillas y fijar el inventario autenticado de
+fingerprints anteriores como exclusión. Las observaciones prospectivas no
+existen aún: cotejar sus fingerprints al generarlas, antes de inferencia, contra
+ese inventario y las nuevas ya publicadas. Una colisión detiene la etapa y se
+documenta; no reemplazar escenas ni ajustar exclusiones después de observarlas.
+Runtime/config, source hashes y exclusiones se fijan antes de generar tests.
 
 Los logaritmos ideales más la perturbación2cents del sampler definen las
 frecuencias efectivamente emitidas. En este banco esa perturbación es detuning

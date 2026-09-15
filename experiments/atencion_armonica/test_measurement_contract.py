@@ -48,6 +48,12 @@ def test_uniform_calibration_and_numeric_ties():
         contract.calibrate_detector(costs, list(reversed(units)))
     with pytest.raises(ValueError):
         contract.calibrate_detector(costs[:, :-1], units)
+    from copy import deepcopy
+    aliased_units = deepcopy(units)
+    # Scene 1 is not the JSON boolean true despite Python equality.
+    aliased_units[3]["scene_id"] = True
+    with pytest.raises(ValueError, match="order"):
+        contract.calibrate_detector(costs, aliased_units)
 
 
 def test_rank_mapping_with_permuted_delivery():
