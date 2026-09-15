@@ -19,6 +19,51 @@ class ReachedBoundary(Exception):
     pass
 
 
+def head_profile_fixture(root, device, coverage, index):
+    binding = {"fixture": "head-profile", "device": device}
+    publish(root, "binding.json", binding)
+    cases = []
+    for case in ("envelope", "first_train_batch"):
+        for objective in ("mse", "decision"):
+            child = root / f"{case}-{objective}"
+            case_binding = {**binding, "case": case, "objective": objective}
+            publish(child, "binding.json", case_binding)
+            snapshots, parent = [], None
+            for step in range(3):
+                blob = publish(child, f"state-{step}.json", {"fixture_state": step})
+                parent = publish(child, f"snapshot-{step}.json", {
+                    "schema": "geometric-decision-snapshot-v1", "previous": parent,
+                    "steps": step, "state": blob})
+                snapshots.append(parent)
+            output = publish(child, "outputs.json", {"fixture_output": True})
+            result = publish(child, "result.json", {"binding": case_binding, "objective": objective,
+                "initial": snapshots[0], "middle": snapshots[1], "last": snapshots[2], "outputs": [output]})
+            cases.append({"case": case, "objective": objective, "root": str(child), "result": result})
+    result = publish(root, "result.json", {"cases": cases})
+    store = audit.open_bound(f"profile-head/{index}", root, binding, coverage)
+    return {"output": {"result": result}}, store, binding
+
+
+def test_profile_head_case_namespaces_cover_all_devices_cases_and_objectives(tmp_path):
+    coverage = core.Coverage()
+    for index, device in enumerate(("cpu", "cuda:0")):
+        row, store, binding = head_profile_fixture(tmp_path / f"head-{index}", device, coverage, index)
+        audit.heterogeneous_profile_closure("profile-head", row, store, binding, coverage)
+    children = {f"profile-head/{i}/{case}-{objective}" for i in range(2)
+                for case in ("envelope", "first_train_batch") for objective in ("mse", "decision")}
+    counts = coverage.summary()["files_by_store"]
+    assert set(counts) == children | {"profile-head/0", "profile-head/1"}
+    assert all(counts[label] == 9 for label in children)
+
+
+def test_profile_head_namespace_does_not_hide_changed_snapshot(tmp_path):
+    coverage = core.Coverage()
+    row, store, binding = head_profile_fixture(tmp_path, "cpu", coverage, 0)
+    (tmp_path / "first_train_batch-decision" / "snapshot-2.json").write_text("changed")
+    with pytest.raises(ValueError, match="authenticated bytes changed"):
+        audit.heterogeneous_profile_closure("profile-head", row, store, binding, coverage)
+
+
 def metadata_case(base, name):
     """Use the producers' manifest/output shapes, including rootless OPEN."""
     operations = {}

@@ -871,7 +871,8 @@ def heterogeneous_profile_closure(operation: str, row: dict[str, Any], store: co
             if case["root"] != str(case_root):
                 raise ValueError("profile head case root differs")
             case_binding = {**binding, "case": case["case"], "objective": case["objective"]}
-            child = open_bound("profile-head-case", case_root, case_binding, coverage, check=check)
+            child_label = f"{store.label}/{case['case']}-{case['objective']}"
+            child = open_bound(child_label, case_root, case_binding, coverage, check=check)
             result = child.json(case["result"], check=check)
             if result["binding"] != case_binding or result["objective"] != case["objective"]:
                 raise ValueError("profile head result binding differs")
