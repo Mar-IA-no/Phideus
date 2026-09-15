@@ -8,7 +8,7 @@ updated: 2026-09-14
 verified_at: 2026-09-14
 valid_at: 2026-09-14
 recorded_at: 2026-09-14
-evidence_commit: 136151c75f08a13b1c4a67f26313a0d2fd900680
+evidence_commit: d9c045bc9a2fbf309245d62be2a8632a7857338c
 source_paths:
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
@@ -225,11 +225,14 @@ las mismas tuplas conocidas, métricas, replay, bootstrap diagnóstico e inventa
 en 25,693755 s. Los perfiles acumulan 215,634043 / 600 s. El sello global y la
 evaluación por identidad de evento están implementados y auditados; la
 proyección completa revela que la asignación original de evaluación/replay
-excede su reserva restante. Falta cerrar la revisión operativa y auditar el
-supervisor integrado, sin reducir muestras ni controles. Estos perfiles no
-autorizan por sí solos nuevas observaciones.
-Tests, probes y evaluación prospectiva siguen pendientes. No hay ventaja
-experimental demostrada ni promoción arquitectónica.
+excedía su reserva restante. Una enmienda explícita asignó la recuperación
+observable post-sello al mismo stage que la previa, conservando todo el
+trabajo y los límites numéricos. Supervisor y enmienda cerraron la auditoría
+técnica; la suite CPU pasó 285 pruebas. La admisión real y el freeze están
+completos y el contraste sobre 2048 escenas está en ejecución. Las respuestas
+siguen sin consultar hasta el sello global. Faltan cierre observable,
+evaluación, replay y auditorías finales. No hay ventaja experimental
+demostrada ni promoción arquitectónica.
 
 ## Bifurcaciones preservadas, no secuencia obligatoria
 

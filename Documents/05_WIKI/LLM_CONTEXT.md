@@ -282,12 +282,17 @@ Reporte profiles/closing-cpu-0/result.json SHA
 dc1e3b20723b91303c1af7916c20497e8a36ec3679aca2d9f731ba8bcbc968b9.
 Perfilacumulado215,634043/600s. Forecast original antestail1,107130s:
 fresh15857,815986s, eval8100,458485s; eval supera7090,675836restantes.
-Revisión operativa/supervisor pendientes, nofreeze. Extensiónexclusiones
-conocidas publicada en perfil, sin autoridad de nuevasobservaciones.
+Enmienda contable implementada/auditada: recoveryobservablepostseal+1hash pasa
+afresh, métricas/replay con4hashes enevaluation; no menos trabajo ni mayorcap.
+Suite285PASS. Admisión0012 COMPLETE5,178484s; freezeSHA
+febc010fa6c88651ecf684d97e7fc0d2b8707c4223357df6c81fe7e61f9dd3fe.
+Attempt0013 fresh ENEJECUCIÓN,2048escenas,144estados,4probespor test,
+reserva15864s; recoverypostseal5537s aparte, evaluation2570s compartidos.
+Fuenteestado commitd9c045bc9a2fbf309245d62be2a8632a7857338c.
 Sello/evaluación poridentidad yreplay estánimplementados/auditados.
 Dos defectos de identidad del ensamblador quedaron
 resueltos y reauditados antes de la ejecución prospectiva.
-Tests nuevos, probes y evaluación prospectiva siguen pendientes. La corrección
+Falta cierre de tests/probes, evaluación y replay. La corrección
 inicial nula hereda una regla de decisión, no demuestra aprendizaje.
 No hay promoción científica ni evidencia física externa añadida.
 Selección OPEN y pruebas mecánicas no son evidencia de ventaja

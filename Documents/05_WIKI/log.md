@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-09-14 — contraste prospectivo congelado y en ejecución
+
+Supervisor y enmienda de contabilidad auditados, admisión real completa y
+roster de 2048 escenas congelado. Comenzó el recorrido observable; las
+respuestas permanecen separadas hasta su sello global. Faltan resultados,
+replay y auditorías finales. Fuente: `d9c045bc9a2fbf309245d62be2a8632a7857338c`.
+
 ## 2026-09-14 — evaluación conocida reproducida y coste de cierre
 
 El perfil CPU de cierre completó métricas, replay y costes restantes sobre
