@@ -435,6 +435,75 @@
       ]
     },
     {
+      "id": "cajas-de-herramientas",
+      "path": "foundations/cajas-de-herramientas.md",
+      "title": "Conocimiento como caja de herramientas",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": "not_applicable",
+      "experiment_status": "not_applicable",
+      "evidence_status": "directiva metodológica; no resultado experimental ni exégesis verificada",
+      "decision_status": "decided",
+      "updated": "2026-09-27",
+      "verified_at": "2026-09-27",
+      "valid_at": "2026-09-27",
+      "recorded_at": "2026-09-27",
+      "source_paths": [
+        "AGENTS.md",
+        "MARCO_EPISTEMOLOGICO_PHIDEUS.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md"
+      ],
+      "depends_on": [],
+      "tangents": []
+    },
+    {
+      "id": "investigacion-accion",
+      "path": "foundations/investigacion-accion.md",
+      "title": "Investigación-acción y revisión del horizonte",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": "not_applicable",
+      "experiment_status": "not_applicable",
+      "evidence_status": "directiva metodológica; no resultado experimental ni exégesis verificada",
+      "decision_status": "decided",
+      "updated": "2026-09-27",
+      "verified_at": "2026-09-27",
+      "valid_at": "2026-09-27",
+      "recorded_at": "2026-09-27",
+      "source_paths": [
+        "AGENTS.md",
+        "MARCO_EPISTEMOLOGICO_PHIDEUS.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md"
+      ],
+      "depends_on": [],
+      "tangents": []
+    },
+    {
+      "id": "lectura-y-transferencia",
+      "path": "foundations/lectura-y-transferencia.md",
+      "title": "Lectura situada y transferencia creativa",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": "not_applicable",
+      "experiment_status": "not_applicable",
+      "evidence_status": "directiva metodológica; no resultado experimental ni exégesis verificada",
+      "decision_status": "decided",
+      "updated": "2026-09-27",
+      "verified_at": "2026-09-27",
+      "valid_at": "2026-09-27",
+      "recorded_at": "2026-09-27",
+      "source_paths": [
+        "AGENTS.md",
+        "MARCO_EPISTEMOLOGICO_PHIDEUS.md",
+        "Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md"
+      ],
+      "depends_on": [],
+      "tangents": []
+    },
+    {
       "id": "front-atencion-armonica",
       "path": "fronts/atencion-armonica.md",
       "title": "Atención Armónica",

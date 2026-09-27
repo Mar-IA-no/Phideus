@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-09-27 — fundamentos y conocimiento como caja de herramientas
+
+Se incorpora la directiva del usuario en AGENTS y tres páginas esquemáticas:
+dimensiones filosóficas, lectura/transferencia y ciclo de investigación-acción.
+La apertura admite usos inesperados sin trasladar automáticamente garantías;
+incluye reflexividad sobre HIT, medios y fines. No modifica resultados ni
+promueve arquitectura. CASMI abierto queda distinguido del objetivo de validar HIT.
+
 ## 2026-09-15 — energía geométrica: resultado y relevo bajo medición
 
 Se integran el contraste de 72 entrenamientos y 2048 escenas, replay,

@@ -2,6 +2,33 @@
 
 Instrucciones base para agentes en este repositorio (persistentes).
 
+## Directiva superior: conocimiento como caja de herramientas — 2026-09-27
+
+Por decisión de Mariano, toda investigación y diseño trata teorías, matemáticas,
+física, software, métodos y saberes como herramientas situadas y recombinables.
+Su propósito original no agota sus usos posibles. Se admite explorar otros
+campos y usos creativos cuando abran preguntas o soluciones pertinentes; no
+exigir utilidad inmediata a toda exploración ni convertirla en acumulación sin
+horizonte. Explicitar supuestos, traducciones, límites y prueba discriminante.
+
+Leer antes de formular encargos de investigación o nuevas arquitecturas:
+`Documents/05_WIKI/foundations/cajas-de-herramientas.md`,
+`Documents/05_WIKI/foundations/lectura-y-transferencia.md` y
+`Documents/05_WIKI/foundations/investigacion-accion.md`.
+Interrogar entidades, relaciones, exclusiones, criterios de evidencia, intereses,
+acceso, licencias y efectos de cada encuadre. Distinguir fuente, interpretación
+y propuesta propia; no inventar intenciones ni trasladar garantías entre dominios.
+Aplicar el mismo examen a HIT, Phideus, benchmarks y propuestas de agentes/usuario.
+
+La wiki conserva síntesis relacionales, tensiones, preguntas y enlaces a originales,
+no copias sustitutivas de fuentes. Los informes de investigación van a Biblioteca.
+Revisar alineación al cierre de cada ciclo y ante bifurcaciones; resultados y
+auditorías pueden justificar cambiar dirección. En CASMI abierto no hay obligación
+de validar HIT: Phideus es una caja de herramientas entre otras. Esta directiva
+no amplía permisos de datos, cómputo, publicación ni intervención en otros proyectos.
+La referencia a Michel Foucault es orientación formulada por Mariano; no atribuir
+citas o una genealogía filosófica precisa sin consultar fuentes originales.
+
 ## Scope
 
 Estas reglas aplican a cualquier agente que trabaje en `/mnt/m2-1TB/Phideus`.
@@ -69,7 +96,7 @@ Regla de aislamiento:
 6. No confundir `GO/NO-GO` con autorización operativa. El agente no promueve por sí solo una arquitectura ni clausura la hipótesis, pero sí debe producir la evidencia experimental necesaria para que el usuario pueda decidir.
 7. Mendieta está habilitado para experimentos de Phideus que toleren una cola larga o que convenga retirar de los recursos locales. Justificar cada despacho por costo, urgencia y valor diagnóstico; no usarlo ni consultarlo por rutina. Esta autorización no se extiende a otros proyectos.
 8. El régimen vigente prioriza diseño arquitectónico y experimentación concreta sobre nuevas olas de investigación. La wiki, el corpus local y los artefactos acumulados son la base principal para proponer y falsar arquitecturas; las carencias teóricas se registran sin abrir automáticamente otra campaña.
-9. Se permiten consultas externas quirúrgicas, descargas de fuentes o verificaciones de implementación sólo cuando un experimento concreto las necesite para avanzar. Debe quedar explícita esa dependencia y evitar que la consulta puntual derive en investigación abierta.
+9. Las consultas externas, descargas y verificaciones se motivan por una incertidumbre explícita. La directiva superior del 2026-09-27 también admite exploración conceptual acotada por una pregunta u horizonte pertinente, aun antes de definir un experimento. Registrar qué se busca, qué podría cambiar y cuándo revisar la búsqueda; no reabrir automáticamente campañas expansivas ni exigir utilidad inmediata a cada hallazgo.
 
 ## Preservación de artefactos experimentales
 

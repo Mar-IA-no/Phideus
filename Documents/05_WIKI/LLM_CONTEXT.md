@@ -136,6 +136,16 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+## Directiva transversal — 2026-09-27
+
+El conocimiento se trabaja como una [caja de herramientas situada](foundations/cajas-de-herramientas.md):
+sus usos posibles no se agotan en su finalidad original, pero trasladar una herramienta
+no traslada automáticamente sus garantías. La [lectura y transferencia](foundations/lectura-y-transferencia.md)
+separa fuente, interpretación y propuesta; la [investigación-acción](foundations/investigacion-accion.md)
+revisa también nuestros supuestos y fines. Estas páginas complementan el marco
+epistemológico; no modifican permisos operativos ni convierten CASMI abierto en
+una obligación de validar HIT.
+
 ## Uso
 
 Este documento permite recuperar el mapa actual del programa en una sola

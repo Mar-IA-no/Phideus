@@ -1,6 +1,6 @@
 # Índice de la wiki de Phideus
 
-> Actualizado: 2026-09-15
+> Actualizado: 2026-09-27
 > Corte base de evidencia: `2b0687d669d02b55b37978d8c16d55c133a0bc02`
 
 ## Entradas
@@ -16,7 +16,16 @@
 - [Registro machine-readable de arquitecturas](architecture-registry.yaml): estados,
   primitives, controles y próximo discriminante sin borrar alternativas.
 
-## Frentes
+## Fundamentos: filosofía y caja de herramientas
+
+- [Conocimiento como caja de herramientas](foundations/cajas-de-herramientas.md):
+  ontología, epistemología, hermenéutica, política y criterios editoriales.
+- [Lectura situada y transferencia creativa](foundations/lectura-y-transferencia.md):
+  fuentes, modelos relacionales, usos nuevos y límites del traslado.
+- [Investigación-acción y revisión del horizonte](foundations/investigacion-accion.md):
+  ciclos, auditorías y distinción entre el horizonte HIT y CASMI abierto.
+
+## Frentes experimentales
 
 - [Escalón 1 y BIAS_CONTROL](fronts/escalon-1-bias-control.md)
 - [Gate 6 AMT](fronts/gate-6-amt.md)
@@ -58,6 +67,6 @@
 - Validación: `python scripts/lint_phideus_wiki.py`
 
 La recuperación canónica usa enlaces, front matter, `catalog.json` y el
-registro arquitectónico. Con `18` páginas y `89` fuentes, una capa de embeddings duplicaría
+registro arquitectónico. Con `21` páginas y `90` fuentes, una capa de embeddings duplicaría
 estado sin resolver una falla observada de retrieval; se difiere hasta que una
 evaluación de recuperación demuestre que el índice estructurado no alcanza.
