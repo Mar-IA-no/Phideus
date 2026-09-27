@@ -2,6 +2,18 @@
 
 Instrucciones base para agentes en este repositorio (persistentes).
 
+## Política vigente de modelos — 2026-09-27
+
+Por orden de Mariano, el trabajo habitual usa `gpt-6-sol` con esfuerzo `high`.
+En hitos pertinentes —riesgo material, cambio de arquitectura, interpretación
+de resultados o cierre— realizar auditoría independiente mediante un subagente
+nuevo `gpt-6-astra` con esfuerzo `medium`. No usar una cadencia mecánica ni
+abrir loops por cosmética; integrar findings y rectificar lo necesario.
+Esta política reemplaza las selecciones históricas incompatibles de modelos
+y esfuerzo en este proyecto y CASMI; no cambia modelos experimentales, permisos
+de GPU ni exige repetir auditorías ya terminadas. Verificar la configuración
+efectiva del runtime; una instrucción escrita no cambia por sí sola el modelo.
+
 ## Directiva superior: conocimiento como caja de herramientas — 2026-09-27
 
 Por decisión de Mariano, toda investigación y diseño trata teorías, matemáticas,
