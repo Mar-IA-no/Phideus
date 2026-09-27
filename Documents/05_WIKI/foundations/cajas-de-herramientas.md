@@ -12,7 +12,7 @@ updated: 2026-09-27
 verified_at: 2026-09-27
 valid_at: 2026-09-27
 recorded_at: 2026-09-27
-evidence_commit: 62a1085c232ed1e59bbfe789f1839c442e26acd2
+evidence_commit: ac26b6b8151e429bb2b53987f6bae3d4d2c35510
 source_paths:
   - AGENTS.md
   - MARCO_EPISTEMOLOGICO_PHIDEUS.md
@@ -60,4 +60,3 @@ La idea de caja de herramientas se incorpora por directiva de Mariano, quien la 
 - [Filosofía y proyección](../../04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_FILOSOFIA_PROYECCION_PHIDEUS.md): §§2–4,9–10, relaciones, hermenéutica y herramientas reutilizables.
 - [Lectura y transferencia](lectura-y-transferencia.md).
 - [Investigación-acción](investigacion-accion.md).
-

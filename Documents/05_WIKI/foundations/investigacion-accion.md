@@ -12,7 +12,7 @@ updated: 2026-09-27
 verified_at: 2026-09-27
 valid_at: 2026-09-27
 recorded_at: 2026-09-27
-evidence_commit: 62a1085c232ed1e59bbfe789f1839c442e26acd2
+evidence_commit: ac26b6b8151e429bb2b53987f6bae3d4d2c35510
 source_paths:
   - AGENTS.md
   - MARCO_EPISTEMOLOGICO_PHIDEUS.md
@@ -62,4 +62,3 @@ El cierre de una ronda no exige una arquitectura ganadora. Basta una reducción 
 La geometría es una orientación falsable, no una garantía de superioridad. La apertura interdisciplinaria no abre reservas de datos, no concede GPU, no autoriza publicar ni borra licencias. Las decisiones de promoción científica continúan en manos del usuario.
 
 Ver [caja de herramientas](cajas-de-herramientas.md) y [ficha de lectura/traslado](lectura-y-transferencia.md).
-
