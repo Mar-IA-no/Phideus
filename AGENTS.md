@@ -14,6 +14,16 @@ y esfuerzo en este proyecto y CASMI; no cambia modelos experimentales, permisos
 de GPU ni exige repetir auditorías ya terminadas. Verificar la configuración
 efectiva del runtime; una instrucción escrita no cambia por sí sola el modelo.
 
+## Cadena autónoma de goals pequeños — 2026-09-27
+
+Mariano pide goals propios, breves y concretos. Cada goal fija una pregunta,
+un entregable y una condición verificable de cierre; al terminar se registra
+la evidencia, se formula el siguiente goal según el resultado y se continúa
+hasta pausa o bloqueo real. Las auditorías se sitúan en hitos pertinentes con
+la política de modelos vigente. No reanudar ni sustituir por inferencia el goal
+histórico de audio que Mariano dejó en pausa; CASMI conserva su propia secuencia
+durable mientras el goal formal de este hilo siga ocupado por aquél.
+
 ## Directiva superior: conocimiento como caja de herramientas — 2026-09-27
 
 Por decisión de Mariano, toda investigación y diseño trata teorías, matemáticas,
