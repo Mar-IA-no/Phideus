@@ -2,6 +2,17 @@
 
 Instrucciones base para agentes en este repositorio (persistentes).
 
+## Auditorías: comprobar siempre el horizonte — 2026-09-28
+
+En cada auditoría periódica o situada, además de los riesgos técnicos del
+momento, responder explícitamente y con evidencia si el trabajo sigue
+alineado con el objetivo y horizonte geometry-first del proyecto o si se
+desvió hacia optimizar un instrumento como fin propio. La auditoría puede
+recomendar detener una línea, cambiar la pregunta o redistribuir esfuerzo.
+No tratar esta lectura como fórmula ritual ni convertirla en una ronda
+cosmética adicional. Esta directiva no cambia el modelo/esfuerzo vigente
+de los auditores: en Phideus/CASMI sigue `gpt-6-astra` `medium`.
+
 ## Política vigente de modelos — 2026-09-27
 
 Por orden de Mariano, el trabajo habitual usa `gpt-6-sol` con esfuerzo `high`.
