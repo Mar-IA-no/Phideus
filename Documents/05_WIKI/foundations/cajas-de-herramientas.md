@@ -8,11 +8,11 @@ architecture_status: not_applicable
 experiment_status: not_applicable
 evidence_status: directiva metodológica; no resultado experimental ni exégesis verificada
 decision_status: decided
-updated: 2026-09-27
-verified_at: 2026-09-27
-valid_at: 2026-09-27
-recorded_at: 2026-09-27
-evidence_commit: ac26b6b8151e429bb2b53987f6bae3d4d2c35510
+updated: 2026-09-28
+verified_at: 2026-09-28
+valid_at: 2026-09-28
+recorded_at: 2026-09-28
+evidence_commit: f6150557b1f2834e645d8e2ae13174ce9591beda
 source_paths:
   - AGENTS.md
   - MARCO_EPISTEMOLOGICO_PHIDEUS.md
@@ -53,6 +53,10 @@ Una herramienta tiene una historia y condiciones de funcionamiento, pero su uso 
 ## Alcance de la referencia filosófica
 
 La idea de caja de herramientas se incorpora por directiva de Mariano, quien la vincula con Michel Foucault. Esta página formula su aplicación al proyecto; no reproduce una cita de Foucault ni establece una genealogía textual. Esa investigación requeriría fuentes originales específicas.
+
+## Alternativa situada: modelos de decisión acotada
+
+[Jev](https://docs.typesafe.ai/introduction) y el proyecto abierto distinto [Laya](https://github.com/NandhaKishorM/laya) sugieren como **candidata**, sin prueba local, una cabeza de decisión tipada dentro de sistemas geométricos más amplios. En CASMI podría comparar hipótesis moleculares completas ya generadas; en otros frentes de Phideus podría leer evidencia producida por un operador explícito. El traslado no conserva la semántica química o física por llamar `score` a una salida: entrada, opciones, labels, abstención y prueba contrafactual deben definirse en cada fenómeno. La prioridad experimental actual no cambia por esta alternativa.
 
 ## Fuentes y navegación
 

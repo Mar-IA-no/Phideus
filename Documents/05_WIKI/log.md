@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-09-28 — Laya/Jev como alternativa de decisión acotada
+
+Se sintetiza en la caja de herramientas una lectura situada de Jev y del
+proyecto abierto Laya; el análisis extenso queda en Biblioteca local. La alternativa propone una
+cabeza de decisión sobre evidencia previamente construida, condicionada a
+pruebas de dominio, orden de opciones, calibración y cobertura de hipótesis.
+No hay prueba local ni promoción; CASMI conserva la prioridad del generador
+de moléculas completas y la GPU permanece suspendida. Fuente base:
+`f6150557b1f2834e645d8e2ae13174ce9591beda`.
+
 ## 2026-09-27 — fundamentos y conocimiento como caja de herramientas
 
 Se incorpora la directiva del usuario en AGENTS y tres páginas esquemáticas:
