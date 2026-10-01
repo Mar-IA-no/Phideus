@@ -1190,6 +1190,15 @@ scores fueron sintéticos; no hubo rescore poblacional ni identificación. La
 preparación metadata autentica452posiciones/401listas/51exclusiones/802paths
 sin decodificar trayectorias. Termina la preparación del selector; sigue la
 dependencia de dispositivo/inferencia, con GPU todavía suspendida.
+Actualización2026-10-01: Mariano habilitó la GPU local y reanudó la cadena.
+CASMI-74cerró en4a17e88con15pruebasCPU, auditoría282 y una corrección puntual
+que rechaza autocast externo. CASMI-75cerró la calibraciónGPU en0479587tras auditoría283: prior, par y
+recuperación terminaron en130,210segundos externos acumulados, con estados
+y trazas exactos al reanudar. PyTorch reservó82MiB y el proceso alcanzó446MiB
+en el muestreo. CASMI76mide el costoCPU fuera de las actualizaciones antes de
+escalar; esto todavía no mide identificación molecular. La continuación hacia esa prueba está autorizada sin otro permiso;
+reservas, datos de evaluación y promoción científica siguen cerrados.
+Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
 La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG
 y recuperación desde un corte anterior al stop. El perfil conserva un único

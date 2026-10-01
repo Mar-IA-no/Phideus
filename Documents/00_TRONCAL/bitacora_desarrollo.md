@@ -1,5 +1,29 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## CASMI75: primera calibración coarseGPU recuperada (2026-10-01)
+
+La implementación revisadaf3279bf completó las tres ejecuciones previstas:
+25,981segundos para el prior,56,574para el par y47,656para repetir el segundo
+paso desde el checkpoint intermedio. La recuperación reprodujo pesos,
+optimizadores, RNG, trazas y cursor exactamente en ese entorno. Se conservan
+seis actualizaciones canónicas y dos repetidas; no se ampliaron posiciones ni
+se abrió evaluación. La memoria fue holgada:82MiB reservados por PyTorch y
+446MiB como mayor residenciaGPU muestreada. El cierre0479587distingue esta
+prueba de mecanismo de la generación molecular libre. Como sólo8,379de los
+56,574segundos del par corresponden a ventanas de actualización, sigue una
+mediciónCPU concreta de la autenticación antes de escalar el entrenamiento.
+
+## CASMI: GPU local autorizada y paso a calibración (2026-10-01)
+
+Mariano reanudó el trabajo hasta ejecutar la calibración local. CASMI-74cerró
+el adaptador CPU en4a17e88: preserva las operaciones anteriores y el vínculo
+entre episodio y actualización. La auditoría282 detectó aceptación indebida
+de autocast externo; se corrigió y comprobó antes de continuar. CASMI-75ya
+ensaya recuperación completa sobre fuentes sintéticas y prepara la medición
+real. La coincidencia CPU no anticipa determinismo ni rendimientoGPU, que son
+la próxima evidencia requerida. PMP mantiene LAB apagado; se conserva su cesión
+y el chequeo de disponibilidad. No se abrieron reservas ni se promovió modelo.
+
 ---
 
 ## CASMI: reanudación CPU y frontera predictiva (2026-09-30)

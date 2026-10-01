@@ -1,5 +1,18 @@
 # Log de la wiki
 
+## 2026-10-01 — calibración GPU CASMI75 completada
+
+Desde0479587se registra ejecución real y recuperación exacta del par desde el
+checkpoint intermedio;130,210s externos en tres procesos. El contexto separa
+allocator82MiB de muestreo446MiB y ejecución de identificación molecular.
+Sigue diagnósticoCPU acotado del sobrecosto observado; no nueva corrida75.
+
+## 2026-10-01 — reanudaciónGPU y adaptador CASMI74
+
+Se incorpora cierre4a17e88y autorización local posterior a la suspensión.
+75continúa hacia prueba de dispositivo; la recuperación CPU sintética es
+mecánica y no acredita identificación ni resultados CUDA.
+
 ## 2026-10-01 — diseño CASMI-73 revisado
 
 Desde2b7ee31, el contexto incorpora el perfil finito de calibración coarse,
