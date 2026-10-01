@@ -1216,6 +1216,14 @@ con pesos/consultas fijos antes de asumir que más training resuelve el problema
 Las22posiciones pendientes y el problemaRAM se conservan como trabajo inconcluso;
 no se reescribió el baseline ni se abrió una reserva. Evidencia y límites en
 [resultado78](../../../Phideus-CASMI/docs/RESULTS_CASMI78_DEVELOPMENT_GENERATION.md).
+CASMI79 implementó el decodificador químico revisado en1bed41a y produjo
+44moléculas válidas en150intentos con los mismos pesos y consultas; quedaron106
+prefijos sin continuación. No hubo fallo final de fórmula/sanitización. El cambio
+restringe conjuntamente valencias y asignación de H: no mide identificación ni
+ventaja espectral.99intentos usan inventarios incompatibles con el dominio neutral
+del candidato; el siguiente contraste propuesto revisa esa interfaz antes de
+asignar25fórmulas por consulta. Las22posiciones GPU y la cargaRAM siguen pendientes;
+la GPU local está autorizada. Auditorías290/291integradas;292confirmó resultados y el cierre diagnóstico. Véase [resultado79](../../../Phideus-CASMI/docs/RESULTS_CASMI79_CHEMICAL_DECODING.md).
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
 La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG

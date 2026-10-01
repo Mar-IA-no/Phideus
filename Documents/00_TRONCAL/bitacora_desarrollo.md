@@ -1,5 +1,19 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI79: validez química y cuello de botella de composición
+
+El contraste real con pesos y consultas congelados pasó de0a44moléculas válidas
+en150intentos. Los106restantes quedaron sin continuación bajo las restricciones;
+no hubo reparación ni reemplazo de intentos. El resultado distingue validez de
+identificación y no demuestra que el espectro completo mejore al control. El
+análisis algebraico ubica99rechazos en inventarios inferidos incompatibles con el
+dominio neutral declarado. Esto vuelve pertinente comprobar el acople entre el
+proponente de fórmulas y el generador antes de suponer que más entrenamiento lo
+resolverá. Los22pasos GPU pendientes y la fallaRAM se conservan; la autorización
+local sigue vigente. Implementación1bed41a, seis pruebas pertinentes, auditorías
+290–292integradas; evidencia en el resultado79
+y la Biblioteca de CASMI. No se promociona una arquitectura por este contraste.
+
 ## 2026-10-01 — costo de autoridad CASMI77 corregido
 
 El cierre0a6954cpreserva equivalencia de episodios, updates y continuación en
