@@ -35,8 +35,12 @@ puntuó ningún checkpoint. CASMI-58 cerró el ledger de exposición conocida:
 32.828identidades alcanzan20.982componentes certificados. La auditoría255
 recomputó sus17regímenes y contrastó40identidades contra metadata filtrada;
 los desconocidos históricos siguen impidiendo acreditar frescura. CASMI-59
-prepara ahora el cargador fit estricto, episodios a demanda y recuperación
-del cursor; no equivale a recuperar atómicamente un entrenamiento. La GPU y las reservas siguen cerradas, las alternativas del
+cerró el cargador fit estricto:16episodios y diez materializaciones repetidas
+coinciden en recuperación. La auditoría257 encontró un acceso público que
+permitía registrar autoridad externa; se retiró y la versión2 pasó el cotejo,
+conservando la anterior. Sus23pruebas verifican admisión y consumo, sin modelos
+o updates. CASMI-60 prepara acoplar cursor/modelo/optimizador/RNG en un checkpoint;
+la prueba de cursor sola no equivale a esa recuperación de entrenamiento. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)
