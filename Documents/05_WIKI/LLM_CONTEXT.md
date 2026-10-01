@@ -1117,7 +1117,10 @@ libres rechazados sin refill. CASMI-55 cerró el roster estructural completo:
 CASMI-56 cerró fuentes del selector:401con estructura y observación de452
 posiciones originales,51exclusiones preservadas. CASMI-57 cerró las802trayectorias
 fijas4603/4604;39.382decisiones con un STOP singleton por path, sin scoring.
-Sigue la cadena de exposición;
+CASMI-58 cerró la exposición conocida:32.828claves/20.982componentes, con
+17regímenes y desconocidos históricos explícitos; auditoría255 sin bloqueos
+materiales. CASMI-59 prepara el cargador fit estricto y episodios a demanda con
+cursor recuperable, sin campaña ni certificación de recuperación atómica;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.
 Esta incorporación verifica esos claims nuevos; no renueva la verificación de

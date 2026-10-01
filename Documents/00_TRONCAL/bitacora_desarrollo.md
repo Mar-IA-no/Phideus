@@ -31,8 +31,12 @@ bandera heredada queda documentada como historia de la etapa estructural,
 sin modificar los artefactos sellados. CASMI-57 fijó las802trayectorias de
 selección bajo las semillas4603/4604; el banco completo llevó5,76segundos CPU
 y la auditoría253 comprobó los vínculos y reconstruyó ocho recorridos. No se
-puntuó ningún checkpoint. CASMI-58 prepara ahora el ledger de exposición
-de toda la cadena, distinguiendo materialización de updates efectivos. La GPU y las reservas siguen cerradas, las alternativas del
+puntuó ningún checkpoint. CASMI-58 cerró el ledger de exposición conocida:
+32.828identidades alcanzan20.982componentes certificados. La auditoría255
+recomputó sus17regímenes y contrastó40identidades contra metadata filtrada;
+los desconocidos históricos siguen impidiendo acreditar frescura. CASMI-59
+prepara ahora el cargador fit estricto, episodios a demanda y recuperación
+del cursor; no equivale a recuperar atómicamente un entrenamiento. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)
