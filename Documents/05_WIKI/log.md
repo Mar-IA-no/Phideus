@@ -1,5 +1,12 @@
 # Log de la wiki
 
+## 2026-10-01 — consumidor CASMI-71 cerrado
+
+Se sincroniza el contexto CASMI desde5eeb6ab: consultas observables explícitas
+en16handles históricos, correcciones277/278 y evidencia CPU acotada. La
+preparación no ejecutó inferencia; sigue selección parametrizada. GPU suspendida
+y candidatas geométricas conservadas sin promover.
+
 ## 2026-09-30 — reanudación CPU de CASMI
 
 Mariano reanuda la cadena de goals CPU. CASMI-48 cerró desde evidencia de

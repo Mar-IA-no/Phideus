@@ -100,6 +100,15 @@ pasaron. La preparación real de metadatos terminó2,09segundos sin crear modelo
 teachers ni entrenar. El cierre481e12c distingue esa evidencia de las pruebas
 con fuentes/actualizadores simulados. Sigue el consumidor de consultas
 observables de la receta64, con GPU y reservas todavía cerradas.
+CASMI-71 habilitó consultas observables explícitas dentro de los dieciséis
+handles fit históricos. Las auditorías277/278 motivaron controles de topología
+y configuración del modelo, reautenticación de fuentes por consulta y cierre
+de dependencias directas. Las27pruebas afectadas pasaron en1,13segundos; la
+preparación real de metadatos terminó en2,961segundos sin crear un modelo ni
+decodificar filas originales. El cierre CASMI5eeb6ab conserva versiones, crudos
+y evidencia de correcciones del coordinador, sin atribuir aceptación independiente
+al código posterior a278. Sigue el consumidor parametrizado de checkpoints
+y selección; no hubo inferencia nueva, identificación ni admisión científica.
 Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
