@@ -15,7 +15,13 @@ admitidas con observaciones y teachers desde la raíz correcta: quince
 registros prior y catorce espectrales completos, sin reemplazar los tres
 fuera de dominio. Su auditoría independiente reprodujo las 1450 acciones
 guardadas. Estos cierres preparan el modelo y no prueban identificación.
-CASMI-53 conecta ahora el proponente contextual congelado a observables. La GPU y las reservas siguen cerradas, las alternativas del
+CASMI-53 conectó el proponente contextual congelado a observables y preservó
+472scores y25celdas en una consulta CPU; el auditor reprodujo exactamente
+esas salidas. CASMI-54 cerró el ejecutor con updates efectivos y recuperación
+exacta del estado completo. Sus75propuestas libres fueron rechazadas, sin refill;
+dos updates verifican la mecánica y no permiten juzgar aprendizaje. La auditoría
+independiente247 confirmó el cierre y recomendó pasar al roster admisible completo,
+sin ampliar el smoke ni lanzar campaña científica. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)

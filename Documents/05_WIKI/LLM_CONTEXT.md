@@ -1109,9 +1109,12 @@ fragmento–estructura y DPP quedan como candidatas diferenciadas, con controles
 y sin implementación. La investigación se cerró durante la pausa. La posterior
 reanudación CPU del 30 de septiembre cerró CASMI-48–52 en sus alcances de
 interfaz, conversión, roles, admisión metadata y backend de supervisión.
-CASMI-53 conecta el proponente contextual congelado a observables; los
-resultados y auditorías residen en el repositorio CASMI, commit411cfee para
-el cierre52. Conserva la GPU suspendida y no activa estas candidatas.
+CASMI-53 cerró el enlace del proponente contextual congelado en una consulta
+observable:472scores/25celdas, sin evaluación contra respuestas. CASMI-54
+cerró el runner recuperable con updates reales, recuperación exacta y75intentos
+libres rechazados sin refill. Sigue el roster estructural admisible completo;
+no hay padre científico ni identificación. Resultados y auditorías residen en
+el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.
 Esta incorporación verifica esos claims nuevos; no renueva la verificación de
 todo el estado multifrente fechado anteriormente en esta página.
 
