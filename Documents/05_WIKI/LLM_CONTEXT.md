@@ -1129,9 +1129,11 @@ de outputs entre uno y dos workers; auditoría261 verificó logits y reducciones
 CASMI-62 cerró un intento incompleto auditado:0consolidadas,8retornadas sin
 consolidar393sin despachar51exclusiones,5,10segundos hasta un falso negativo
 de igualdad tupla/lista. Auditoría263 verificó artefactos y hashes completos;
-no hay costo poblacional medido. Sigue63con corrección JSON íntegra y un único
-intento de iguales límites, después receta de campaña/inferencia; sin elección
-científica de estos pesos diminutos.
+62no mide costo poblacional. CASMI-63corrigió JSON íntegro y completó401moléculas/
+802trayectorias/3208evaluaciones en137,35segundos; auditoría264verificó las157528
+NLL y reducciones exactas. Se cierra la línea smoke poblacional y sigue64con
+receta concreta de campaña/inferencia y gates pendientes, sin elegir estos
+pesos como checkpoint científico.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.

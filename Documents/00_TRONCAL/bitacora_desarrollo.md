@@ -51,10 +51,13 @@ logits, NLL y medias sin repetir el piloto. CASMI-62 cerró su intento poblacion
 como incompleto auditado: se detuvo a los5,10segundos al comparar tuplas Python
 con listas JSON, antes de consolidar scores. Conservó las452posiciones:8retornadas
 sin consolidar393sin despachar51exclusiones; la auditoría263 verificó el cierre
-y la igualdad de los ocho hashes completos con61. Sigue63con una corrección
-de transporte y un único intento acotado, después termina esta línea smoke
-y se prepara la receta de campaña/inferencia. Puntuar serializaciones no
-identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
+y la igualdad de los ocho hashes completos con61. CASMI-63corrigió esa frontera
+y completó401moléculas802trayectorias y3208evaluaciones en137,35segundos CPU.
+La auditoría264 reconstruyó las157528NLL y sus reducciones sin repetir el modelo;
+no encontró hallazgos materiales. La línea smoke poblacional queda cerrada.
+Sigue64con receta concreta de campaña/inferencia y sus gates pendientes de
+presupuesto, padre científico, estado GPU, exposición, cohorte y scorer oficial.
+Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)
