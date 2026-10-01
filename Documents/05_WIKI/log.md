@@ -1,5 +1,11 @@
 # Log de la wiki
 
+## 2026-10-01 — diseño CASMI-73 revisado
+
+Desde2b7ee31, el contexto incorpora el perfil finito de calibración coarse,
+las correcciones281 y el archivo de fuentes primarias. No acredita ejecución
+en GPU; sigue implementación CPU. Candidatas geométricas siguen sin promoción.
+
 ## 2026-10-01 — preparación de selección CASMI-72 cerrada
 
 Se sincroniza desdeb57fa74: candidatos completos parametrizados, correcciones

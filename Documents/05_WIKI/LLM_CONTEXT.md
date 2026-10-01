@@ -1190,6 +1190,15 @@ scores fueron sintéticos; no hubo rescore poblacional ni identificación. La
 preparación metadata autentica452posiciones/401listas/51exclusiones/802paths
 sin decodificar trayectorias. Termina la preparación del selector; sigue la
 dependencia de dispositivo/inferencia, con GPU todavía suspendida.
+CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
+La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG
+y recuperación desde un corte anterior al stop. El perfil conserva un único
+modo float32, distingue el contador AdamW en CPU de los momentos en dispositivo
+y limita la eventual prueba a tres invocaciones de75segundos como máximo. Esos
+son límites propuestos, no tiempos medidos ni permiso de GPU. Las fuentes
+PyTorch2.6 y la lectura del código instalado quedaron archivadas; no se ejecutó
+modelo ni prueba de dispositivo. Sigue una implementación CPU acotada y después
+la evidencia real que sólo una habilitación explícita permitiría obtener.
 No se eligen pesos mecánicos como checkpoint científico.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
