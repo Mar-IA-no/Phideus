@@ -44,9 +44,12 @@ seis updates canónicos y tres repeticiones recuperadas coinciden exactamente,
 con22pruebas y auditoría259. La primera corrida falló por metadata de versión
 que rechazaba el lector seguro; se conservó y la corrección pasó en versión2,
 18,93segundos CPU. Se verifica recuperación mecánica, sin acreditar aprendizaje
-o elegir un padre científico. CASMI-61 abrió el scorer con propósito selection
-separado y un piloto de costo con checkpoints pareados; el banco completo viene
-después de esa medición. La GPU y las reservas siguen cerradas, las alternativas del
+o elegir un padre científico. CASMI-61 cerró el scorer con propósito selection
+separado:16recorridos y cuatro checkpoints CPU produjeron outputs idénticos
+con uno y dos workers,19pruebas y9,61segundos. La auditoría261 reconstruyó
+logits, NLL y medias sin repetir el piloto. CASMI-62 abrió un intento poblacional
+con pool persistente y límite global, para conservar las452posiciones y resolver
+cobertura; puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)

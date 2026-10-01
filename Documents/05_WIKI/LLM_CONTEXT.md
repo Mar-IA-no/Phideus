@@ -1123,8 +1123,11 @@ materiales. CASMI-59 cerró el cargador fit estricto:16episodios y diez repetici
 exactas,23pruebas y API de autoridad corregida en versión2, auditoría257.
 CASMI-60 cerró recovery conjunto de cursor/modelo/AdamW/RNG: seis updates y tres
 repeticiones exactas,22pruebas,18,93segundos CPU y auditoría259 sin bloqueos.
-Es mecánica acotada, no calidad de aprendizaje. CASMI-61 abrió diseño del scorer
-selection separado y piloto de costo; el banco completo espera esa medición.
+Es mecánica acotada, no calidad de aprendizaje. CASMI-61 cerró scorer selection
+separado:16paths/cuatro checkpoints,19pruebas,9,61segundos y equivalencia exacta
+de outputs entre uno y dos workers; auditoría261 verificó logits y reducciones.
+CASMI-62 diseña un intento de cobertura poblacional acotado con pool persistente,
+conservando452posiciones, sin elección científica de estos pesos diminutos.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.
