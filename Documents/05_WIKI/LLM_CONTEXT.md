@@ -1224,6 +1224,14 @@ ventaja espectral.99intentos usan inventarios incompatibles con el dominio neutr
 del candidato; el siguiente contraste propuesto revisa esa interfaz antes de
 asignar25fórmulas por consulta. Las22posiciones GPU y la cargaRAM siguen pendientes;
 la GPU local está autorizada. Auditorías290/291integradas;292confirmó resultados y el cierre diagnóstico. Véase [resultado79](../../../Phideus-CASMI/docs/RESULTS_CASMI79_CHEMICAL_DECODING.md).
+CASMI80 comprobó las2.132composiciones guardadas y su conversión de masa/aducto:
+no encontró un desfase de H; el pool declara que no garantiza valencia. La nueva
+selección compatible con el soporte79produjo108válidos/150intentos,36callejones
+y6rechazos por orden textual de fórmulas sin carbono. Los51recorridos retenidos
+son exactamente iguales a79. La mejora es de asignación de candidatos dentro de
+un dominio restringido, no de aprendizaje ni identificación. Se conservan1.962
+archivos anteriores y el estado64/10. El siguiente trabajo vuelve a la cargaRAM
+y22posicionesGPUinconclusas, con GPUlocalautorizada. Auditorías293/294integradas, con resultado verificado; véase [resultado80](../../../Phideus-CASMI/docs/RESULTS_CASMI80_COMPOSITION_SELECTION.md).
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
 La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG

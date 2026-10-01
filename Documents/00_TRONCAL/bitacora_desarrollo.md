@@ -1,5 +1,19 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI80: composición neutral y retorno al entrenamiento
+
+La selección de25fórmulas por consulta, fijada antes de generar y compatible con
+las condiciones necesarias del decodificador, produjo108salidas válidas en150
+intentos. Las51trayectorias retenidas coinciden con el contraste anterior: cambió
+la asignación del presupuesto, no los pesos ni el decodificador. Permanecen36
+prefijos sin continuación y6rechazos por orden de escritura de fórmulas sin
+carbono, que no se reclasificaron. El diagnóstico recorrió2.132composiciones y no
+encontró un error de conversión de aducto. La línea de validez neutral termina
+con este contraste; sigue corregir la carga de datos que agotóRAM y recuperar
+los22pasosGPUpendientes. Commit071dd55, siete pruebas pertinentes y auditoría293;
+la revisión294verificó implementación y resultados. No se infiere utilidad
+predictiva ni precisión del desafío a partir de estos conteos.
+
 ## 2026-10-01 — CASMI79: validez química y cuello de botella de composición
 
 El contraste real con pesos y consultas congelados pasó de0a44moléculas válidas
