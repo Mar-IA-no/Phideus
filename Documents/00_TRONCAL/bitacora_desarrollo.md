@@ -21,7 +21,11 @@ esas salidas. CASMI-54 cerró el ejecutor con updates efectivos y recuperación
 exacta del estado completo. Sus75propuestas libres fueron rechazadas, sin refill;
 dos updates verifican la mecánica y no permiten juzgar aprendizaje. La auditoría
 independiente247 confirmó el cierre y recomendó pasar al roster admisible completo,
-sin ampliar el smoke ni lanzar campaña científica. La GPU y las reservas siguen cerradas, las alternativas del
+sin ampliar el smoke ni lanzar campaña científica. CASMI-55 recorrió las
+27.660identidades admitidas y conservó24.128elegibles y3.532exclusiones; el
+auditor249 recomputó la población completa. Son prerrequisitos estructurales,
+no trayectorias teacher ni exposición por gradientes. Sigue la admisión de
+fuentes del selector. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)

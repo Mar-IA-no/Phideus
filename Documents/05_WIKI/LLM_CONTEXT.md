@@ -1112,7 +1112,9 @@ interfaz, conversión, roles, admisión metadata y backend de supervisión.
 CASMI-53 cerró el enlace del proponente contextual congelado en una consulta
 observable:472scores/25celdas, sin evaluación contra respuestas. CASMI-54
 cerró el runner recuperable con updates reales, recuperación exacta y75intentos
-libres rechazados sin refill. Sigue el roster estructural admisible completo;
+libres rechazados sin refill. CASMI-55 cerró el roster estructural completo:
+24,128elegibles/27,660claves; no certifica trayectorias o gradientes.
+Sigue la admisión del selector y la cadena de exposición;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.
 Esta incorporación verifica esos claims nuevos; no renueva la verificación de
