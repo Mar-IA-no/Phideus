@@ -1232,6 +1232,18 @@ son exactamente iguales a79. La mejora es de asignación de candidatos dentro de
 un dominio restringido, no de aprendizaje ni identificación. Se conservan1.962
 archivos anteriores y el estado64/10. El siguiente trabajo vuelve a la cargaRAM
 y22posicionesGPUinconclusas, con GPUlocalautorizada. Auditorías293/294integradas, con resultado verificado; véase [resultado80](../../../Phideus-CASMI/docs/RESULTS_CASMI80_COMPOSITION_SELECTION.md).
+CASMI-81 completó las 22 posiciones pendientes en GPU: ambos brazos llegaron
+a 32 actualizaciones, con el prior de 64 conservado. Separar adquisición CPU de
+actualización GPU evitó la residencia conjunta que interrumpió CASMI-78; se
+preservaron pesos, AdamW, ambos RNG y 2.281 archivos anteriores. La auditoría 296
+verificó los estados y 2.360 decisiones de las trazas, sin encontrar un defecto que
+invalide esta corrida. El original sigue registrado como abortado y la continuación
+tiene su propio linaje. Esto prueba ejecución, no utilidad predictiva. CASMI-82
+compara los pesos en 10 y 32 con candidatos y fuentes fijos; las deudas de validez
+neutral quedan sin retoque. La GPU local sigue autorizada y estaba libre al cierre;
+reservas y promoción científica siguen separadas. Véase el
+[resultado de CASMI-81](../../../Phideus-CASMI/docs/RESULTS_CASMI81_GPU_RECOVERY.md).
+
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
 La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG

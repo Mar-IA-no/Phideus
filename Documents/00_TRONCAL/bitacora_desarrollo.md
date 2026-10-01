@@ -1,5 +1,29 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-81: recuperación GPU completa y vuelta a medir aprendizaje
+
+La continuación recuperó el checkpoint pareado de la posición 10 sin reiniciar
+pesos, momentos de AdamW ni estados aleatorios. El prior de 64 permanece intacto y
+ambos brazos llegaron a 32 actualizaciones: 22 episodios nuevos completos y 44
+updates efectivos. La separación entre el productor CPU original y el actualizador
+GPU resolvió el bloqueo observado de memoria. El primer intento quedó preservado:
+se detuvo antes de actualizar por una diferencia entre tupla y lista al comparar el
+perfil, corregida mediante igualdad canónica del perfil completo.
+
+Las auditorías 295 y 296 se integraron y sus terminales fueron liberadas y
+verificadas. La segunda recomputó linajes, 2.360 decisiones de trazas y 2.281 archivos
+históricos intactos. La ejecución exitosa sumó 185,112 segundos de procesos hijos y
+muestreó 450 MiB de GPU; el pico CPU de la fuente estuvo cerca del límite de 2 GiB,
+sin excederlo. La GPU quedó libre. Las cuotas del supervisor son cooperativas y los
+tests del preflight v1 requieren su revisión exacta: son límites de reutilización,
+no razones para repetir la corrida.
+
+La siguiente pregunta es si los pesos completados aportan a la reconstrucción de
+estructura frente al contexto. CASMI-82 prepara ese contraste con fuentes y
+candidatos fijos, sin otra ronda de optimización de validez neutral ni promoción
+científica. La evidencia está en el
+[resultado de CASMI-81](../../../Phideus-CASMI/docs/RESULTS_CASMI81_GPU_RECOVERY.md).
+
 ## 2026-10-01 — CASMI80: composición neutral y retorno al entrenamiento
 
 La selección de25fórmulas por consulta, fijada antes de generar y compatible con
