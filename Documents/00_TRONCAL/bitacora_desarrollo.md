@@ -79,6 +79,11 @@ contrato compartido de checkpoint completo y selección de sólo lectura, con
 cursor, fallas locales y updates separados. El cierre CASMI es eaa1f07 y los
 crudos269/271 se preservan separados. No se afirma equivalencia universal ni readiness;
 presupuesto, padre científico, estado GPU, exposición y cohorte siguen abiertos.
+CASMI-68 cerró el contrato compartido tras la auditoría273 y su corrección
+de contabilidad: el complemento del cursor indica posiciones no comprometidas,
+no necesariamente nunca solicitadas. El trabajo descartado queda en el historial
+de intentos. El cierre b07e0bb es documental; CASMI-69 implementará y probará
+la recuperación CPU completa y el lector de selección con fixtures sintéticos.
 Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 

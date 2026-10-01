@@ -1149,6 +1149,11 @@ decodificados incidentalmente no son exposición por gradientes. Termina
 certificación de fuentes; sigue contrato compartido de checkpoint completo y
 selección de sólo lectura. Ruta original no ejercitada. Cierre eaa1f07 y raw271
 separado en CASMI.
+CASMI-68 cerró el contrato compartido tras la auditoría273 y su corrección
+de contabilidad: el complemento del cursor indica posiciones no comprometidas,
+no necesariamente nunca solicitadas. El trabajo descartado queda en el historial
+de intentos. El cierre b07e0bb es documental; CASMI-69 implementará y probará
+la recuperación CPU completa y el lector de selección con fixtures sintéticos.
 No se eligen pesos mecánicos como checkpoint científico.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
