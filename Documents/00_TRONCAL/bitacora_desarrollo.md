@@ -28,8 +28,11 @@ no trayectorias teacher ni exposición por gradientes. CASMI-56 admitió las
 fuentes del selector:401estructuras con observación y51exclusiones de452
 posiciones. El auditor251 comprobó todos sus recibos y conversiones; una
 bandera heredada queda documentada como historia de la etapa estructural,
-sin modificar los artefactos sellados. CASMI-57 fija ahora las dos trayectorias
-por molécula antes de cualquier selección de checkpoint. La GPU y las reservas siguen cerradas, las alternativas del
+sin modificar los artefactos sellados. CASMI-57 fijó las802trayectorias de
+selección bajo las semillas4603/4604; el banco completo llevó5,76segundos CPU
+y la auditoría253 comprobó los vínculos y reconstruyó ocho recorridos. No se
+puntuó ningún checkpoint. CASMI-58 prepara ahora el ledger de exposición
+de toda la cadena, distinguiendo materialización de updates efectivos. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)
