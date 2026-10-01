@@ -47,9 +47,14 @@ que rechazaba el lector seguro; se conservó y la corrección pasó en versión2
 o elegir un padre científico. CASMI-61 cerró el scorer con propósito selection
 separado:16recorridos y cuatro checkpoints CPU produjeron outputs idénticos
 con uno y dos workers,19pruebas y9,61segundos. La auditoría261 reconstruyó
-logits, NLL y medias sin repetir el piloto. CASMI-62 abrió un intento poblacional
-con pool persistente y límite global, para conservar las452posiciones y resolver
-cobertura; puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
+logits, NLL y medias sin repetir el piloto. CASMI-62 cerró su intento poblacional
+como incompleto auditado: se detuvo a los5,10segundos al comparar tuplas Python
+con listas JSON, antes de consolidar scores. Conservó las452posiciones:8retornadas
+sin consolidar393sin despachar51exclusiones; la auditoría263 verificó el cierre
+y la igualdad de los ocho hashes completos con61. Sigue63con una corrección
+de transporte y un único intento acotado, después termina esta línea smoke
+y se prepara la receta de campaña/inferencia. Puntuar serializaciones no
+identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)

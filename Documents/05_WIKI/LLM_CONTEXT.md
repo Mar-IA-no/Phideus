@@ -1126,8 +1126,12 @@ repeticiones exactas,22pruebas,18,93segundos CPU y auditoría259 sin bloqueos.
 Es mecánica acotada, no calidad de aprendizaje. CASMI-61 cerró scorer selection
 separado:16paths/cuatro checkpoints,19pruebas,9,61segundos y equivalencia exacta
 de outputs entre uno y dos workers; auditoría261 verificó logits y reducciones.
-CASMI-62 diseña un intento de cobertura poblacional acotado con pool persistente,
-conservando452posiciones, sin elección científica de estos pesos diminutos.
+CASMI-62 cerró un intento incompleto auditado:0consolidadas,8retornadas sin
+consolidar393sin despachar51exclusiones,5,10segundos hasta un falso negativo
+de igualdad tupla/lista. Auditoría263 verificó artefactos y hashes completos;
+no hay costo poblacional medido. Sigue63con corrección JSON íntegra y un único
+intento de iguales límites, después receta de campaña/inferencia; sin elección
+científica de estos pesos diminutos.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.
