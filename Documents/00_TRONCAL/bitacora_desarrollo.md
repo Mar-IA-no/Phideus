@@ -67,9 +67,17 @@ concreto de fixtures fuente a CSV, mapas y sello:150posiciones sintéticas,
 duplicados conservados y negativa propia por modo si una query no tiene salida
 genuina. Pasaron33pruebas y una invocación CPU0,93segundos;269verificó todos
 los pins y relaciones sin repetir scorer. Sus puntuaciones fueron construidas,
-no miden calidad molecular. La línea de serialización termina; sigue67con
-supervisión fuente bajo demanda, antes de checkpoints/selección científicos.
-El cierre CASMI es5b43a09 y el crudo269se preserva separado. No se afirma equivalencia universal ni readiness;
+no miden calidad molecular. La línea de serialización termina. CASMI-67 cerró
+la fuente bajo demanda con doce episodios offline completos,22pruebas y una
+invocación de32,157segundos, sin construir modelos ni ejecutar updates.
+La auditoría271 verificó155salidas,25copias de fuentes y los doce outcomes
+completos frente a59, sin repetir teachers; no encontró correcciones materiales.
+Tres adquisiciones espectrales abastecieron seis episodios con tres reusos y
+dos evicciones. La decodificación incidental de shards se distingue del consumo
+real y de los gradientes. Termina esta certificación de fuentes; sigue el
+contrato compartido de checkpoint completo y selección de sólo lectura, con
+cursor, fallas locales y updates separados. El cierre CASMI es eaa1f07 y los
+crudos269/271 se preservan separados. No se afirma equivalencia universal ni readiness;
 presupuesto, padre científico, estado GPU, exposición y cohorte siguen abiertos.
 Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.

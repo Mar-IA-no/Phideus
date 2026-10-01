@@ -1141,8 +1141,14 @@ ni integración con inferencia científica. CASMI-66cerró el transporte fuente
 sintético a CSV/mapa/sello con150slots, duplicados preservados y refusal propio
 por modo.33pruebas y una invocación CPU0,93s;269reconstruyó físicamente todas
 las entradas/salidas y aceptó alcance acotado. Los scores construidos no miden
-modelos. Termina serialización y sigue67con supervisión bajo demanda, después
-checkpoints/selección científicos; cierre5b43a09 y raw269separado en CASMI.
+modelos. CASMI-67cerró supervisión bajo demanda con doce episodios offline
+completos,22pruebas y32,157s CPU, sin modelos/updates.271autenticó155salidas,
+25snapshots y los doce outcomes completos frente a59; no halló corrección
+material. Tres vistas adquiridas/tres reusos/dos evicciones; los shards
+decodificados incidentalmente no son exposición por gradientes. Termina
+certificación de fuentes; sigue contrato compartido de checkpoint completo y
+selección de sólo lectura. Ruta original no ejercitada. Cierre eaa1f07 y raw271
+separado en CASMI.
 No se eligen pesos mecánicos como checkpoint científico.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
