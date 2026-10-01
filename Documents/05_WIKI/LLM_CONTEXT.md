@@ -1114,7 +1114,9 @@ observable:472scores/25celdas, sin evaluación contra respuestas. CASMI-54
 cerró el runner recuperable con updates reales, recuperación exacta y75intentos
 libres rechazados sin refill. CASMI-55 cerró el roster estructural completo:
 24,128elegibles/27,660claves; no certifica trayectorias o gradientes.
-Sigue la admisión del selector y la cadena de exposición;
+CASMI-56 cerró fuentes del selector:401con estructura y observación de452
+posiciones originales,51exclusiones preservadas. Sigue el banco de trayectorias
+fijas4603/4604 y la cadena de exposición;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.
 Esta incorporación verifica esos claims nuevos; no renueva la verificación de

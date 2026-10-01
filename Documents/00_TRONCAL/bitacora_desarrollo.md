@@ -24,8 +24,12 @@ independiente247 confirmó el cierre y recomendó pasar al roster admisible comp
 sin ampliar el smoke ni lanzar campaña científica. CASMI-55 recorrió las
 27.660identidades admitidas y conservó24.128elegibles y3.532exclusiones; el
 auditor249 recomputó la población completa. Son prerrequisitos estructurales,
-no trayectorias teacher ni exposición por gradientes. Sigue la admisión de
-fuentes del selector. La GPU y las reservas siguen cerradas, las alternativas del
+no trayectorias teacher ni exposición por gradientes. CASMI-56 admitió las
+fuentes del selector:401estructuras con observación y51exclusiones de452
+posiciones. El auditor251 comprobó todos sus recibos y conversiones; una
+bandera heredada queda documentada como historia de la etapa estructural,
+sin modificar los artefactos sellados. CASMI-57 fija ahora las dos trayectorias
+por molécula antes de cualquier selección de checkpoint. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)
