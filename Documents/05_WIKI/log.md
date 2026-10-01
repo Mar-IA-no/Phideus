@@ -1,5 +1,15 @@
 # Log de la wiki
 
+## 2026-10-01 — costo de autoridad CASMI77 corregido
+
+El cierre0a6954cpreserva equivalencia de episodios, updates y continuación en
+pruebas sintéticas. La medición auténtica del guard bajó de135–151ms a menos
+de1ms; el sello inicial consume más tiempo y memoria. Auditorías284/285 y una
+prueba puntual cerraron la validación previa a adquirir una fuente. Los140
+artefactos de calibración75siguen intactos. Sigue entrenamiento/generación
+útil con admisión explícita del nuevo source; GPU local autorizada, reservas
+cerradas y ninguna promoción científica inferida.
+
 ## 2026-10-01 — calibración GPU CASMI75 completada
 
 Desde0479587se registra ejecución real y recuperación exacta del par desde el

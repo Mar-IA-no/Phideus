@@ -1195,8 +1195,14 @@ CASMI-74cerró en4a17e88con15pruebasCPU, auditoría282 y una corrección puntual
 que rechaza autocast externo. CASMI-75cerró la calibraciónGPU en0479587tras auditoría283: prior, par y
 recuperación terminaron en130,210segundos externos acumulados, con estados
 y trazas exactos al reanudar. PyTorch reservó82MiB y el proceso alcanzó446MiB
-en el muestreo. CASMI76mide el costoCPU fuera de las actualizaciones antes de
-escalar; esto todavía no mide identificación molecular. La continuación hacia esa prueba está autorizada sin otro permiso;
+en el muestreo. CASMI76aisló el costo de reserializar toda la autoridad en cada
+validación. CASMI77cerró en0a6954cuna representación inmutable: las validaciones
+metadata medidas bajaron de135–151ms a0,831–0,900ms, con mayor costo inicial y
+memoria. Las auditorías284/285 y una prueba específica corrigieron el rechazo
+previo a leer fuentes cuando se sustituye el calendario. Se preservaron los140
+artefactos75; el ahorro aislado no equivale a throughputGPU. El siguiente goal
+integra la ruta en entrenamiento/generación de desarrollo recuperable; esto
+todavía no mide identificación molecular. La continuación hacia esa prueba está autorizada sin otro permiso;
 reservas, datos de evaluación y promoción científica siguen cerrados.
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
