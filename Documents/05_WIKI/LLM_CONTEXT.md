@@ -1107,8 +1107,11 @@ menores de cualquier lista ordenada de masas: esa positividad pertenece al
 encoding y no prueba química. Subespacios ordinarios, witness conjunto
 fragmento–estructura y DPP quedan como candidatas diferenciadas, con controles
 y sin implementación. La investigación se cerró durante la pausa. La posterior
-reanudación CPU del 30 de septiembre cerró CASMI-48/49 y abrió CASMI-50 para
-roles/procedencias; conserva la GPU suspendida y no activa estas candidatas.
+reanudación CPU del 30 de septiembre cerró CASMI-48–52 en sus alcances de
+interfaz, conversión, roles, admisión metadata y backend de supervisión.
+CASMI-53 conecta el proponente contextual congelado a observables; los
+resultados y auditorías residen en el repositorio CASMI, commit411cfee para
+el cierre52. Conserva la GPU suspendida y no activa estas candidatas.
 Esta incorporación verifica esos claims nuevos; no renueva la verificación de
 todo el estado multifrente fechado anteriormente en esta página.
 

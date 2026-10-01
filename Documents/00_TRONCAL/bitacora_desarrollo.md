@@ -8,9 +8,14 @@ Mariano reanudó los goals pequeños del frente. CASMI-48 cerró desde la
 evidencia de interfaz ya auditada. CASMI-49 resolvió la conversión observable
 de cinco canales y reprodujo un caso fit de catorce picos; ese cotejo no
 certifica el pipeline raw ni demuestra identificación molecular. Dos auditorías
-independientes acompañaron plan y resultado. CASMI-50 prepara admisión por
-roles, procedencia separada y prior condicionado sólo por fórmula, mediante
-fixtures CPU. La GPU y las reservas siguen cerradas, las alternativas del
+independientes acompañaron plan y resultado. CASMI-50 cerró la frontera
+sintética de roles y procedencia; CASMI-51 autenticó la admisión metadata
+real y excluyó componentes usados por el selector. CASMI-52 conectó fuentes
+admitidas con observaciones y teachers desde la raíz correcta: quince
+registros prior y catorce espectrales completos, sin reemplazar los tres
+fuera de dominio. Su auditoría independiente reprodujo las 1450 acciones
+guardadas. Estos cierres preparan el modelo y no prueban identificación.
+CASMI-53 conecta ahora el proponente contextual congelado a observables. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)
