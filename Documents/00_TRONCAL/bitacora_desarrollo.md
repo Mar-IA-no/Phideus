@@ -1,5 +1,28 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-87: recuperación del entrenamiento desde142
+
+La continuación GPU llegó a142 posiciones por brazo y se detuvo al preparar
+el siguiente espectro: el lector CPU superó su límite de2GiB. No se había
+publicado el episodio142 ni aplicado su update. La operación completa quedó
+preservada en una copia verificada de2891archivos y549903517bytes, conservando
+el último estado pareado, los momentos AdamW y los estados RNG.
+
+Dos pruebas CPU con allocators distintos reprodujeron el fallo. Una tercera,
+con allocator del sistema y liberación más temprana de memoria temporal, completó
+las mismas142/143posiciones dentro del límite. La auditoría independiente309
+verificó la preservación y el supervisor de recuperación antes de relanzar.
+No se cambiaron el lector, la receta científica, los datos, el endpoint ni las
+cotas. El primer par real recuperado completó144updates por brazo y el siguiente
+llegó a146; la adquisición utilizó2030740KiB y12.277s, con25.337s de ajuste.
+
+CASMI-87 permanece activo: faltan256, las400predicciones fijadas y su evaluación
+auditada. Estas ocho consultas siguen siendo desarrollo reutilizado. La GPU
+local está autorizada; reservas y remoto permanecen cerrados. Evidencia en el
+[plan de recuperación](../../../Phideus-CASMI/docs/CASMI87_INTERRUPTION_RECOVERY_PLAN.md)
+y la [auditoría309](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/309_CASMI87_INTERRUPTION_RECOVERY_AUDIT_ASTRA.md).
+
+
 ## 2026-10-01 — CASMI-87: piloto GPU completo y continuación en marcha
 
 CASMI-87 pasó de preparación a entrenamiento GPU real. El piloto incluido llevó
