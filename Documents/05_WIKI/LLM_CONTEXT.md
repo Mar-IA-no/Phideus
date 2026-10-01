@@ -1204,6 +1204,18 @@ artefactos75; el ahorro aislado no equivale a throughputGPU. El siguiente goal
 integra la ruta en entrenamiento/generación de desarrollo recuperable; esto
 todavía no mide identificación molecular. La continuación hacia esa prueba está autorizada sin otro permiso;
 reservas, datos de evaluación y promoción científica siguen cerrados.
+CASMI78ejecutó GPU local en d88f48a: prior64actualizaciones y10por brazo
+condicionado antes de superar el límiteRSS al leer una vista original. El
+entrenamiento32del par quedó incompleto. La recuperación separada a197ffe,
+revisada por288, consumió esos pesos enCPU:150trayectorias,0moléculas válidas,
+119rechazos químicos,28desajustes de fórmula y3callejones de acciones. El replay
+sinforward atribuyó los119rechazos a valencias no admitidas. No es precisiónCASMI
+ni un techo; la lectura físicamente posible y la geometría local de acciones no
+bastan para garantizar moléculas válidas. Sigue contrastar decodificación química
+con pesos/consultas fijos antes de asumir que más training resuelve el problema.
+Las22posiciones pendientes y el problemaRAM se conservan como trabajo inconcluso;
+no se reescribió el baseline ni se abrió una reserva. Evidencia y límites en
+[resultado78](../../../Phideus-CASMI/docs/RESULTS_CASMI78_DEVELOPMENT_GENERATION.md).
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
 La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG

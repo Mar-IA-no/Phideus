@@ -1,5 +1,13 @@
 # Log de la wiki
 
+## 2026-10-01 — CASMI78: entrenamiento GPU interrumpido y generación real
+
+Se incorporan los resultados64prior/10por brazo, con entrenamiento32incompleto,
+y150trayectorias libres sin moléculas válidas. El replay identifica errores de
+valencia entre las causas observadas. La siguiente pregunta compara restricciones
+químicas de decodificación con pesos fijos; no supone que más cómputo por sí solo
+resuelva el resultado. Checkpoints, baseline y reservas permanecen preservados.
+
 ## 2026-10-01 — costo de autoridad CASMI77 corregido
 
 El cierre0a6954cpreserva equivalencia de episodios, updates y continuación en
