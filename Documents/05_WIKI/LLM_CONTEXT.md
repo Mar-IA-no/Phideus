@@ -1244,6 +1244,18 @@ neutral quedan sin retoque. La GPU local sigue autorizada y estaba libre al cier
 reservas y promoción científica siguen separadas. Véase el
 [resultado de CASMI-81](../../../Phideus-CASMI/docs/RESULTS_CASMI81_GPU_RECOVERY.md).
 
+CASMI-82 completó ese contraste y la auditoría 298 verificó sus crudos: 3.208
+puntuaciones sobre 401 moléculas y 150 propuestas libres. La pérdida media de
+trayectorias pasó de aproximadamente 2,188 a 2,172 en ambos brazos; la diferencia
+full−context a 32 fue −0,000127454. Las propuestas válidas pasaron de 108 a 115,
+con 50 controles prior idénticos y 100 secuencias aprendidas cambiadas. La pérdida
+usa fórmula oracle y el banco de desarrollo reutilizado; las propuestas libres
+son dos consultas de fit. Ninguna cifra demuestra identificación o generalización.
+Se preservaron 2.931 archivos previos. La siguiente prueba CASMI-83 llevará ocho
+posiciones originales de desarrollo a generación libre y evaluación de identidad
+posterior al sello, con fórmulas inferidas y exposición de toda la cadena explícita.
+Véase el [resultado de CASMI-82](../../../Phideus-CASMI/docs/RESULTS_CASMI82_LEARNED_CONTRAST.md).
+
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
 La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG

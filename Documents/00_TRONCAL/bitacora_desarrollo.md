@@ -1,5 +1,29 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-82: aprendizaje medido y próxima reconstrucción libre
+
+El contraste entre los pesos en 10 y 32 actualizaciones produjo 150 propuestas
+libres y 3.208 puntuaciones de trayectorias. La pérdida media bajó aproximadamente
+de 2,188 a 2,172 en ambos brazos; la diferencia full−context a 32 fue −0,000127454.
+Las salidas válidas pasaron de 108 a 115 sobre 150 y cambiaron las 100 secuencias
+de acciones de los modelos entrenados, mientras los 50 controles prior conservaron
+exactamente sus resultados. En una consulta disminuyó la diversidad conjunta y en
+la otra aumentó: el conteo válido no resume todo el comportamiento.
+
+La auditoría independiente 298 recalculó las 157.528 decisiones y las reducciones,
+verificó los resultados sellados y los 2.931 archivos anteriores, sin hallazgos
+invalidantes. Su terminal fue liberada y se verificó la ausencia. El pase completo
+CPU tardó 117,192 segundos con dos workers; la GPU continúa habilitada para cuando
+aporte materialmente. No hubo entrenamiento nuevo ni retoque del decodificador.
+
+La evidencia separa lo que ya mide de la pregunta pendiente: NLL con fórmula oracle
+en desarrollo reutilizado y propuestas sobre dos consultas de fit no prueban
+recuperación de estructuras desconocidas. CASMI-83 fija ocho posiciones originales
+de desarrollo para generar con fórmulas inferidas, sellar hasta 600 slots y después
+medir identidad, conservando exposición del ranker y del generador por separado.
+El [resultado de CASMI-82](../../../Phideus-CASMI/docs/RESULTS_CASMI82_LEARNED_CONTRAST.md)
+enlaza los agregados y las limitaciones; no se promovió una arquitectura.
+
 ## 2026-10-01 — CASMI-81: recuperación GPU completa y vuelta a medir aprendizaje
 
 La continuación recuperó el checkpoint pareado de la posición 10 sin reiniciar
