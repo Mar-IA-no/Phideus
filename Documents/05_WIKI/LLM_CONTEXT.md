@@ -1274,6 +1274,23 @@ brazo. Este desarrollo reutilizado conserva exposición histórica del ranker y 
 no constituye evaluación fresca de toda la cadena. Véase el
 [resultado de CASMI-83](../../../Phideus-CASMI/docs/RESULTS_CASMI83_DEVELOPMENT_FREE_GENERATION.md).
 
+CASMI-84 encontró un recorrido legal para cada una de las seis identidades cuya
+fórmula había sido entregada en CASMI-83, usando las raíces y celdas reales de esa
+corrida. Las 313 acciones pasaron el soporte vigente y los terminales coincidieron
+en fórmula e identidad. Es una prueba constructiva asistida por la respuesta:
+CASMI-83 conserva cero identificaciones en ocho consultas. No mide probabilidad
+molecular ni convierte el diagnóstico en predicción.
+
+Las 158 decisiones con alternativas corresponden a enlaces; las 144 asignaciones
+de H fueron forzadas. La conversión a H total conserva identidad y enlaces, pero no
+explica por sí sola los errores de conectividad, que ocurren antes en la secuencia.
+El próximo contraste propuesto puntúa esos seis recorridos con los tres modelos
+fijos y un control uniforme, para orientar aprendizaje o muestreo. La ejecución
+CPU tardó 31,923 segundos y conservó los 1.345 archivos de CASMI-83 y doce fuentes
+consumidas de CASMI-56. Las revisiones independientes 301/302 están integradas, con reproducción de las
+313 acciones y preservación comprobada, sin hallazgo invalidante. La GPU local continúa autorizada. Véase el
+[resultado de CASMI-84](../../../Phideus-CASMI/docs/RESULTS_CASMI84_TARGET_SUPPORT.md).
+
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
 La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG
