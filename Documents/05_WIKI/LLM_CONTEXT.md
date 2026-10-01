@@ -1331,13 +1331,16 @@ GPU; la adquisición usó 1,88 GiB de RAM. Las revisiones 307/308 se integraron 
 hallazgos de evidencia de recursos y recuperación de JSON parcial se corrigieron
 antes del lanzamiento en a6385e1.
 
-La continuación fija hasta 256 posiciones está en marcha; se comprobó su primer
-checkpoint posterior, en 36. La proyección desde el piloto es de unos 1,14 GiB de
-salida y 76,5 minutos restantes al incluir crecimiento de validación: todavía no
-son costes de una corrida completa. El readout quedó fijado antes del fit. Faltan
-el endpoint, los 400 slots nuevos de generación, la evaluación y la auditoría final;
-el goal permanece activo y no hay promoción científica. Véase el
-[plan CASMI-87](../../../Phideus-CASMI/docs/CASMI87_BROADER_PAIRED_LEARNING_PLAN.md).
+La continuación se detuvo en el checkpoint completo142 cuando la adquisición
+CPU superó su límite de2GiB. Se preservó la operación íntegra y la auditoría309
+verificó una recuperación con el mismo lector y estado, cambiando sólo el entorno
+de asignación/liberación de memoria. El primer par real recuperado completó144
+con2030740KiB de adquisición y el proceso ya alcanzó150, manteniendo los límites
+y la receta. La recuperación está en marcha hacia256; no hay resultado final.
+El readout quedó fijado antes del fit. Faltan el endpoint, los400slots nuevos,
+la evaluación y la auditoría final; el goal sigue activo sin promoción científica.
+Véanse el [plan CASMI-87](../../../Phideus-CASMI/docs/CASMI87_BROADER_PAIRED_LEARNING_PLAN.md)
+y la [recuperación auditada](../../../Phideus-CASMI/docs/CASMI87_INTERRUPTION_RECOVERY_PLAN.md).
 
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
