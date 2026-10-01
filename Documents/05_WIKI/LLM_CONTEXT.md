@@ -1137,8 +1137,13 @@ circularidad entre etapas y explicitó consumidores científicos pendientes.
 CASMI-65recuperó notebook oficial13 y comparó39casos sintéticos en0,82segundos
 CPU, con auditoría267. Vacíos compactan rango oficial, inválidos no vacíos y
 duplicados lo ocupan. Se cierra la consulta acotada, no paridad universal/futura
-ni serializer. Sigue66con mapa raw-slot→token y refusal propio, luego backend
-científico, sin elegir estos pesos como checkpoint científico.
+ni integración con inferencia científica. CASMI-66cerró el transporte fuente
+sintético a CSV/mapa/sello con150slots, duplicados preservados y refusal propio
+por modo.33pruebas y una invocación CPU0,93s;269reconstruyó físicamente todas
+las entradas/salidas y aceptó alcance acotado. Los scores construidos no miden
+modelos. Termina serialización y sigue67con supervisión bajo demanda, después
+checkpoints/selección científicos; cierre5b43a09 y raw269separado en CASMI.
+No se eligen pesos mecánicos como checkpoint científico.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.

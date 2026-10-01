@@ -62,9 +62,14 @@ leyó completa la versión corregida y la aceptó dentro de ese alcance. CASMI-6
 recuperó el notebook oficial13 y comparó39casos sintéticos en0,82segundos CPU.
 La auditoría267 leyó fuente y casos completos, sin repetirlos. Se distinguieron
 celdas originales y tokens entregados: los vacíos desaparecen del rango oficial,
-pero los inválidos no vacíos y duplicados lo ocupan. Sigue66con una proyección
-explícita y negativa propia para filas sin salidas genuinas; después backend
-científico completo. No se afirma equivalencia universal ni readiness;
+pero los inválidos no vacíos y duplicados lo ocupan. CASMI-66cerró el puente
+concreto de fixtures fuente a CSV, mapas y sello:150posiciones sintéticas,
+duplicados conservados y negativa propia por modo si una query no tiene salida
+genuina. Pasaron33pruebas y una invocación CPU0,93segundos;269verificó todos
+los pins y relaciones sin repetir scorer. Sus puntuaciones fueron construidas,
+no miden calidad molecular. La línea de serialización termina; sigue67con
+supervisión fuente bajo demanda, antes de checkpoints/selección científicos.
+El cierre CASMI es5b43a09 y el crudo269se preserva separado. No se afirma equivalencia universal ni readiness;
 presupuesto, padre científico, estado GPU, exposición y cohorte siguen abiertos.
 Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
