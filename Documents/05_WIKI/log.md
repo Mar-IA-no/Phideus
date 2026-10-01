@@ -1,5 +1,11 @@
 # Log de la wiki
 
+## 2026-10-01 — preparación de selección CASMI-72 cerrada
+
+Se sincroniza desdeb57fa74: candidatos completos parametrizados, correcciones
+279/280 y evidencia sintética explícita. Termina la preparación del selector;
+sigue la dependencia real de dispositivo/inferencia, sin uso GPU autorizado.
+
 ## 2026-10-01 — consumidor CASMI-71 cerrado
 
 Se sincroniza el contexto CASMI desde5eeb6ab: consultas observables explícitas

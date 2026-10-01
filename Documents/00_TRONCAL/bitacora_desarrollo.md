@@ -109,6 +109,17 @@ decodificar filas originales. El cierre CASMI5eeb6ab conserva versiones, crudos
 y evidencia de correcciones del coordinador, sin atribuir aceptación independiente
 al código posterior a278. Sigue el consumidor parametrizado de checkpoints
 y selección; no hubo inferencia nueva, identificación ni admisión científica.
+CASMI-72 conectó checkpoints completos y candidatos predeclarados con el
+selector fijo y la reducción por molécula. Las auditorías279/280 pidieron un
+linaje físico único, un prior efectivamente terminado y un punto de publicación
+final sin comprobaciones de presupuesto posteriores. Las23pruebas iniciales
+pasaron en6,02segundos; cuatro pruebas específicas verificaron la publicación
+corregida, también en el consumidor71, en0,92segundos. El cierre CASMIb57fa74
+conserva todos los artefactos anteriores. El cargador de estados fue real y los
+scores fueron sintéticos; no hubo rescore poblacional ni identificación. La
+preparación metadata autentica452posiciones/401listas/51exclusiones/802paths
+sin decodificar trayectorias. Termina la preparación del selector; sigue la
+dependencia de dispositivo/inferencia, con GPU todavía suspendida.
 Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
