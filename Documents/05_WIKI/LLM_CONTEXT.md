@@ -1152,8 +1152,16 @@ separado en CASMI.
 CASMI-68 cerró el contrato compartido tras la auditoría273 y su corrección
 de contabilidad: el complemento del cursor indica posiciones no comprometidas,
 no necesariamente nunca solicitadas. El trabajo descartado queda en el historial
-de intentos. El cierre b07e0bb es documental; CASMI-69 implementará y probará
-la recuperación CPU completa y el lector de selección con fixtures sintéticos.
+de intentos. CASMI-69 implementó recuperación CPU completa y lectura de selección
+con un validador compartido. La auditoría274 encontró tres defectos materiales:
+asociación del optimizador con los parámetros, tipos de contadores y profundidad
+del linaje entre fases. Se corrigieron; las seis pruebas afectadas pasaron en
+4,64 segundos, sin repetir la suite por rutina. El cierre CASMI es51da5f3.
+Las pruebas anteriores conservan sus versiones y receipts; la auditoría cruda
+precede esas correcciones y no se presenta como aceptación independiente del
+código final. La admisión sigue siendo exclusivamente sintética: no existe padre
+científico ni campaña admitida. El siguiente trabajo conecta un consumidor real
+de la receta64; termina la certificación aislada de esta interfaz.
 No se eligen pesos mecánicos como checkpoint científico.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
