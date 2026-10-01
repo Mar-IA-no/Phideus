@@ -1,5 +1,25 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-83: generación libre sin identificaciones
+
+CASMI-83 completó la generación libre sobre ocho consultas de desarrollo excluidas
+por componente del ajuste de grafos. Los 600 slots produjeron 406 estructuras
+válidas, 118 callejones, una identidad desconocida y 75 ausencias. Ningún brazo
+identificó correctamente una referencia. La fórmula de referencia estaba en las
+celdas entregadas para seis consultas; faltaba en un pool completo y queda
+indeterminada en el ion no soportado. Por eso el próximo diagnóstico comprueba
+si el decodificador puede expresar las seis identidades en sus raíces reales,
+sin contar un recorrido asistido por la respuesta como predicción. No se deduce
+un techo ni se amplía automáticamente el entrenamiento.
+
+La auditoría independiente 300 verificó fuentes, sellos, métricas y preservación
+de 3.480 archivos, sin defecto que invalide la corrida. Los 18 procesos terminaron;
+la etapa restante con dos carriles CPU tardó 66,262 segundos. La GPU continúa
+autorizada y el entrenamiento previo llegó efectivamente a 32 actualizaciones por
+brazo. Este desarrollo reutilizado conserva exposición histórica del ranker y mapas;
+no constituye evaluación fresca de toda la cadena. Véase el
+[resultado de CASMI-83](../../../Phideus-CASMI/docs/RESULTS_CASMI83_DEVELOPMENT_FREE_GENERATION.md).
+
 ## 2026-10-01 — CASMI-82: aprendizaje medido y próxima reconstrucción libre
 
 El contraste entre los pesos en 10 y 32 actualizaciones produjo 150 propuestas
