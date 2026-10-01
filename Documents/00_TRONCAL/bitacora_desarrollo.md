@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-87: piloto GPU completo y continuación en marcha
+
+CASMI-87 pasó de preparación a entrenamiento GPU real. El piloto incluido llevó
+ambos brazos de 32 a 34 updates, con dos episodios aceptados y restauración exacta
+de parámetros, AdamW y RNG. Duró 23,4 segundos y alcanzó unos 450 MiB de memoria
+GPU; la adquisición usó 1,88 GiB de RAM. Las revisiones 307/308 se integraron y sus
+hallazgos de evidencia de recursos y recuperación de JSON parcial se corrigieron
+antes del lanzamiento en a6385e1.
+
+La continuación fija hasta 256 posiciones está en marcha; se comprobó su primer
+checkpoint posterior, en 36. La proyección desde el piloto es de unos 1,14 GiB de
+salida y 76,5 minutos restantes al incluir crecimiento de validación: todavía no
+son costes de una corrida completa. El readout quedó fijado antes del fit. Faltan
+el endpoint, los 400 slots nuevos de generación, la evaluación y la auditoría final;
+el goal permanece activo y no hay promoción científica. Véase el
+[plan CASMI-87](../../../Phideus-CASMI/docs/CASMI87_BROADER_PAIRED_LEARNING_PLAN.md).
+
+
 ## 2026-10-01 — CASMI-86: efecto de las columnas espectrales con pesos fijos
 
 CASMI-86 completó seis intervenciones con los mismos pesos full32: se anularon

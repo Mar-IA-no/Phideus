@@ -1324,6 +1324,21 @@ la generación sobre las mismas ocho consultas de desarrollo, sin presentarlas c
 reserva nueva ni ampliar la suite de ablaciones. GPU local autorizada; reservas
 cerradas. Véase el [resultado de CASMI-86](../../../Phideus-CASMI/docs/RESULTS_CASMI86_FIXED_FULL_ABLATION.md).
 
+CASMI-87 pasó de preparación a entrenamiento GPU real. El piloto incluido llevó
+ambos brazos de 32 a 34 updates, con dos episodios aceptados y restauración exacta
+de parámetros, AdamW y RNG. Duró 23,4 segundos y alcanzó unos 450 MiB de memoria
+GPU; la adquisición usó 1,88 GiB de RAM. Las revisiones 307/308 se integraron y sus
+hallazgos de evidencia de recursos y recuperación de JSON parcial se corrigieron
+antes del lanzamiento en a6385e1.
+
+La continuación fija hasta 256 posiciones está en marcha; se comprobó su primer
+checkpoint posterior, en 36. La proyección desde el piloto es de unos 1,14 GiB de
+salida y 76,5 minutos restantes al incluir crecimiento de validación: todavía no
+son costes de una corrida completa. El readout quedó fijado antes del fit. Faltan
+el endpoint, los 400 slots nuevos de generación, la evaluación y la auditoría final;
+el goal permanece activo y no hay promoción científica. Véase el
+[plan CASMI-87](../../../Phideus-CASMI/docs/CASMI87_BROADER_PAIRED_LEARNING_PLAN.md).
+
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
 La auditoría281 precisó ubicación y dtype del estado, inicialización del RNG
