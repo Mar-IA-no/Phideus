@@ -1121,8 +1121,11 @@ CASMI-58 cerró la exposición conocida:32.828claves/20.982componentes, con
 17regímenes y desconocidos históricos explícitos; auditoría255 sin bloqueos
 materiales. CASMI-59 cerró el cargador fit estricto:16episodios y diez repeticiones
 exactas,23pruebas y API de autoridad corregida en versión2, auditoría257.
-CASMI-60 prepara recovery conjunto de cursor/modelo/optimizador/RNG; no hay
-campaña ni certificación de esa integración todavía;
+CASMI-60 cerró recovery conjunto de cursor/modelo/AdamW/RNG: seis updates y tres
+repeticiones exactas,22pruebas,18,93segundos CPU y auditoría259 sin bloqueos.
+Es mecánica acotada, no calidad de aprendizaje. CASMI-61 abrió diseño del scorer
+selection separado y piloto de costo; el banco completo espera esa medición.
+No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.
 Esta incorporación verifica esos claims nuevos; no renueva la verificación de

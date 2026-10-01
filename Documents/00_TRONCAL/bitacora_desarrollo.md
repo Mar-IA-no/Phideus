@@ -39,8 +39,14 @@ cerró el cargador fit estricto:16episodios y diez materializaciones repetidas
 coinciden en recuperación. La auditoría257 encontró un acceso público que
 permitía registrar autoridad externa; se retiró y la versión2 pasó el cotejo,
 conservando la anterior. Sus23pruebas verifican admisión y consumo, sin modelos
-o updates. CASMI-60 prepara acoplar cursor/modelo/optimizador/RNG en un checkpoint;
-la prueba de cursor sola no equivale a esa recuperación de entrenamiento. La GPU y las reservas siguen cerradas, las alternativas del
+o updates. CASMI-60 cerró el estado conjunto de cursor/modelo/AdamW/RNG:
+seis updates canónicos y tres repeticiones recuperadas coinciden exactamente,
+con22pruebas y auditoría259. La primera corrida falló por metadata de versión
+que rechazaba el lector seguro; se conservó y la corrección pasó en versión2,
+18,93segundos CPU. Se verifica recuperación mecánica, sin acreditar aprendizaje
+o elegir un padre científico. CASMI-61 abrió el scorer con propósito selection
+separado y un piloto de costo con checkpoints pareados; el banco completo viene
+después de esa medición. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
 ## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)
