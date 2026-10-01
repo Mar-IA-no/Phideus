@@ -1,5 +1,25 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-85: probabilidad de recorridos con pesos fijos
+
+CASMI-85 completó las 18 puntuaciones previstas, seis recorridos por cada modelo,
+con 939 decisiones y sin cambiar pesos ni RNG. En los 18 casos la política asigna
+más probabilidad al recorrido que el control uniforme de acciones legales. La media
+de logprob fue −114,474901 para prior, −112,938119 para contexto y −112,927999 para
+espectro completo. Full−context promedió 0,010119, con tres diferencias de cada signo.
+Comparar redes entrenadas separadamente no identifica un efecto causal del espectro;
+tampoco el uniforme constituye un control sin entrenar emparejado.
+
+La corrida CPU tardó 34,773 segundos: 32,086 de autenticación y 1,733 de scoring.
+Se conservaron 3.128 archivos anteriores y doce fuentes consumidas. La revisión previa
+303 y la revisión independiente del resultado 304 están integradas, sin hallazgos invalidantes. Estos recorridos
+asistidos por la respuesta no agregan identificaciones a CASMI-83 ni estiman toda la
+masa de cada identidad. El próximo contraste es CASMI-86: seis ablaciones espectrales dentro del mismo
+full32, comparadas con las seis puntuaciones ya selladas. Es una intervención
+numérica, potencialmente fuera de distribución. Un ajuste GPU más amplio sigue
+como candidato posterior; dieciséis moléculas no permiten inferir un techo. Véase el
+[resultado de CASMI-85](../../../Phideus-CASMI/docs/RESULTS_CASMI85_ACTUAL_PATH_PROBABILITY.md).
+
 ## 2026-10-01 — CASMI-84: soporte de las seis identidades comprobado
 
 CASMI-84 encontró un recorrido legal para cada una de las seis identidades cuya
