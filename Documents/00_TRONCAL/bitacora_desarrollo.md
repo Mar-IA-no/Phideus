@@ -92,6 +92,14 @@ precede esas correcciones y no se presenta como aceptación independiente del
 código final. La admisión sigue siendo exclusivamente sintética: no existe padre
 científico ni campaña admitida. El siguiente trabajo conecta un consumidor real
 de la receta64; termina la certificación aislada de esta interfaz.
+CASMI-70conectó la admisión real de fuentes, el actualizador fijado y la
+recuperación en un consumidor CPU. Las auditorías275/276motivaron correcciones
+de historial, padre completo, cancelación y cuotas. Se preserva una prueba
+fallida de cancelación y su corrección; los dos casos finales del lanzador
+pasaron. La preparación real de metadatos terminó2,09segundos sin crear modelos,
+teachers ni entrenar. El cierre481e12c distingue esa evidencia de las pruebas
+con fuentes/actualizadores simulados. Sigue el consumidor de consultas
+observables de la receta64, con GPU y reservas todavía cerradas.
 Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
