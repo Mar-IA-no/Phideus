@@ -55,8 +55,12 @@ y la igualdad de los ocho hashes completos con61. CASMI-63corrigió esa frontera
 y completó401moléculas802trayectorias y3208evaluaciones en137,35segundos CPU.
 La auditoría264 reconstruyó las157528NLL y sus reducciones sin repetir el modelo;
 no encontró hallazgos materiales. La línea smoke poblacional queda cerrada.
-Sigue64con receta concreta de campaña/inferencia y sus gates pendientes de
-presupuesto, padre científico, estado GPU, exposición, cohorte y scorer oficial.
+CASMI-64cerró la receta candidata, enlazada a ocho cierres físicos. La auditoría265
+encontró prerequisitos circulares y consumidores científicos omitidos; se
+separaron por etapa y se registraron los adaptadores pendientes. El seguimiento266
+leyó completa la versión corregida y la aceptó dentro de ese alcance. Sigue65
+con una consulta quirúrgica al scorer oficial y la paridad de identidad/ranks;
+presupuesto, padre científico, estado GPU, exposición y cohorte siguen abiertos.
 Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
 
