@@ -1134,8 +1134,11 @@ de igualdad tupla/lista. Auditoría263 verificó artefactos y hashes completos;
 NLL y reducciones exactas. Se cierra la línea smoke poblacional. CASMI-64cerró
 receta humana/JSON con ocho fuentes físicas y auditorías265/266; corrigió
 circularidad entre etapas y explicitó consumidores científicos pendientes.
-Sigue65con scorer oficial y paridad de identidad/serialización/ranks, sin elegir
-estos pesos como checkpoint científico.
+CASMI-65recuperó notebook oficial13 y comparó39casos sintéticos en0,82segundos
+CPU, con auditoría267. Vacíos compactan rango oficial, inválidos no vacíos y
+duplicados lo ocupan. Se cierra la consulta acotada, no paridad universal/futura
+ni serializer. Sigue66con mapa raw-slot→token y refusal propio, luego backend
+científico, sin elegir estos pesos como checkpoint científico.
 No hay campaña;
 no hay padre científico ni identificación. Resultados y auditorías residen en
 el repositorio CASMI, commits411cfee/7e22a34 para los cierres52/53. Conserva la GPU suspendida y no activa estas candidatas.

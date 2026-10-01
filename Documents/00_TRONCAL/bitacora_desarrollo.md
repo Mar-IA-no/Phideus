@@ -58,8 +58,13 @@ no encontró hallazgos materiales. La línea smoke poblacional queda cerrada.
 CASMI-64cerró la receta candidata, enlazada a ocho cierres físicos. La auditoría265
 encontró prerequisitos circulares y consumidores científicos omitidos; se
 separaron por etapa y se registraron los adaptadores pendientes. El seguimiento266
-leyó completa la versión corregida y la aceptó dentro de ese alcance. Sigue65
-con una consulta quirúrgica al scorer oficial y la paridad de identidad/ranks;
+leyó completa la versión corregida y la aceptó dentro de ese alcance. CASMI-65
+recuperó el notebook oficial13 y comparó39casos sintéticos en0,82segundos CPU.
+La auditoría267 leyó fuente y casos completos, sin repetirlos. Se distinguieron
+celdas originales y tokens entregados: los vacíos desaparecen del rango oficial,
+pero los inválidos no vacíos y duplicados lo ocupan. Sigue66con una proyección
+explícita y negativa propia para filas sin salidas genuinas; después backend
+científico completo. No se afirma equivalencia universal ni readiness;
 presupuesto, padre científico, estado GPU, exposición y cohorte siguen abiertos.
 Puntuar serializaciones no identifica moléculas. La GPU y las reservas siguen cerradas, las alternativas del
 Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
