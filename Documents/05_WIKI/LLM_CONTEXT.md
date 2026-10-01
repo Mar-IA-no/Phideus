@@ -4,12 +4,13 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-15
+updated: 2026-09-30
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
 evidence_commit: 2b0687d669d02b55b37978d8c16d55c133a0bc02
 source_paths:
+  - Biblioteca/Grassmanniano_Positivo_Amplituhedro/CROSS_REPORT.md
   - Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md
   - experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md
   - experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md
@@ -1095,6 +1096,21 @@ arquitectura de cuñas fija y agrega un detector de aplicabilidad con abstenció
 no observada; el protocolo sólo se materializa si una enumeración racional
 demuestra identificabilidad. Ambos contratos fueron auditados, pero no fueron
 ejecutados ni promovidos.
+
+## Incorporación conceptual — 2026-09-30
+
+SRC-GRASSMANN-POSITIVE-TRANSFER amplía el antecedente R32/A13/A18 con
+Grassmanniano positivo, formas canónicas, tilings BCFW de árbol publicados en
+2025 y herramientas de subespacios. La nueva [página conceptual](concepts/grassmanniano-positivo-amplituhedro.md)
+separa teoremas de transferencia no validada. Vandermonde hace positivos los
+menores de cualquier lista ordenada de masas: esa positividad pertenece al
+encoding y no prueba química. Subespacios ordinarios, witness conjunto
+fragmento–estructura y DPP quedan como candidatas diferenciadas, con controles
+y sin implementación. La investigación se cerró durante la pausa. La posterior
+reanudación CPU del 30 de septiembre cerró CASMI-48/49 y abrió CASMI-50 para
+roles/procedencias; conserva la GPU suspendida y no activa estas candidatas.
+Esta incorporación verifica esos claims nuevos; no renueva la verificación de
+todo el estado multifrente fechado anteriormente en esta página.
 
 ## Autoridad documental
 

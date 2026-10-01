@@ -2,6 +2,16 @@
 
 Instrucciones base para agentes en este repositorio (persistentes).
 
+## Phideus/CASMI reanudado sólo CPU — 2026-09-30
+
+Mariano reanuda investigación y trabajo con goals pequeños encadenados hasta
+pausa o bloqueo real. GPU local/remota sigue suspendida y no se amplían reservas,
+promoción o autoridad científica. Mantener primer brazo prioritario y segundo
+durante dependencias. Investigación Grassmanniano/amplituhedro preservada como
+candidatas sin activación por analogía. Trabajo nuevo GPT-6.1 Sol High y auditoría
+Astra Medium conforme al mensaje recursivo036; no afirmar cambio de runtime
+sin evidencia ni reactivar el antiguo goal de audio por inferencia.
+
 ## Auditorías: comprobar siempre el horizonte — 2026-09-28
 
 En cada auditoría periódica o situada, además de los riesgos técnicos del

@@ -1,6 +1,7 @@
 schema_version: 1
-updated: 2026-09-15
-evidence_commit: 2b0687d669d02b55b37978d8c16d55c133a0bc02
+updated: 2026-09-30
+evidence_commit: e917a8772560058f64045902c011d3045f2b5e1c
+research_update_note: Incorporación conceptual Grassmanniano/amplituhedro; sin nueva campaña ni renovación de evidencia experimental histórica.
 snapshot_note: >-
   Olas 26-60 integradas y auditadas en su alcance. Ola 26 ejecutó cuatro
   anclas checker-only, Ola 27 permanece documental, Ola 28 ejecutó 22
@@ -83,6 +84,14 @@ snapshot_note: >-
   incompleta; el nuevo ciclo geométrico no la retoma por inercia. No hubo selección científica ni promoción. El atlas raw mantiene
   cobertura 9 full / 20 partial / 4 not. No hay GO/NO-GO.
 sources:
+  - id: SRC-GRASSMANN-POSITIVE-TRANSFER
+    title: Grassmanniano positivo, amplituhedro y transferencia situada
+    path: Biblioteca/Grassmanniano_Positivo_Amplituhedro/CROSS_REPORT.md
+    authority: primary_source_research_and_explicit_unvalidated_transfer
+    evidence_regime: mathematical_physical_source_reading_current_code_reading_no_experiment
+    mutable: true
+    fronts: [E3, AA, CASMI]
+    note: "Cuatro informes verbatim; diferencia Grassmann ordinario/positivo, forma/amplitud/probabilidad y soporte/selección. Subespacios, witness conjunto y DPP son candidatas no ejecutadas. Corte de investigación durante pausa de CASMI-48; reanudación CPU posterior sin activar candidatas. GPU suspendida."
   - id: SRC-GEOMETRIC-RESEARCH-ACTION
     title: Geometría armónica computable y programa de investigación-acción
     path: Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md

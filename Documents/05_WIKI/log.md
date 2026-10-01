@@ -1,5 +1,30 @@
 # Log de la wiki
 
+## 2026-09-30 — reanudación CPU de CASMI
+
+Mariano reanuda la cadena de goals CPU. CASMI-48 cerró desde evidencia de
+interfaz auditada; CASMI-49 cerró conversión observable con auditorías236/237
+y un replay fit acotado. CASMI-50 prepara roles y procedencias sin datasets
+de selección, entrenamiento ni GPU. Las candidatas de esta investigación
+continúan sin implementar; su corte histórico durante la pausa se conserva.
+
+## 2026-09-30 — Grassmanniano positivo y amplituhedro
+
+Se integra una investigación en cuatro frentes sobre la transcripción aportada:
+matemática, física, cómputo y transferencia situada. La página conceptual y el
+registro preservan subespacios para señales, coherencia conjunta fragmento–estructura
+y selección diversa condicional como candidatas distintas. Se distinguen positividad
+impuesta por encoding, realizabilidad y evidencia del fenómeno; la forma canónica no
+se presenta como posterior molecular. Los crudos y originales quedan en Biblioteca.
+CASMI-48 continúa pausado y no se utiliza GPU ni se ejecutan experimentos. Base de
+lectura Phideus: `e917a8772560058f64045902c011d3045f2b5e1c`; CASMI:
+`c534fe572269eb730bdf9b75737bb29e232624c2`.
+
+La auditoría independiente Astra Medium leyó el corpus completo y contrastó
+fuentes focales. Se integró una precisión media: tiling BCFW probado y estatuto
+general de geometría positiva/forma canónica son garantías distintas. Sin
+hallazgos altos/bloqueantes; horizonte alineado dentro del alcance documental.
+
 ## 2026-09-28 — Laya/Jev como alternativa de decisión acotada
 
 Se sintetiza en la caja de herramientas una lectura situada de Jev y del

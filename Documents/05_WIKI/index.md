@@ -1,7 +1,7 @@
 # Índice de la wiki de Phideus
 
-> Actualizado: 2026-09-27
-> Corte base de evidencia: `2b0687d669d02b55b37978d8c16d55c133a0bc02`
+> Actualizado: 2026-09-30
+> Corte base de la incorporación conceptual: `e917a8772560058f64045902c011d3045f2b5e1c`; cada página conserva el corte de su evidencia.
 
 ## Entradas
 
@@ -42,6 +42,8 @@
 - [PPU y Natural Harmonic Geometry](concepts/ppu-geometria-armonica-natural.md)
 - [Ground truth para geometría proporcional](concepts/ground-truth-geometria-proporcional.md)
 - [Álgebra geométrica y ejecutores Clifford](concepts/algebra-geometrica-clifford.md)
+- [Grassmanniano positivo y amplituhedro](concepts/grassmanniano-positivo-amplituhedro.md):
+  coherencia global, subespacios y candidatas de transferencia sin validación local.
 - [Régimen de evidencia](concepts/regimen-de-evidencia.md)
 - [Registro de tensiones documentales](concepts/contradicciones-documentales.md)
 
@@ -67,6 +69,6 @@
 - Validación: `python scripts/lint_phideus_wiki.py`
 
 La recuperación canónica usa enlaces, front matter, `catalog.json` y el
-registro arquitectónico. Con `21` páginas y `90` fuentes, una capa de embeddings duplicaría
-estado sin resolver una falla observada de retrieval; se difiere hasta que una
+registro arquitectónico. Una capa de embeddings duplicaría estado sin resolver
+una falla observada de retrieval; se difiere hasta que una
 evaluación de recuperación demuestre que el índice estructurado no alcanza.

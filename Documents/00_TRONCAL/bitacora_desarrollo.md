@@ -2,6 +2,44 @@
 
 ---
 
+## CASMI: reanudación CPU y frontera predictiva (2026-09-30)
+
+Mariano reanudó los goals pequeños del frente. CASMI-48 cerró desde la
+evidencia de interfaz ya auditada. CASMI-49 resolvió la conversión observable
+de cinco canales y reprodujo un caso fit de catorce picos; ese cotejo no
+certifica el pipeline raw ni demuestra identificación molecular. Dos auditorías
+independientes acompañaron plan y resultado. CASMI-50 prepara admisión por
+roles, procedencia separada y prior condicionado sólo por fórmula, mediante
+fixtures CPU. La GPU y las reservas siguen cerradas, las alternativas del
+Grassmanniano permanecen candidatas y los archivos ajenos se conservan.
+
+## Grassmanniano positivo: investigación y candidatas recuperables (2026-09-30)
+
+La transcripción aportada por Mariano motivó una [investigación](../../Biblioteca/Grassmanniano_Positivo_Amplituhedro/README.md)
+en cuatro frentes, conservados por separado. La geometría del amplituhedro organiza
+amplitudes bajo supuestos físicos concretos; su forma canónica no proporciona una
+posterior sobre moléculas. Para el proyecto se preservan tres posibilidades con
+contratos pendientes: comparar subespacios de señales, exigir explicaciones de
+fragmentos compatibles con una estructura y seleccionar propuestas diversas si se
+diagnostica redundancia. La [wiki](../05_WIKI/concepts/grassmanniano-positivo-amplituhedro.md)
+distingue estas candidatas del baseline y del antecedente de agosto.
+
+El encargo es documental y no reanuda el goal CASMI-48, que permanece pausado.
+Se consultó CASMI en lectura; no se abrieron reservas, entrenamientos ni GPU. Los
+cinco archivos untracked ajenos de Phideus se conservaron. La revisión independiente
+Astra Medium leyó el corpus completo y consideró alineado el horizonte. Se integró
+su precisión sobre tiling probado y estatuto general de geometría positiva/forma
+canónica; no hubo hallazgos altos ni bloqueantes. El corpus cierra su alcance
+documental, sin abrir trabajo experimental.
+
+Se integran los mensajes recursivos recientes: mensaje recursivo 033 integrado
+(target y permisos efectivos); mensaje recursivo 034 integrado (relevo portable);
+mensaje recursivo 035 integrado (mitigación observada, sin elevar este turno);
+mensaje recursivo 036 integrado (trabajo nuevo GPT-6.1 Sol High y auditoría Astra
+Medium); mensaje recursivo 037 integrado (eventos sin transcript propio). La lectura
+no demuestra recarga local del hook ni cambia permisos, pausas o runtime del hilo.
+Se mantiene el sandbox efectivo y no se intervienen sesiones ajenas.
+
 ## Energía geométrica: campaña y verificación completas (2026-09-15)
 
 El [contraste](../../experiments/atencion_armonica/RESULTS_GEOMETRIC_DECISION_ENERGY.md)

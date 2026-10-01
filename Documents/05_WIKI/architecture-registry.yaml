@@ -1,5 +1,5 @@
 schema_version: 1
-updated: 2026-09-15
+updated: 2026-09-30
 policy:
   promotion_authority: user
   external_research: experiment_blocking_only
@@ -7,6 +7,42 @@ policy:
   gpu_coordination: local_requires_scope_duration_vram_notice_and_confirmed_availability_remote_relevant_jobs_authorized_after_resource_verification
 
 architectures:
+  - id: grassmann-subspace-reader
+    name: Lector de subespacios
+    status: candidate
+    priority: preserved_without_experiment_activation
+    primitive: comparación de spans por proyectores o ángulos en un ambiente común
+    evidence_for: operaciones matemáticas y software disponibles; elimina redundancia de base cuando la tarea la admite
+    evidence_against: sin evidencia local; puede borrar energía y temporalidad; ambiente y rango aún requieren contrato
+    next_experiment: proyección frente a covarianza o representación completa con inputs iguales y controles de base, rango y dinámica, sólo en un frente autorizado
+    source_paths:
+      - Biblioteca/Grassmanniano_Positivo_Amplituhedro/CROSS_REPORT.md
+      - Documents/05_WIKI/concepts/grassmanniano-positivo-amplituhedro.md
+    interpretation: Grassmanniano ordinario; no positividad total ni validación de HIT
+  - id: casmi-joint-fragment-witness
+    name: Coherencia conjunta fragmento–estructura
+    status: candidate
+    priority: preserved_pending_chemical_map_and_discriminating_design
+    primitive: witness compatible de productos observados y una hipótesis molecular bajo contexto común
+    evidence_for: permite formular una diferencia entre explicaciones locales y realizabilidad conjunta
+    evidence_against: mapa no definido; productos pueden solaparse; restricciones equivocadas pueden eliminar moléculas admisibles
+    next_experiment: si existe mapa defendible, coherencia genérica frente a variante positiva con fórmula inferida, context/full y presupuesto comunes; identidad y cobertura
+    source_paths:
+      - Biblioteca/Grassmanniano_Positivo_Amplituhedro/agent_reports/R4_TRANSFER.md
+      - Documents/05_WIKI/concepts/grassmanniano-positivo-amplituhedro.md
+    interpretation: propuesta no implementada; no atribuye forma canónica o positividad física a MS/MS; reanudación CPU posterior sin activar esta candidata
+  - id: casmi-diverse-slot-selection
+    name: Selección diversa de propuestas
+    status: candidate
+    priority: deferred_until_redundancy_is_observed
+    primitive: DPP según kernel de calidad y diversidad sobre soporte disponible
+    evidence_for: puente determinantal conocido para selección de subconjuntos
+    evidence_against: no redundancia causal diagnosticada aquí; no crea respuesta ausente y puede perder calidad
+    next_experiment: calidad y deduplicación simple frente a DPP con soporte y costo iguales si un diagnóstico pertinente lo justifica
+    source_paths:
+      - Biblioteca/Grassmanniano_Positivo_Amplituhedro/agent_reports/R3_COMPUTATION.md
+      - Biblioteca/Grassmanniano_Positivo_Amplituhedro/agent_reports/R4_TRANSFER.md
+    interpretation: alternativa condicional sin prioridad; PSD y menores cuadrados no equivalen a positividad total
   - id: harmonic-decision-geometric-energy
     name: Energía geométrica para la decisión
     status: candidate

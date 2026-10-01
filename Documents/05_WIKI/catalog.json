@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "generated_from": "Documents/05_WIKI",
-  "evidence_commit": "2b0687d669d02b55b37978d8c16d55c133a0bc02",
+  "evidence_commit": "e917a8772560058f64045902c011d3045f2b5e1c",
   "pages": [
     {
       "id": "phideus-llm-context",
@@ -14,11 +14,12 @@
       "experiment_status": null,
       "evidence_status": null,
       "decision_status": null,
-      "updated": "2026-09-15",
+      "updated": "2026-09-30",
       "verified_at": "2026-09-15",
       "valid_at": "2026-09-15",
       "recorded_at": "2026-09-15",
       "source_paths": [
+        "Biblioteca/Grassmanniano_Positivo_Amplituhedro/CROSS_REPORT.md",
         "Documents/00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md",
         "experiments/atencion_armonica/PLAN_GEOMETRIC_RESEARCH_ACTION.md",
         "experiments/atencion_armonica/RESULTS_ENERGY_PARTITION_AUDIT.md",
@@ -294,6 +295,38 @@
       ],
       "tangents": [
         "phideus-evidence-regime"
+      ]
+    },
+    {
+      "id": "grassmanniano-positivo-amplituhedro",
+      "path": "concepts/grassmanniano-positivo-amplituhedro.md",
+      "title": "Grassmanniano positivo, amplituhedro y transferencia",
+      "kind": "concept",
+      "page_status": "current",
+      "front_status": "transversal",
+      "architecture_status": "candidate",
+      "experiment_status": "not_started",
+      "evidence_status": "fuentes matemáticas/físicas consultadas; transferencia a señales y química sin prueba local",
+      "decision_status": "preserved",
+      "updated": "2026-09-30",
+      "verified_at": "2026-09-30",
+      "valid_at": "2026-09-30",
+      "recorded_at": "2026-09-30",
+      "source_paths": [
+        "Biblioteca/Grassmanniano_Positivo_Amplituhedro/CROSS_REPORT.md",
+        "Biblioteca/Grassmanniano_Positivo_Amplituhedro/NARRATED_REPORT.md",
+        "Biblioteca/Grassmanniano_Positivo_Amplituhedro/BIBLIOGRAPHY.md",
+        "Biblioteca/Geometria_Proporcional_Ground_Truth/agent_reports/32_cluster_algebras_positive_geometry.md"
+      ],
+      "depends_on": [
+        "cajas-de-herramientas",
+        "lectura-y-transferencia",
+        "ground-truth-geometria-proporcional"
+      ],
+      "tangents": [
+        "algebra-geometrica-clifford",
+        "front-atencion-armonica",
+        "front-escalon-3"
       ]
     },
     {
