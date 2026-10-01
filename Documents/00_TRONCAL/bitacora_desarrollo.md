@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-86: efecto de las columnas espectrales con pesos fijos
+
+CASMI-86 completó seis intervenciones con los mismos pesos full32: se anularon
+las columnas espectrales y se conservaron fórmula, precursor, polaridad, conteo,
+raíz y prefijos. Las seis puntuaciones originales de CASMI-85 se reutilizaron sin
+repetir inferencia. La logprobabilidad del recorrido cambió +0,00497998 de media:
+cuatro aumentos y dos disminuciones. Son cambios numéricos pequeños en estos casos,
+no evidencia de utilidad química ni de un techo de aprendizaje tras dieciséis moléculas.
+
+La única corrida duró 33,773 segundos, con 0,623 de scoring; se preservaron 3.187
+archivos anteriores, doce fuentes consumidas, pesos y RNG. La revisión previa 305
+y la revisión del resultado 306 están integradas, sin hallazgos invalidantes. El siguiente
+experimento elegido es ampliar el ajuste emparejado GPU de 32 a 256 posiciones y comparar
+la generación sobre las mismas ocho consultas de desarrollo, sin presentarlas como
+reserva nueva ni ampliar la suite de ablaciones. GPU local autorizada; reservas
+cerradas. Véase el [resultado de CASMI-86](../../../Phideus-CASMI/docs/RESULTS_CASMI86_FIXED_FULL_ABLATION.md).
+
+
 ## 2026-10-01 — CASMI-85: probabilidad de recorridos con pesos fijos
 
 CASMI-85 completó las 18 puntuaciones previstas, seis recorridos por cada modelo,
