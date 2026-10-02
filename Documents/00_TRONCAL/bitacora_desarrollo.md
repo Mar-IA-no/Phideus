@@ -1,5 +1,45 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-88 cerrado: aprende enlaces, todavía no recupera identidades
+
+La prueba con GPU repitió dieciséis veces los mismos ocho registros de cuatro
+moléculas de entrenamiento. Los dos brazos partieron del estado anterior y
+llegaron a 384 actualizaciones, conservando AdamW y los estados aleatorios. Las
+lecturas inicial, intermedia y final produjeron 600 intentos con fórmula conocida
+como condición oracle explícita. La pérdida sobre las mismas trazas bajó de
+aproximadamente 2,08 a 0,86, pero no apareció una identidad objetivo entre los
+25 candidatos por molécula de ninguno de los brazos. Es un resultado de ajuste
+sobre casos ya expuestos, no una evaluación de generalización ni un techo del modelo.
+
+El desglose de los logits muestra que mejoraron las decisiones de construcción
+de enlaces; la pérdida de hidrógenos ya era casi nula al comienzo. La separación
+entre aprender prefijos correctos y generar libremente la molécula sigue abierta.
+En el endpoint, los brazos de contexto y completo produjeron 78 y 84 slots válidos
+de 100, con 15 y 13 identidades no resueltas, respectivamente. Validez no equivale
+a coincidencia con la respuesta y esos desconocidos no se convierten en errores
+químicos demostrados.
+
+El primer intento se detuvo por un error del ejecutor al comparar dieciséis
+actualizaciones con treinta y dos eventos de registro. La recuperación revisada
+conservó todo el intento y reprodujo exactamente su primer ciclo, incluidos pesos,
+AdamW y RNG. La operación completa duró 371 segundos, además de los 58 del intento
+interrumpido. La auditoría independiente 313 verificó los diecisiete checkpoints,
+las pérdidas, las 29.652 elecciones libres y la preservación de artefactos; no
+halló un defecto invalidante. Los procesos terminaron y la GPU quedó libre, con
+su autorización local vigente.
+
+El próximo goal, CASMI-89, analizará las trazas libres ya guardadas para localizar
+la pérdida de compatibilidad con el grafo objetivo y medir la probabilidad conjunta
+de las acciones que todavía la conservan. La comparación admitirá permutaciones
+de átomos equivalentes y mantendrá explícitas las búsquedas no resueltas. Es una
+pregunta CPU sobre la generación observada, sin nuevos forwards ni entrenamiento;
+la conectividad de una representación no se confundirá con toda la identidad
+química o tautomérica. Su implementación y revisión concreta siguen pendientes.
+
+Fuentes: [resultado 88](../../../Phideus-CASMI/docs/RESULTS_CASMI88_FIXED_FIT_LEARNING.md),
+[auditoría 313](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/313_CASMI88_FIXED_FIT_RESULT_AUDIT_ASTRA.md)
+y [plan 89](../../../Phideus-CASMI/docs/CASMI89_FREE_PREFIX_COMPATIBILITY_PLAN.md).
+
 ## 2026-10-01 — CASMI-87 cerrado: más ajuste, sin mejora predictiva observada
 
 CASMI-87 completó el aprendizaje pareado hasta256updates por brazo: las224

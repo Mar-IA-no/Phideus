@@ -1340,18 +1340,43 @@ los procesos terminaron y la GPU quedó libre, con su autorización local vigent
 La validación de estados consumió1968s frente a372s de updates sincronizados,
 por lo que ese costo debe reducirse dentro del siguiente experimento real.
 
-La pregunta siguiente es de ajuste: si repetir exposición sobre cuatro moléculas
-fijas del fit aumenta su recuperación por identidad, junto con la pérdida medida
-siempre sobre las mismas trazas. CASMI-88 propone16ciclos y lecturas fijas inicial,
-intermedia y final, con fórmula conocida como condición oracle explícita. La
-simetría de acciones entre átomos indistinguibles impide tratar cero CE de un
-recorrido arbitrario como criterio de capacidad molecular. No se cambia todavía
-la arquitectura ni se reutilizan las ocho consultas para tuning. La implementación
-y ejecución88siguen pendientes; reservas y remoto permanecen cerrados.
+La prueba con GPU repitió dieciséis veces los mismos ocho registros de cuatro
+moléculas de entrenamiento. Los dos brazos partieron del estado anterior y
+llegaron a 384 actualizaciones, conservando AdamW y los estados aleatorios. Las
+lecturas inicial, intermedia y final produjeron 600 intentos con fórmula conocida
+como condición oracle explícita. La pérdida sobre las mismas trazas bajó de
+aproximadamente 2,08 a 0,86, pero no apareció una identidad objetivo entre los
+25 candidatos por molécula de ninguno de los brazos. Es un resultado de ajuste
+sobre casos ya expuestos, no una evaluación de generalización ni un techo del modelo.
 
-Véanse el [resultado87](../../../Phideus-CASMI/docs/RESULTS_CASMI87_BROADER_PAIRED_LEARNING.md),
-la [auditoría310](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/310_CASMI87_BROADER_LEARNING_RESULT_AUDIT_ASTRA.md)
-y el [plan88](../../../Phideus-CASMI/docs/CASMI88_FIXED_FIT_LEARNING_PLAN.md).
+El desglose de los logits muestra que mejoraron las decisiones de construcción
+de enlaces; la pérdida de hidrógenos ya era casi nula al comienzo. La separación
+entre aprender prefijos correctos y generar libremente la molécula sigue abierta.
+En el endpoint, los brazos de contexto y completo produjeron 78 y 84 slots válidos
+de 100, con 15 y 13 identidades no resueltas, respectivamente. Validez no equivale
+a coincidencia con la respuesta y esos desconocidos no se convierten en errores
+químicos demostrados.
+
+El primer intento se detuvo por un error del ejecutor al comparar dieciséis
+actualizaciones con treinta y dos eventos de registro. La recuperación revisada
+conservó todo el intento y reprodujo exactamente su primer ciclo, incluidos pesos,
+AdamW y RNG. La operación completa duró 371 segundos, además de los 58 del intento
+interrumpido. La auditoría independiente 313 verificó los diecisiete checkpoints,
+las pérdidas, las 29.652 elecciones libres y la preservación de artefactos; no
+halló un defecto invalidante. Los procesos terminaron y la GPU quedó libre, con
+su autorización local vigente.
+
+El próximo goal, CASMI-89, analizará las trazas libres ya guardadas para localizar
+la pérdida de compatibilidad con el grafo objetivo y medir la probabilidad conjunta
+de las acciones que todavía la conservan. La comparación admitirá permutaciones
+de átomos equivalentes y mantendrá explícitas las búsquedas no resueltas. Es una
+pregunta CPU sobre la generación observada, sin nuevos forwards ni entrenamiento;
+la conectividad de una representación no se confundirá con toda la identidad
+química o tautomérica. Su implementación y revisión concreta siguen pendientes.
+
+Fuentes: [resultado 88](../../../Phideus-CASMI/docs/RESULTS_CASMI88_FIXED_FIT_LEARNING.md),
+[auditoría 313](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/313_CASMI88_FIXED_FIT_RESULT_AUDIT_ASTRA.md)
+y [plan 89](../../../Phideus-CASMI/docs/CASMI89_FREE_PREFIX_COMPATIBILITY_PLAN.md).
 
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
