@@ -1,5 +1,18 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — GPU suspendida; continúa el diagnóstico de las trazas guardadas
+
+Mariano vuelve a reservar la GPU hasta nuevo aviso. CASMI-88 ya terminó y no
+quedaban procesos propios de esa corrida al comprobarlo. CASMI-89 puede avanzar
+sin ocuparla: compara las decisiones libres guardadas con el grafo de la molécula
+objetivo. El verificador está implementado y sus pruebas sintéticas pasan; la
+revisión independiente314 está en curso antes de ejecutar el análisis completo.
+La referencia se fija en los enlaces enteros del primer teacher guardado, porque
+compararlos directamente con etiquetas aromáticas introduciría incompatibilidades
+artificiales. Este diagnóstico conserva ese límite de representación y no decide
+identidad química. Cuando el próximo avance material necesite GPU, el goal se
+pausará y se avisará, sin sustituirlo por actividad periférica.
+
 ## 2026-10-01 — CASMI-88 cerrado: aprende enlaces, todavía no recupera identidades
 
 La prueba con GPU repitió dieciséis veces los mismos ocho registros de cuatro

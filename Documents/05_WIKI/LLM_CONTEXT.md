@@ -1366,6 +1366,11 @@ las pérdidas, las 29.652 elecciones libres y la preservación de artefactos; no
 halló un defecto invalidante. Los procesos terminaron y la GPU quedó libre, con
 su autorización local vigente.
 
+Actualización de recursos del 01/10 local (02/10 UTC): Mariano suspendió nuevamente
+la GPU hasta nuevo aviso. CASMI-89 continúa sólo con el análisis CPU de las trazas
+guardadas; al necesitar GPU para el siguiente avance material, se pausa el goal.
+La autorización local mencionada arriba corresponde al cierre histórico de88.
+
 El próximo goal, CASMI-89, analizará las trazas libres ya guardadas para localizar
 la pérdida de compatibilidad con el grafo objetivo y medir la probabilidad conjunta
 de las acciones que todavía la conservan. La comparación admitirá permutaciones

@@ -1,3 +1,14 @@
+## Phideus/CASMI: GPU suspendida hasta nuevo aviso — 2026-10-01 (2026-10-02 UTC)
+
+Mariano confirma explícitamente: «no uses la GPU hasta nuevo aviso». Esta orden
+posterior revoca la cesión local del01/10 para Phideus/CASMI. No iniciar CUDA,
+entrenamiento/inferencia GPU, relanzadores ni sustitución remota; preservar
+checkpoints y detener recuperablemente sólo trabajo propio si lo hubiera.
+CASMI88 ya terminó y CASMI89 analiza trazas guardadas: puede continuar sólo CPU
+si avanza materialmente el objetivo. Cuando el siguiente paso razonable requiera
+GPU, avisar, pausar el goal y detener la cadena, sin tareas periféricas de relleno.
+No modifica permisos de otros proyectos ni autoriza intervenir procesos ajenos.
+
 # AGENTS.md
 
 Instrucciones base para agentes en este repositorio (persistentes).
