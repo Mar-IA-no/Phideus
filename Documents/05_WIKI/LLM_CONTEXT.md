@@ -1371,17 +1371,26 @@ la GPU hasta nuevo aviso. CASMI-89 continúa sólo con el análisis CPU de las t
 guardadas; al necesitar GPU para el siguiente avance material, se pausa el goal.
 La autorización local mencionada arriba corresponde al cierre histórico de88.
 
-El próximo goal, CASMI-89, analizará las trazas libres ya guardadas para localizar
-la pérdida de compatibilidad con el grafo objetivo y medir la probabilidad conjunta
-de las acciones que todavía la conservan. La comparación admitirá permutaciones
-de átomos equivalentes y mantendrá explícitas las búsquedas no resueltas. Es una
-pregunta CPU sobre la generación observada, sin nuevos forwards ni entrenamiento;
-la conectividad de una representación no se confundirá con toda la identidad
-química o tautomérica. Su implementación y revisión concreta siguen pendientes.
+CASMI-89 cerró el análisis CPU de las 600 trazas libres. La masa compatible de
+raíz subió de aproximadamente 87% a 92%, pero hubo primer abandono demostrado
+del grafo representado en todos los slots: 599 durante ATTACH y uno durante CLOSE.
+No hubo búsquedas inciertas. La referencia admite permutaciones de átomos, pero
+fija una forma Kekulé docente: rechazo de ese grafo no es imposibilidad de toda
+identidad química. Las masas condicionales posteriores cambian de población de
+prefijos, no prueban un efecto causal del espectro. La auditoría315 verificó
+resultados y corrigió una precisión de conteo, sin alterar las hojas selladas.
 
-Fuentes: [resultado 88](../../../Phideus-CASMI/docs/RESULTS_CASMI88_FIXED_FIT_LEARNING.md),
-[auditoría 313](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/313_CASMI88_FIXED_FIT_RESULT_AUDIT_ASTRA.md)
-y [plan 89](../../../Phideus-CASMI/docs/CASMI89_FREE_PREFIX_COMPATIBILITY_PLAN.md).
+CASMI-90 queda seleccionado y pausado por la suspensión GPU: comparar docentes
+fijos contra diversidad de raíces/índices/recorridos de los mismos cuatro grafos,
+con estado256, presupuesto128updates por brazo y arquitectura/loss apareados.
+Es una hipótesis de cobertura, no una explicación establecida. El ejecutor90 y
+su preparación mínima no están implementados; se retoman con el experimento
+material cuando vuelva a habilitarse GPU, sin sustitución CPU prolongada.
+
+Fuentes: [resultado89](../../../Phideus-CASMI/docs/RESULTS_CASMI89_FREE_PREFIX_COMPATIBILITY.md),
+[auditoría315](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/315_CASMI89_PREFIX_RESULT_AUDIT_ASTRA.md),
+[plan90](../../../Phideus-CASMI/docs/CASMI90_TEACHER_SERIALIZATION_DIVERSITY_PLAN.md)
+y [resultado88](../../../Phideus-CASMI/docs/RESULTS_CASMI88_FIXED_FIT_LEARNING.md).
 
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.

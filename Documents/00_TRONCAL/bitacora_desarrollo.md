@@ -1,5 +1,32 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-89 cerrado; próxima comparación en pausa por GPU
+
+El análisis CPU de las 600 generaciones guardadas mostró una mejora parcial:
+la masa compatible en la primera decisión pasó de aproximadamente 87% a 92%,
+pero todos los intentos abandonaron el grafo de referencia. En 599 casos, la
+primera salida ocurrió al agregar átomos; sólo una ocurrió durante el cierre.
+El abandono medio se desplazó de cerca de la quinta decisión a la sexta o
+séptima, sin mejora monótona entre las lecturas intermedia y final. Una de las
+cuatro moléculas empeoró su masa inicial aunque el promedio mejorara.
+
+La comparación permite permutaciones de átomos y fija el grafo de enlaces enteros
+del primer teacher. No prueba imposibilidad de otras representaciones de una
+misma identidad química. No hubo búsquedas inciertas: las 59 identidades que88
+había dejado sin resolver siguen en ese estado. El piloto y el resto del análisis
+consumieron 2,35 y 12,73 segundos de ejecución CPU, respectivamente; no se cargaron
+modelos ni se hicieron nuevos forwards. La auditoría independiente315 verificó
+las masas, los testigos y las reducciones, e indicó una precisión menor de conteo
+que quedó corregida conservando el agregado anterior. CASMI-89 queda cerrado.
+
+La próxima prueba seleccionada, CASMI-90, contrasta repetir los dos recorridos
+docentes originales con diversificar raíces, índices y recorridos válidos de los
+mismos cuatro grafos, manteniendo arquitectura, loss, estado inicial y presupuesto.
+Es una hipótesis de cobertura, no una causa ya demostrada. El plan está documentado;
+el ejecutor y la preparación mínima siguen pendientes. La medición requiere GPU,
+por lo que la cadena queda pausada hasta nueva habilitación, sin entrenamiento
+CPU sustituto ni nuevos goals periféricos.
+
 ## 2026-10-01 — GPU suspendida; continúa el diagnóstico de las trazas guardadas
 
 Mariano vuelve a reservar la GPU hasta nuevo aviso. CASMI-88 ya terminó y no
