@@ -1,5 +1,37 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-01 — CASMI-87 cerrado: más ajuste, sin mejora predictiva observada
+
+CASMI-87 completó el aprendizaje pareado hasta256updates por brazo: las224
+posiciones nuevas añadieron112moléculas a las16anteriores, sin exclusiones ni
+repetición de updates tras la recuperación. La evaluación fijada generó400slots
+nuevos y reutilizó200del prior. Ningún brazo identificó una de las ocho consultas
+de desarrollo:0/8, también0/6 entre las que recibieron la fórmula de referencia.
+Los slots válidos bajaron de138a116 en contexto y de136a117 en el brazo completo.
+La ampliación no produjo la mejora buscada en esta trayectoria; no establece un
+techo de aprendizaje ni permite generalizar sobre representaciones físicas.
+
+La auditoría independiente310 verificó113checkpoints,448reducciones de pérdida,
+las métricas y la preservación de3209archivos anteriores más2891del intento
+interrumpido. No encontró hallazgos bloqueantes. El experimento87queda cerrado;
+los procesos terminaron y la GPU quedó libre, con su autorización local vigente.
+La validación de estados consumió1968s frente a372s de updates sincronizados,
+por lo que ese costo debe reducirse dentro del siguiente experimento real.
+
+La pregunta siguiente es de ajuste: si repetir exposición sobre cuatro moléculas
+fijas del fit aumenta su recuperación por identidad, junto con la pérdida medida
+siempre sobre las mismas trazas. CASMI-88 propone16ciclos y lecturas fijas inicial,
+intermedia y final, con fórmula conocida como condición oracle explícita. La
+simetría de acciones entre átomos indistinguibles impide tratar cero CE de un
+recorrido arbitrario como criterio de capacidad molecular. No se cambia todavía
+la arquitectura ni se reutilizan las ocho consultas para tuning. La implementación
+y ejecución88siguen pendientes; reservas y remoto permanecen cerrados.
+
+Véanse el [resultado87](../../../Phideus-CASMI/docs/RESULTS_CASMI87_BROADER_PAIRED_LEARNING.md),
+la [auditoría310](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/310_CASMI87_BROADER_LEARNING_RESULT_AUDIT_ASTRA.md)
+y el [plan88](../../../Phideus-CASMI/docs/CASMI88_FIXED_FIT_LEARNING_PLAN.md).
+
+
 ## 2026-10-01 — CASMI-87: recuperación del entrenamiento desde142
 
 La continuación GPU llegó a142 posiciones por brazo y se detuvo al preparar

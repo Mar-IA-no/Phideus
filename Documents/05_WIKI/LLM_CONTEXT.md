@@ -1324,23 +1324,34 @@ la generación sobre las mismas ocho consultas de desarrollo, sin presentarlas c
 reserva nueva ni ampliar la suite de ablaciones. GPU local autorizada; reservas
 cerradas. Véase el [resultado de CASMI-86](../../../Phideus-CASMI/docs/RESULTS_CASMI86_FIXED_FULL_ABLATION.md).
 
-CASMI-87 pasó de preparación a entrenamiento GPU real. El piloto incluido llevó
-ambos brazos de 32 a 34 updates, con dos episodios aceptados y restauración exacta
-de parámetros, AdamW y RNG. Duró 23,4 segundos y alcanzó unos 450 MiB de memoria
-GPU; la adquisición usó 1,88 GiB de RAM. Las revisiones 307/308 se integraron y sus
-hallazgos de evidencia de recursos y recuperación de JSON parcial se corrigieron
-antes del lanzamiento en a6385e1.
+CASMI-87 completó el aprendizaje pareado hasta256updates por brazo: las224
+posiciones nuevas añadieron112moléculas a las16anteriores, sin exclusiones ni
+repetición de updates tras la recuperación. La evaluación fijada generó400slots
+nuevos y reutilizó200del prior. Ningún brazo identificó una de las ocho consultas
+de desarrollo:0/8, también0/6 entre las que recibieron la fórmula de referencia.
+Los slots válidos bajaron de138a116 en contexto y de136a117 en el brazo completo.
+La ampliación no produjo la mejora buscada en esta trayectoria; no establece un
+techo de aprendizaje ni permite generalizar sobre representaciones físicas.
 
-La continuación se detuvo en el checkpoint completo142 cuando la adquisición
-CPU superó su límite de2GiB. Se preservó la operación íntegra y la auditoría309
-verificó una recuperación con el mismo lector y estado, cambiando sólo el entorno
-de asignación/liberación de memoria. El primer par real recuperado completó144
-con2030740KiB de adquisición y el proceso ya alcanzó150, manteniendo los límites
-y la receta. La recuperación está en marcha hacia256; no hay resultado final.
-El readout quedó fijado antes del fit. Faltan el endpoint, los400slots nuevos,
-la evaluación y la auditoría final; el goal sigue activo sin promoción científica.
-Véanse el [plan CASMI-87](../../../Phideus-CASMI/docs/CASMI87_BROADER_PAIRED_LEARNING_PLAN.md)
-y la [recuperación auditada](../../../Phideus-CASMI/docs/CASMI87_INTERRUPTION_RECOVERY_PLAN.md).
+La auditoría independiente310 verificó113checkpoints,448reducciones de pérdida,
+las métricas y la preservación de3209archivos anteriores más2891del intento
+interrumpido. No encontró hallazgos bloqueantes. El experimento87queda cerrado;
+los procesos terminaron y la GPU quedó libre, con su autorización local vigente.
+La validación de estados consumió1968s frente a372s de updates sincronizados,
+por lo que ese costo debe reducirse dentro del siguiente experimento real.
+
+La pregunta siguiente es de ajuste: si repetir exposición sobre cuatro moléculas
+fijas del fit aumenta su recuperación por identidad, junto con la pérdida medida
+siempre sobre las mismas trazas. CASMI-88 propone16ciclos y lecturas fijas inicial,
+intermedia y final, con fórmula conocida como condición oracle explícita. La
+simetría de acciones entre átomos indistinguibles impide tratar cero CE de un
+recorrido arbitrario como criterio de capacidad molecular. No se cambia todavía
+la arquitectura ni se reutilizan las ocho consultas para tuning. La implementación
+y ejecución88siguen pendientes; reservas y remoto permanecen cerrados.
+
+Véanse el [resultado87](../../../Phideus-CASMI/docs/RESULTS_CASMI87_BROADER_PAIRED_LEARNING.md),
+la [auditoría310](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/310_CASMI87_BROADER_LEARNING_RESULT_AUDIT_ASTRA.md)
+y el [plan88](../../../Phideus-CASMI/docs/CASMI88_FIXED_FIT_LEARNING_PLAN.md).
 
 Los párrafos siguientes conservan el corte anterior de preparación.
 CASMI-73 cerró el diseño de calibración explícita de dispositivo en2b7ee31.
