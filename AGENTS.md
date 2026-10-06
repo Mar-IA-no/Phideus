@@ -1,3 +1,13 @@
+## Phideus/CASMI: investigación y selección de agentes — 2026-10-06
+
+Mariano pide continuar la investigación. Para nuevas delegaciones: `gpt-6-astra`
+con esfuerzo `medium` en tareas complejas y auditorías independientes; esfuerzo
+`low` en tareas simples. Usar `gpt-6.1-sol` con esfuerzo `high` para trabajo lento
+que pueda avanzar en paralelo sin bloquear otros avances. Esta selección sustituye
+las reglas anteriores incompatibles de delegación de este frente; no cambia el
+runtime del coordinador por sí sola. La reanudación de investigación no habilita
+GPU local/remota ni tareas periféricas: conservar la pausa ante dependencia GPU.
+
 ## Phideus/CASMI: GPU suspendida hasta nuevo aviso — 2026-10-01 (2026-10-02 UTC)
 
 Mariano confirma explícitamente: «no uses la GPU hasta nuevo aviso». Esta orden

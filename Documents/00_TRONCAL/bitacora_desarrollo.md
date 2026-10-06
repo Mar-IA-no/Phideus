@@ -1,5 +1,18 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-06 — Reanudación solicitada y frontera de recursos
+
+Se registró la nueva selección de agentes: Astra Medium para tareas complejas
+y auditorías, Astra Low para simples y GPT-6.1 High para trabajo lento que pueda
+avanzar en paralelo. El cotejo del resultado89, la auditoría315 y el plan90
+confirma que la siguiente medición material necesita GPU, todavía suspendida.
+CASMI-90 permanece sin implementar y se vuelve a pausar formalmente; no se
+repiten diagnósticos cerrados ni se abren tareas auxiliares para sustituirlo.
+
+Mensaje recursivo 040 integrado: los avisos imprescindibles de m2-alert se
+dirigen al grupo compartido; no se emitió aviso rutinario ni se cambió el gateway.
+
+
 ## 2026-10-01 — CASMI-89 cerrado; próxima comparación en pausa por GPU
 
 El análisis CPU de las 600 generaciones guardadas mostró una mejora parcial:
