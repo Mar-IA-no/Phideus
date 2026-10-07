@@ -1394,6 +1394,23 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
+CASMI-95 comparó exposición a historias visitadas por el modelo frente a
+ventanas docentes emparejadas. La masa compatible mejoró en las ocho slices de
+prefijos comunes no expuestos, pero la pérdida empeoró en dos moléculas del modo
+con espectro. Las600trayectorias nuevas no recuperaron ninguna estructura
+completa;596tuvieron identidad local válida y4quedaron desconocidas. El ajuste
+parcial no se convierte en éxito molecular ni en generalización a nuevas moléculas.
+
+La revisión independiente340 corroboró el resultado, los512updates y la
+preservación de24.040archivos previos. La operación tomó347,644segundos y su
+análisis26,005segundos CPU. Se retira el constructor irreversible como frente
+inmediato, sin declarar un techo científico. El siguiente diseño debe distinguirse
+de los generadores globales y editores ya estudiados: se examinan corrupción y
+reconstrucción revisable, y ensamblaje conjunto de motivos/puertos como candidatas
+separadas. Ninguna está promovida. El [resultado95](../../../Phideus-CASMI/docs/RESULTS_CASMI95_POLICY_PREFIX_LEARNING.md)
+conserva condiciones y evidencia. GPU local autorizada; remotos y reservas cerrados,
+con prioridad del primer brazo y continuidad del frente abierto.
+
 CASMI-94 examinó8.832decisiones guardadas y encontró en todas una clase
 puramente compatible. Las quince clases mixtas localizadas no sostienen una
 barrera inevitable bajo esta partición conservadora; tampoco se ha demostrado
