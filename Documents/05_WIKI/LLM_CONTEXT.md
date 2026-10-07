@@ -1394,6 +1394,24 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
+CASMI-96 entrenó una propuesta completa que puede borrar y cambiar enlaces en
+cada paso de una reversa categórica coherente. El experimento finito completó
+1.024actualizaciones y400propuestas en215,173segundos. La pérdida supervisada bajó
+hasta≈0,0246, pero ninguna propuesta final recuperó la molécula y ningún probe
+reconstruyó exactamente su estado etiquetado completo. El92%de acierto por par
+incluye una mayoría de pares sin enlace; no equivale a coherencia molecular.
+
+La auditoría independiente345 corroboró resultados y preservación de28.665archivos
+previos, sin hallazgos materiales abiertos. Se cierra esta receta sin extender
+parámetros por inercia ni declarar un techo de la familia. El siguiente objetivo
+es una prueba aprendida de composición por motivos y puertos: debe fijar soporte,
+tamaños y reutilización de fragmentos, y muestrear ensamblajes completos sin recibir
+el ensamblaje correcto. La alternativa sigue siendo candidata; las cuatro moléculas
+fit y fórmulaoracle no demuestran generalización ni competitividad. El
+[resultado96](../../../Phideus-CASMI/docs/RESULTS_CASMI96_REVISABLE_PROPOSALS.md)
+preserva evidencia y límites. GPU local autorizada y libre tras el ensayo; remotos
+y reservas cerrados, ambos brazos abiertos con prioridad del primero.
+
 CASMI-95 comparó exposición a historias visitadas por el modelo frente a
 ventanas docentes emparejadas. La masa compatible mejoró en las ocho slices de
 prefijos comunes no expuestos, pero la pérdida empeoró en dos moléculas del modo
