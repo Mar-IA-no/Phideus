@@ -1,3 +1,13 @@
+## Phideus/CASMI: GPU local habilitada y continuidad — 2026-10-07
+
+Mariano autoriza explícitamente «tenes el gpu para vos... dale para adelante».
+Levanta la suspensión local de octubre para Phideus/CASMI y reanuda CASMI-90:
+completar preparación, revisión independiente y comparación GPU finita, sin
+pedir permisos por corrida. Verificar ocupación y ownership antes de cargar;
+no detener procesos ajenos. Conservar checkpoints y parada recuperable. No
+habilita GPU remota, reservas de datos ni promoción científica automática.
+Mantener selección de agentes del6/10 y cadena autónoma hasta nueva pausa.
+
 ## Phideus/CASMI: investigación y selección de agentes — 2026-10-06
 
 Mariano pide continuar la investigación. Para nuevas delegaciones: `gpt-6-astra`
