@@ -1,5 +1,25 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-07 — La condición persistente no resuelve la construcción
+
+CASMI-93 mantuvo la observación disponible en cada decisión y comparó esa mezcla
+con la condición sólo inicial, sobre cuatro estructuras ya admitidas agrupadas
+en dos pares de igual fórmula. Los512updates y1.000trayectorias nuevas no
+recuperaron ninguna de las estructuras, tampoco al intercambiar espectros entre
+miembros del par conservando la metadata receptora. La pérdida docente baja,
+pero esa mejora no se traduce en construcción completa. La revisión333 cotejó
+los resultados con otro matcher de grafos y cerró el contraste sin hallazgos
+materiales. No se prolonga esta mezcla.
+
+El siguiente paso es una única prueba CPU sobre los errores guardados: comprobar
+si hay alternativas de distinta compatibilidad molecular que la representación
+del scorer obliga a puntuar igual. Distinguir esa barrera de un ranking aprendido
+inadecuado podría justificar otro diseño; contar empates o volver a certificar
+simetrías no bastaría. La explicación se retira si la evidencia no la respalda.
+El [resultado93](../../../Phideus-CASMI/docs/RESULTS_CASMI93_PERSISTENT_CONDITION.md)
+conserva los controles, denominadores y límites. La GPU local sigue autorizada
+y quedó libre; reservas y recursos remotos permanecen cerrados.
+
 ## 2026-10-07 — La búsqueda concentra caminos sin recuperar moléculas
 
 La comparación CASMI-92 mantuvo los pesos y cambió la asignación y selección de
