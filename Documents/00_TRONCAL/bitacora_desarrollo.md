@@ -1,5 +1,20 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-07 — Comparación de diversidad docente ejecutada
+
+Con la nueva autorización local se completó CASMI-90 después de revisar su
+implementación en una instancia independiente Astra Medium. La comparación
+conservó los mismos cuatro grafos, estados iniciales y presupuesto: cambiar
+raíces, índices y recorridos mejoró el promedio de la primera decisión, pero
+no prolongó globalmente la construcción compatible ni produjo identidades
+correctas observadas. La mejora inicial se concentra en una molécula y no
+autoriza una conclusión general sobre diversidad o espectros. Los datos y
+checkpoints quedaron preservados; la auditoría independiente318 confirmó los resultados y cerró el contraste.
+La siguiente pregunta cambia la loss para admitir alternativas compatibles
+con el grafo sin cambiar las trayectorias docentes.
+El [informe de CASMI-90](../../../Phideus-CASMI/docs/RESULTS_CASMI90_TEACHER_SERIALIZATION_DIVERSITY.md)
+reúne medidas, slices y límites. No se extendió el entrenamiento.
+
 ## 2026-10-06 — Reanudación solicitada y frontera de recursos
 
 Se registró la nueva selección de agentes: Astra Medium para tareas complejas

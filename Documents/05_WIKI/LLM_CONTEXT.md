@@ -1380,13 +1380,23 @@ identidad química. Las masas condicionales posteriores cambian de población de
 prefijos, no prueban un efecto causal del espectro. La auditoría315 verificó
 resultados y corrigió una precisión de conteo, sin alterar las hojas selladas.
 
-CASMI-90 queda seleccionado y pausado por la suspensión GPU: comparar docentes
-fijos contra diversidad de raíces/índices/recorridos de los mismos cuatro grafos,
-con estado256, presupuesto128updates por brazo y arquitectura/loss apareados.
-Es una hipótesis de cobertura, no una explicación establecida. El ejecutor90 y
-su preparación mínima no están implementados; se retoman con el experimento
-material cuando vuelva a habilitarse GPU, sin sustitución CPU prolongada.
+El 7 de octubre Mariano habilitó de nuevo la GPU local. CASMI-90 implementó y
+ejecutó el contraste auditado entre docentes fijos y serializaciones diversas:
+cuatro ramas, 128 actualizaciones adicionales por rama y 1.200 salidas selladas.
+La diversidad aumentó la masa compatible media de raíz al final, pero ese cambio
+provino de una molécula; las otras tres disminuyeron. El primer abandono medio
+ocurrió antes que con docentes fijos y no se observó la identidad objetivo en
+ninguna de las 48 celdas de 25 intentos. Los 95 estados de identidad desconocida
+no se convierten en fracasos químicos demostrados. Las 600 salidas del control
+fijo reprodujeron88 exactamente, excluyendo etiquetas y tiempos. La auditoría independiente318 confirmó el resultado y su alcance; CASMI-90
+está cerrado. Sigue un contraste de objetivo singleton frente a masa de acciones
+compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
+automática del entrenamiento. La GPU local sigue habilitada; remoto
+y reservas permanecen cerrados.
 
+Véase el [resultado90](../../../Phideus-CASMI/docs/RESULTS_CASMI90_TEACHER_SERIALIZATION_DIVERSITY.md),
+con slices, artefactos y límites; la revisión prelaunch317 cubrió el código y
+el banco antes de entrenar.
 Fuentes: [resultado89](../../../Phideus-CASMI/docs/RESULTS_CASMI89_FREE_PREFIX_COMPATIBILITY.md),
 [auditoría315](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/315_CASMI89_PREFIX_RESULT_AUDIT_ASTRA.md),
 [plan90](../../../Phideus-CASMI/docs/CASMI90_TEACHER_SERIALIZATION_DIVERSITY_PLAN.md)
