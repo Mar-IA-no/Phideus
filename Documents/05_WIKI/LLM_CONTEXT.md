@@ -1394,6 +1394,22 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
+CASMI-94 examinó8.832decisiones guardadas y encontró en todas una clase
+puramente compatible. Las quince clases mixtas localizadas no sostienen una
+barrera inevitable bajo esta partición conservadora; tampoco se ha demostrado
+capacidad universal del modelo. Las diferencias FP32 se conservan, sin convertir
+igualdad algebraica en igualdad binaria ni la relajación local en una cota molecular.
+La revisión independiente335 reconstruyó el resultado y no dejó hallazgos
+materiales. El análisis real tomó11,557segundos CPU y preservó23.037archivos.
+
+Se cierra esta explicación. El siguiente contraste estudia exposición a historias
+visitadas por la política frente a historias docentes, manteniendo scorer y
+objetivo de masa compatible. Habrá separación de exposición y comprobación,
+lectura libre nueva y cierre finito: no un rescate por profundidad o índices.
+El [resultado94](../../../Phideus-CASMI/docs/RESULTS_CASMI94_SCORER_EQUIVALENCE.md)
+conserva evidencia y límites. La GPU local sigue autorizada; reservas y recursos
+remotos permanecen cerrados. Los dos brazos continúan con prioridad del primero.
+
 CASMI-93 mantuvo la observación disponible en cada decisión y comparó esa mezcla
 con la condición sólo inicial, sobre cuatro estructuras ya admitidas agrupadas
 en dos pares de igual fórmula. Los512updates y1.000trayectorias nuevas no
