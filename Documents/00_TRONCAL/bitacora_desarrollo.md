@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-07 — Entrenamiento conservado, lectura interrumpida numéricamente
+
+CASMI-97 completó las1.024actualizaciones del modelo de motivos, árbol global y
+puertos, pero su lectura final se interrumpió por pérdida de precisión del
+normalizador. La auditoría independiente352 corroboró el aborto y su diagnóstico
+con aritmética de100dígitos. Se conservan206propuestas observadas, un intento
+interrumpido y193no iniciados; no hay comparación final ni juicio de recuperación
+molecular. Los dos terminales válidos finales son duplicados del mismo estado.
+
+El objetivo de comparación sigue activo. CASMI-98 registra el subobjetivo de
+completar una lectura finita con los pesos congelados y una evaluación estable
+de la misma distribución, sin reentrenar ni relajar tolerancias. La operación97
+y sus checkpoints permanecen intactos. Los35.528artefactos anteriores conservaron
+sus hashes y tamaños. La GPU local está autorizada y quedó libre; este siguiente
+paso es CPU. Remotos y reservas siguen cerrados, con prioridad del primer brazo.
+El [resultado97](../../../Phideus-CASMI/docs/RESULTS_CASMI97_MOTIF_PROPOSALS.md)
+distingue el entrenamiento completado de la comparación que todavía falta.
+
 ## 2026-10-07 — Reversibilidad aprendida sin recuperación molecular
 
 CASMI-96 entrenó una propuesta completa que puede borrar y cambiar enlaces en
