@@ -1,5 +1,19 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-07 — Masa compatible: mejora parcial y siguiente contraste de generación
+
+CASMI-91 cambió la pérdida conservando docentes y presupuesto. La construcción
+libre se mantiene compatible algo más tiempo en el promedio final y produce
+más moléculas químicamente válidas, aunque ninguna identidad objetivo. El efecto
+varía por molécula y modo; tampoco valida causalidad espectral o generalización.
+La auditoría independiente323 confirmó estados, medidas y preservación de los
+artefactos. La próxima pregunta conserva los pesos para separar la selección de
+trayectorias del aprendizaje: búsqueda de haz acotada frente a muestreo, con
+costes y reglas fijados antes de observar su resultado. Los antecedentes de
+búsqueda y revisión de grafos siguen disponibles; no se los presenta como ideas
+nuevas. Véase el [resultado91](../../../Phideus-CASMI/docs/RESULTS_CASMI91_COMPATIBLE_ACTION_MASS.md).
+
+
 ## 2026-10-07 — Comparación de diversidad docente ejecutada
 
 Con la nueva autorización local se completó CASMI-90 después de revisar su

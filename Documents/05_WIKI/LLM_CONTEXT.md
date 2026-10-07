@@ -1394,6 +1394,18 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
+CASMI-91 completó después el contraste de masa conjunta de acciones compatibles.
+La primera salida final se retrasa de 5,09 a 5,79 en contexto y de 5,52 a 5,95
+con observación completa, pero sólo cinco de ocho slices mejoran y no aparece
+ninguna identidad objetivo. Los 400 resultados nuevos abandonan la conectividad
+representada durante ATTACH. La auditoría323 confirma este beneficio parcial:
+1.200 posiciones de condición incluyen 200 aliases y sólo 1.000 predicciones
+únicas. Los controles y 15.380 archivos anteriores se preservan. El siguiente
+contraste estudia búsqueda de haz frente a muestreo con pesos congelados y
+presupuesto explícito; no prolonga el entrenamiento ni promueve la arquitectura.
+El [resultado91](../../../Phideus-CASMI/docs/RESULTS_CASMI91_COMPATIBLE_ACTION_MASS.md)
+conserva tablas, controles y límites.
+
 Véase el [resultado90](../../../Phideus-CASMI/docs/RESULTS_CASMI90_TEACHER_SERIALIZATION_DIVERSITY.md),
 con slices, artefactos y límites; la revisión prelaunch317 cubrió el código y
 el banco antes de entrenar.
