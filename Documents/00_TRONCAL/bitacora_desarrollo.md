@@ -1,5 +1,14 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-07 — Continuidad CPU y nueva reserva de GPU
+
+Mariano volvió a reservar la GPU para otras tareas. Al comprobar la liberación
+no quedaban procesos propios de CASMI en el dispositivo. La suspensión local y
+remota queda persistida; CASMI-98 continúa con pesos congelados y una lectura
+CPU acotada. El objetivo formal sigue activo mientras esta comparación avanza;
+si el próximo paso material requiere GPU, se pausará y se informará la dependencia.
+No se sustituyen entrenamientos por corridas CPU largas.
+
 ## 2026-10-07 — Entrenamiento conservado, lectura interrumpida numéricamente
 
 CASMI-97 completó las1.024actualizaciones del modelo de motivos, árbol global y

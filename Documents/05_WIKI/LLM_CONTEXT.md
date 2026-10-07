@@ -1394,6 +1394,11 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
+Directiva posterior del7/10: GPU local y remota suspendida por Mariano.
+No queda trabajo GPU propio activo. CASMI-98 continúa sólo en CPU con los pesos
+congelados; al llegar a una dependencia material de GPU se pausa el goal y se
+informa. Las autorizaciones que siguen describen el momento de aquellos ensayos.
+
 CASMI-97 completó las1.024actualizaciones del modelo de motivos, árbol global y
 puertos, pero su lectura final se interrumpió por pérdida de precisión del
 normalizador. La auditoría independiente352 corroboró el aborto y su diagnóstico
