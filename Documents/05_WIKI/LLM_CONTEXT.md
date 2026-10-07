@@ -1394,6 +1394,24 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
+CASMI-99 completó el intercambio de espectros con pesos y azar congelados:
+200 propuestas nuevas y 200 referencias a salidas previas, sin entrenamiento.
+La recuperación propia y de la pareja no cambió; tampoco los primeros ranks.
+El brazo completo modificó una de cien propuestas y pequeñas probabilidades
+condicionales. Hay sensibilidad local, pero este contraste no demuestra una
+preferencia molecular útil por el espectro ni generalización fuera del fit.
+
+La auditoría independiente358 corroboró el resultado sin hallazgos materiales.
+Se cierra99 y se deja CASMI-100 en pausa por la reserva de GPU de Mariano. El
+siguiente contraste propuesto exige cambiar el aprendizaje del condicionamiento
+espectral: aún faltan diseño, implementación, revisión numérica y piloto. No se
+ha demostrado que la loss sea la causa ni existe un job listo. No se prolonga la
+cadena con más swaps, semillas o entrenamiento CPU. Ambas rutas se conservan con
+prioridad de la primera. Evidencia y límites en el
+[resultado99](../../../Phideus-CASMI/docs/RESULTS_CASMI99_PAIRED_SPECTRUM.md).
+
+Antecedente de construcción, previo al contraste99:
+
 CASMI-98 completó la lectura que faltaba con los pesos congelados de97 y una
 evaluación estable del mismo normalizador, sin nuevo entrenamiento. Las cuatro
 estructuras fit aparecen dentro de25propuestas en ambos brazos, en ranks4,4,10,10.
