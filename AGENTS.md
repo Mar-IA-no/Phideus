@@ -1,3 +1,17 @@
+## Phideus/CASMI: GPU nuevamente suspendida; continuidad CPU — 2026-10-07
+
+Mariano pide disponer de la GPU para otras tareas y ordena continuar con todo
+lo que no implique GPU. Esta orden posterior revoca la habilitación local del
+7/10 para Phideus/CASMI hasta nuevo aviso explícito. No iniciar CUDA, training,
+inferencia GPU, relanzadores ni sustitución por GPU remota. Detener de forma
+recuperable sólo procesos propios si los hubiera; preservar checkpoints y no
+intervenir procesos ajenos. CASMI97 completó entrenamiento y abortó la lectura
+CPU por precisión numérica; CASMI98 continúa únicamente CPU con pesos congelados.
+El goal formal97 sigue activo porque este trabajo avanza materialmente la
+comparación pendiente. Si el siguiente paso razonable requiere GPU, informar,
+pausar el goal y detener la cadena, sin tareas periféricas ni CPU larga sustitutiva.
+Fuente: pedido directo de Mariano; registrado 2026-10-07 12:38:31 UTC.
+
 ## Phideus/CASMI: GPU local habilitada y continuidad — 2026-10-07
 
 Mariano autoriza explícitamente «tenes el gpu para vos... dale para adelante».
