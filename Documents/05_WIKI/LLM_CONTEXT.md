@@ -1394,6 +1394,16 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
+CASMI-92 ejecutó una comparación de haz con pesos congelados:320historias
+completas y80slots sin camino, ninguna recuperación, y una sola raíz final en
+cada celda. La concentración dejó144identidades válidas únicas y150duplicados,
+frente a341/1del muestreo, sumados por celda. El resultado desplaza la próxima
+pregunta desde afinar búsqueda hacia mantener disponible la condición observable
+en cada decisión; primero exige una cohorte ya admitida de igual fórmula y
+estructuras distintas, y controles comparables. Auditoría328 integrada,92cerrado; no hay
+promoción ni ampliación de datos. Véase el
+[resultado92](../../../Phideus-CASMI/docs/RESULTS_CASMI92_FROZEN_SEARCH.md).
+
 CASMI-91 completó después el contraste de masa conjunta de acciones compatibles.
 La primera salida final se retrasa de 5,09 a 5,79 en contexto y de 5,52 a 5,95
 con observación completa, pero sólo cinco de ocho slices mejoran y no aparece

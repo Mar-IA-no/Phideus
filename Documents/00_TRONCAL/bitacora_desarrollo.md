@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-07 — La búsqueda concentra caminos sin recuperar moléculas
+
+La comparación CASMI-92 mantuvo los pesos y cambió la asignación y selección de
+trayectorias. Terminó en217segundos:320salidas completas,80faltantes explícitos
+y ninguna estructura objetivo recuperada. Cada celda acabó concentrada en una
+raíz; el número de identidades válidas distintas cayó de341a144, sumado por celda.
+La ejecución finita y sus artefactos permiten separar este resultado de una
+falta de presupuesto o una corrida interrumpida.
+
+La revisión independiente328 confirmó el resultado y cerró92sin hallazgos materiales. La alternativa señalada
+para el próximo contraste conserva la observación en cada decisión del modelo,
+en vez de dejarla sólo en el estado inicial. Antes de implementarla requiere
+casos ya admitidos con igual fórmula y estructuras distintas: las cuatro
+fórmulas del ensayo actual no bastan para atribuir utilidad al espectro.
+El [resultado92](../../../Phideus-CASMI/docs/RESULTS_CASMI92_FROZEN_SEARCH.md)
+conserva denominadores, controles, recursos y límites. No se prolonga el haz
+mediante barridos ni se promueve la nueva alternativa por esta observación.
+
 ## 2026-10-07 — Masa compatible: mejora parcial y siguiente contraste de generación
 
 CASMI-91 cambió la pérdida conservando docentes y presupuesto. La construcción
