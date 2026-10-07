@@ -1394,26 +1394,24 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
-Directiva posterior del7/10: GPU local y remota suspendida por Mariano.
-No queda trabajo GPU propio activo. CASMI-98 continúa sólo en CPU con los pesos
-congelados; al llegar a una dependencia material de GPU se pausa el goal y se
-informa. Las autorizaciones que siguen describen el momento de aquellos ensayos.
+CASMI-98 completó la lectura que faltaba con los pesos congelados de97 y una
+evaluación estable del mismo normalizador, sin nuevo entrenamiento. Las cuatro
+estructuras fit aparecen dentro de25propuestas en ambos brazos, en ranks4,4,10,10.
+Es construcción molecular completa bajo condiciones privilegiadas; todavía no
+hay evidencia de generalización ni beneficio de disponer del espectro. Los dos
+brazos comparten12hits propios y9de la pareja por100slots finales, con duplicados.
 
-CASMI-97 completó las1.024actualizaciones del modelo de motivos, árbol global y
-puertos, pero su lectura final se interrumpió por pérdida de precisión del
-normalizador. La auditoría independiente352 corroboró el aborto y su diagnóstico
-con aritmética de100dígitos. Se conservan206propuestas observadas, un intento
-interrumpido y193no iniciados; no hay comparación final ni juicio de recuperación
-molecular. Los dos terminales válidos finales son duplicados del mismo estado.
-
-El objetivo de comparación sigue activo. CASMI-98 registra el subobjetivo de
-completar una lectura finita con los pesos congelados y una evaluación estable
-de la misma distribución, sin reentrenar ni relajar tolerancias. La operación97
-y sus checkpoints permanecen intactos. Los35.528artefactos anteriores conservaron
-sus hashes y tamaños. La GPU local está autorizada y quedó libre; este siguiente
-paso es CPU. Remotos y reservas siguen cerrados, con prioridad del primer brazo.
-El [resultado97](../../../Phideus-CASMI/docs/RESULTS_CASMI97_MOTIF_PROPOSALS.md)
-distingue el entrenamiento completado de la comparación que todavía falta.
+La auditoría independiente355 corroboró1600comparaciones de grafo y800árboles
+coloreados con otro matcher. La operación CPU tardó113,64segundos y preservó
+45.541artefactos anteriores. Quedan cerrados la comparación formal97 y subgoal98;
+la operación97 conserva su aborto histórico. CASMI-99 abre un único intercambio
+de espectros entre parejas de igual fórmula, con pesos, metadata y uniformes
+congelados, para distinguir sensibilidad de preferencia molecular. La GPU local
+y remota sigue suspendida; ante una dependencia material se pausa la cadena.
+El [resultado98](../../../Phideus-CASMI/docs/RESULTS_CASMI98_STABLE_READOUT.md)
+conserva denominadores y límites; el
+[plan99](../../../Phideus-CASMI/docs/CASMI99_PAIRED_SPECTRUM_INTERVENTION_PLAN.md)
+fija el contraste CPU. Se mantienen ambos brazos con prioridad del primero.
 
 CASMI-96 entrenó una propuesta completa que puede borrar y cambiar enlaces en
 cada paso de una reversa categórica coherente. El experimento finito completó

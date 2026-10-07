@@ -1,5 +1,28 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+
+## 2026-10-07 — Construcción completa fit; intervención espectral CPU
+
+CASMI-98 completó la lectura que faltaba con los pesos congelados de97 y una
+evaluación estable del mismo normalizador, sin nuevo entrenamiento. Las cuatro
+estructuras fit aparecen dentro de25propuestas en ambos brazos, en ranks4,4,10,10.
+Es construcción molecular completa bajo condiciones privilegiadas; todavía no
+hay evidencia de generalización ni beneficio de disponer del espectro. Los dos
+brazos comparten12hits propios y9de la pareja por100slots finales, con duplicados.
+
+La auditoría independiente355 corroboró1600comparaciones de grafo y800árboles
+coloreados con otro matcher. La operación CPU tardó113,64segundos y preservó
+45.541artefactos anteriores. Quedan cerrados la comparación formal97 y subgoal98;
+la operación97 conserva su aborto histórico. CASMI-99 abre un único intercambio
+de espectros entre parejas de igual fórmula, con pesos, metadata y uniformes
+congelados, para distinguir sensibilidad de preferencia molecular. La GPU local
+y remota sigue suspendida; ante una dependencia material se pausa la cadena.
+El [resultado98](../../../Phideus-CASMI/docs/RESULTS_CASMI98_STABLE_READOUT.md)
+conserva denominadores y límites; el
+[plan99](../../../Phideus-CASMI/docs/CASMI99_PAIRED_SPECTRUM_INTERVENTION_PLAN.md)
+fija el contraste CPU. Se mantienen ambos brazos con prioridad del primero.
+
+
 ## 2026-10-07 — Continuidad CPU y nueva reserva de GPU
 
 Mariano volvió a reservar la GPU para otras tareas. Al comprobar la liberación
