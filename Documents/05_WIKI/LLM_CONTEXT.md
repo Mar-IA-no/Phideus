@@ -1889,3 +1889,19 @@ GO/NO-GO; distingue el ciclo geométrico activo de las líneas conservadas.
 - [PPU / Natural Harmonic Geometry](concepts/ppu-geometria-armonica-natural.md)
 - [Régimen de evidencia](concepts/regimen-de-evidencia.md)
 - [Ground truth proporcional](concepts/ground-truth-geometria-proporcional.md)
+
+## 2026-10-08 — CASMI103 cerrado: consulta espectral y decisiones
+
+La lectura de800pares guardados terminó en4,77s CPU sin nuevos forwards. La
+entrada plena cambia y las probabilidades responden desde el primer bloque,
+pero los25candidatos de cada molécula2/3 conservan todas las elecciones. En0/1
+contrastivo divergen25/24trayectorias, ya al seleccionar bloques moleculares.
+La comparación se detiene allí para no atribuir al espectro diferencias entre
+estados distintos. La auditoría377 corroboró el resultado; los probes docentes100
+ya contienen el contraste de estados fijos y no se repetirán. Sigue un diseño
+concreto: consultar los picos desde el prefijo y la fórmula restante al elegir
+cada bloque. Es una hipótesis de condicionamiento, sin parámetros nuevos ni
+cambio de loss/soporte; revisión e implementación pendientes. GPU local autorizada,
+remoto/reservas cerrados. No se infiere ausencia de información ni techo físico.
+Ver [resultado103](../../../Phideus-CASMI/docs/RESULTS_CASMI103_COMMON_HISTORY.md).
+
