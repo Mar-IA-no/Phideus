@@ -1918,3 +1918,22 @@ propios y800finales, con checkpoints y parada recuperable; aún no se lanzó.
 GPUlocalautorizada, remoto/reservas cerrados. Después de este contraste único,
 la revisión debe atender el poder discriminante del protocolo, sin más afinaciones
 sobre los mismos cuatro casosfit. Ver [plan104](../../../Phideus-CASMI/docs/CASMI104_STATE_CONDITIONED_M_PLAN.md).
+
+## 2026-10-08 — CASMI104 cerrado: validez sin dirección espectral observada
+
+El [contraste104](../../../Phideus-CASMI/docs/RESULTS_CASMI104_STATE_QUERY.md)
+terminó512actualizaciones y sus lecturas libres. La auditoría independiente389
+corroboró los resultados desde los registros guardados. La nueva consulta según
+el estado de construcción mejora la validez hasta98de100propuestas, pero esa
+mejora aparece también sin productos espectrales. Intercambiar los espectros no
+cambió ninguna de las100trayectorias finales de cada modo y objetivo; se perdió
+la dirección finita que100había mostrado en dos casos. Las probabilidades sí
+cambian, y esta observación no demuestra independencia ni un techo del modelo.
+
+Las cuatro referencias ya se recuperaban dentro de25propuestas en ambos modelos.
+El aumento de frecuencia de aciertos no amplía esa cobertura. El análisisCPU
+necesitó una recuperación manual por memoria, revisada y conservada junto con
+el intento fallido; el entrenamiento no se repitió. El siguiente paso comprueba
+soporte con catálogo construido sólo desde entrenamiento y estructuras separadas
+ya admitidas, antes de otra comparación neuronal. No se sigue afinando los mismos
+cuatrofit. GPU local habilitada; reservas cerradas y sin promoción científica.
