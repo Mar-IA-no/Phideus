@@ -1,6 +1,27 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
 
+## 2026-10-08 — CASMI109 cerrado: dirección espectral sin prueba de discriminación
+
+El [diagnóstico de trayectorias verdaderas](../../../Phideus-CASMI/docs/RESULTS_CASMI109_TRUE_PATH.md)
+comparó el mismo modelo completo con entrada real y con tres canales puestos
+en cero. La entrada real aumentó la probabilidad de la trayectoria correcta
+en 86 de 144 consultas y la redujo en 58; la diferencia media fue de 0,0348 nats,
+principalmente en la elección del árbol. La auditoría independiente confirmó
+los agregados y las 144 reducciones reproducidas desde logits conservados.
+
+El resultado aporta dirección a la sensibilidad observada anteriormente, pero
+no demuestra que el espectro distinga la estructura correcta de alternativas:
+los ceros pueden llevar al modelo fuera de distribución y la probabilidad de
+una trayectoria no es la probabilidad marginal de la molécula. El próximo
+contraste se acota a cuatro pares de igual fórmula ya admitidos, con márgenes
+recíprocos y control de las señales residuales. La alternativa de aprendizaje
+contrastivo sigue separada; no se adopta por esta ventaja media. Preparación,
+puntuación y replay tomaron 15,75, 31,26 y 11,41 segundos en CPU, sin entrenamiento,
+GPU ni apertura de reservas. La recuperación de moléculas completas sigue siendo
+el horizonte y no cambió con este diagnóstico.
+
+
 ## 2026-10-08 — CASMI108 cerrado: validez y recuperación son resultados distintos
 
 El [contraste de política con pesos fijos](../../../Phideus-CASMI/docs/RESULTS_CASMI108_FIXED_WEIGHT.md)
