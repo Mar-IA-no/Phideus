@@ -1,5 +1,24 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI105 cerrado: soporte fuera del catálogo de cuatro casos
+
+El [catálogo construido sólo con entrenamiento](../../../Phideus-CASMI/docs/RESULTS_CASMI105_TRAIN_ONLY_CATALOGUE.md)
+contiene151tipos y representa193de401estructuras de desarrollo elegibles;
+144también cumplen el límite actual de24átomos. Las452posiciones originales
+conservan51exclusiones históricas. El principal límite está en componentes
+cíclicos mayores de6átomos y modos de hidrógeno, sin confundir esa ausencia de
+soporte con rendimiento neuronal. Una pasadaCPU de13,30s y la auditoría393
+corroboraron el resultado; no hubo entrenamiento ni nuevos resultados espectrales.
+
+La revisión independiente recomienda probar primero el aporte del espectro en
+el dominio ya soportado:886estructuras de entrenamiento y144de desarrollo
+separadas por componentes, controles contexto/completo y pesos nuevos. El
+denominador452y la exposición histórica del desarrollo permanecen explícitos.
+Se conserva la ampliación de unidades/Hcomo alternativa posterior; no se
+prolonga el censo ni el ajuste sobre cuatrofit. GPU local habilitada y reservas
+cerradas; no hay promoción arquitectónica ni evaluación confirmatoria.
+
+
 ## 2026-10-08 — CASMI104 cerrado: validez sin dirección espectral observada
 
 El [contraste104](../../../Phideus-CASMI/docs/RESULTS_CASMI104_STATE_QUERY.md)
