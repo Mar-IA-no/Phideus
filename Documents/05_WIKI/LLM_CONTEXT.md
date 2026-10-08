@@ -1986,3 +1986,20 @@ Se conserva la [alternativa de contraste entre estructuras de igual fórmula](..
 sin implementarla. GPU local autorizada desde8/10;108/109 fueronCPU por costo medido.
 Reservas y GPU remota cerradas, sin promoción. El [calendario comprobado](../../../Phideus-CASMI/Biblioteca/CASMI2026_DEADLINE_20261008.md)
 fija entrega final14/12/2026 a23:59UTC, sujeto a cambios oficiales.
+
+
+## 2026-10-08 — CASMI110: límite del endpoint y candidata de aprendizaje
+
+El [contraste recíproco110](../../../Phideus-CASMI/docs/RESULTS_CASMI110_RECIPROCAL_MARGIN.md),
+auditado422, completó ocho cruces y reutilizó ocho propios109, con dieciséisraws
+reproducidos en4,65sCPU. Rreal original por par:−5,515917/−0,278684/+0,028992/−1,127760.
+Cada par prefiere la misma candidata con ambos espectros; nunca ambos márgenes
+individuales positivos. Sólo el tercer par tiene metadataexacta yRceros0. No
+nuevas recuperaciones, generalización o causalidad universal; cuatro pares/8casos.
+
+Terminan los probes del endpoint fijo. La [candidata423](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/423_CONDITIONAL_MARGIN_LEARNING_CANDIDATE.md)
+propone continuación factorial entradafull/contexto ×objetivoordinario/margen,
+con pesos inicialesfull106 comunes, exposición/selección comparables y generación
+libre144×25 como lectura decisiva. Contexto conserva historia espectral previa:
+el estimando es continuación. Diseño y piloto pendientes; sin promoción ni
+apertura de reservas, GPUlocal autorizada y remoto cerrado.

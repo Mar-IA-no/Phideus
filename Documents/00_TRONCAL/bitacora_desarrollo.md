@@ -1,6 +1,26 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
 
+## 2026-10-08 — CASMI110 cerrado: pasar del diagnóstico al aprendizaje
+
+El [contraste de cuatro pares de igual fórmula](../../../Phideus-CASMI/docs/RESULTS_CASMI110_RECIPROCAL_MARGIN.md)
+reutilizó ocho trayectorias propias y puntuó ocho cruces. La suma recíproca,
+que cancela una preferencia aditiva fija por candidata, favoreció la asignación
+correcta en un par y la cruzada en tres. Sin embargo, en los cuatro pares los
+dos espectros prefirieron individualmente la misma candidata. Sólo un par
+mantiene idéntica metadata residual; su pequeña señal positiva no supera esa
+preferencia común. El alcance son ocho casos ya expuestos, no una validación general.
+
+La auditoría independiente confirmó los resultados y recomendó terminar aquí
+los diagnósticos del modelo congelado. La siguiente propuesta compara objetivo
+ordinario y margen entre estructuras de igual fórmula, con entrada completa o
+contexto y pesos iniciales comunes. Ese contexto conserva aprendizaje espectral
+anterior: se estudiará la continuación desde el endpoint, no entrenamiento sin
+historia espectral. La evaluación por generación libre debe decidir si el cambio
+ayuda a recuperar moléculas, más allá del score docente. La operación110 tomó
+4,65 segundos en CPU; no entrenó, generó candidatos ni usó GPU.
+
+
 ## 2026-10-08 — CASMI109 cerrado: dirección espectral sin prueba de discriminación
 
 El [diagnóstico de trayectorias verdaderas](../../../Phideus-CASMI/docs/RESULTS_CASMI109_TRUE_PATH.md)
