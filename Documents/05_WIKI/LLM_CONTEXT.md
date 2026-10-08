@@ -137,6 +137,17 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI112 — CLOSED, auditoría final448integrada, 2026-10-08.
+Catálogo2365tipos sólo de24092orígenes prior, congelado antes de selector;
+construcción exacta y aceptación24092/24092prior,2747/2750trainingespectral,
+373/401desarrollo histórico.28sin bloque y51excluidas preservan452.325,30sCPU,
+28112registros autenticados; proveniencia auxiliar comprobada posteriormente
+(salvedad448). No generación neuronal ni ganancia espectral inferida.
+La siguiente candidata es una política aprendida de bloques/puertos con control
+contexto/completo; GPU suspendida por Mariano, sólo preparaciónCPUpertinente.
+Ver [resultado112](../../../Phideus-CASMI/docs/RESULTS_CASMI112_VARIABLE_BLOCKS.md).
+
+
 ## Directiva transversal — 2026-09-27
 
 El conocimiento se trabaja como una [caja de herramientas situada](foundations/cajas-de-herramientas.md):

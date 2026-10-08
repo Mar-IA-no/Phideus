@@ -1,3 +1,16 @@
+## Phideus/CASMI: GPU suspendida nuevamente; continuidad sólo CPU — 2026-10-08
+
+Mariano indica «necesito usar el gpu para otra cosa, no lo uses hasta nuevo aviso,
+avanza solo con lo que no implique gpu». Esta orden posterior revoca la cesión
+local del8/10. No iniciar CUDA, entrenamiento/inferencia GPU, relanzadores ni
+sustitución por GPU remota. No hay corrida GPU propia activa en este corte;
+CASMI112 está ejecutando un experimento estructural sólo CPU, finito600s/4GiB,
+que puede continuar. Preservar checkpoints y no intervenir procesos ajenos.
+Continuar sólo trabajo CPU materialmente pertinente; cuando el siguiente avance
+razonable requiera GPU, avisar, pausar el goal y detener la cadena sin tareas
+periféricas ni entrenamiento CPU largo sustitutivo. Esperar habilitación explícita.
+Fuente: pedido directo de Mariano, registrado 2026-10-08 18:08:37 UTC.
+
 ## Phideus/CASMI: GPU local nuevamente habilitada — 2026-10-08
 
 Mariano indica «dispones del gpu de nuevo, continua». Levanta la suspensión

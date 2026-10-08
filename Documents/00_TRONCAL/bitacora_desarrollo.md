@@ -1,5 +1,19 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI112 cerrado: construcción completa y GPU nuevamente suspendida
+
+La interfaz de bloques variables conserva atributos atómicos, hidrógenos y
+puertos al ensamblar moléculas. El catálogo se construyó sólo con el prior y se
+congeló antes del desarrollo. La [pasada CPU](../../../Phideus-CASMI/docs/RESULTS_CASMI112_VARIABLE_BLOCKS.md)
+completó325,30segundos:373de401moléculas admitidas se reconstruyen y aceptan;
+28carecen de bloques y las51exclusiones previas mantienen452. La auditoría448verificó recuentos y seis replays; se corrigió la afirmación de
+sellado original de la proveniencia auxiliar, comprobada posteriormente. El resultado no prueba generación neuronal ni información espectral.
+
+Mariano volvió a suspender la GPU durante esta corrida, que ya era sólo CPU.
+La orden quedó persistida. Se prepara una política aprendida de bloques/puertos;
+la calibración y entrenamiento esperan habilitación explícita, sin sustituirlos
+por trainingCPUlargo. La evidencia y checkpoints anteriores se preservan.
+
 
 ## 2026-10-08 — CASMI111 cerrado: el margen no aumenta recuperación total
 
