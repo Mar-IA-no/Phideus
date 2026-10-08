@@ -1,5 +1,22 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI113: preparación CPU auditada y pausa ante GPU
+
+La [política de bloques y puertos](../../../Phideus-CASMI/docs/RESULTS_CASMI113_CPU_POLICY.md)
+ya codifica el catálogo y el prefijo construido, y produce decisiones normalizadas
+condicionadas por la observación. El perfil único de ocho casos de training terminó
+en33,19segundos, con32intentos de propuesta y ninguna actualización de pesos.
+Las trazas y gradientes entre uno y cuatro hilos pasaron la tolerancia prevista;
+se conservaron checkpoint inicial, gradientes, logits y fallos. Esto demuestra
+ejecutabilidad en ese prefijo, sin medir recuperación ni ventaja espectral.
+
+La auditoría independiente453 no encontró defectos sustantivos pendientes y
+confirmó que repetir censos o perfiles CPU no resolvería la pregunta siguiente.
+CASMI113 queda pausado: hay que adaptar y calibrar el ejecutor GPU antes de
+entrenar la comparación completo/contexto. Mariano mantiene suspendido el
+dispositivo; la cadena se detiene con recuperación y diseño siguiente guardados.
+
+
 ## 2026-10-08 — CASMI112 cerrado: construcción completa y GPU nuevamente suspendida
 
 La interfaz de bloques variables conserva atributos atómicos, hidrógenos y

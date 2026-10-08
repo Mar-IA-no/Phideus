@@ -137,6 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI113 — PAUSED por GPU suspendida, preparación CPU auditada453.
+Política de bloques/puertos132293parámetros, catálogo2365; ocho casos de training,
+32slots,0updates, perfil33,185sCPU y1,42GiB RSS. Gradientes finitos y paridad1/4
+hilos en tolerancia. Sin recuperación evaluada. Sigue adaptación/calibraciónGPU
+antes de training; no ejecutorGPU listo ni sustituciónCPUlarga.
+Ver [resultado113](../../../Phideus-CASMI/docs/RESULTS_CASMI113_CPU_POLICY.md).
+
 CASMI112 — CLOSED, auditoría final448integrada, 2026-10-08.
 Catálogo2365tipos sólo de24092orígenes prior, congelado antes de selector;
 construcción exacta y aceptación24092/24092prior,2747/2750trainingespectral,
