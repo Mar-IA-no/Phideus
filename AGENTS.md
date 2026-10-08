@@ -1,3 +1,14 @@
+## Phideus/CASMI: GPU local nuevamente habilitada — 2026-10-08
+
+Mariano indica «dispones del gpu de nuevo, continua». Levanta la suspensión
+local del7/10 y reanuda CASMI100 y la cadena autónoma autorizada: diseño,
+implementación, auditoría independiente y experimento finito. No pedir permiso
+por corrida. Verificar ocupación y ownership antes de cargar, no intervenir
+procesos ajenos; conservar checkpoints y parada recuperable. GPU remota,
+reservas de datos y promoción científica no quedan habilitadas. Mantener
+la selección de agentes del6/10 y auditorías Astra Medium en hitos pertinentes.
+La propuesta100 todavía requiere diseño, revisión numérica y piloto.
+
 ## Phideus/CASMI: GPU nuevamente suspendida; continuidad CPU — 2026-10-07
 
 Mariano pide disponer de la GPU para otras tareas y ordena continuar con todo

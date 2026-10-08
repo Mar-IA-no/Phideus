@@ -1,5 +1,14 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — GPU local habilitada; CASMI100 reanudado
+
+Mariano vuelve a habilitar la GPU local y pide continuar. La comprobación inicial
+mostró la RTX3090 sin procesos de cómputo, con4MiB ocupados. Se retoma el diseño
+del contraste de aprendizaje espectral pendiente tras99, con revisión independiente
+antes de implementación/ejecución. La cesión no abre GPU remota ni reservas de datos;
+checkpoints y procesos ajenos se preservan. El goal formal100 está activo.
+
+
 ## 2026-10-07 — Intervención espectral cerrada y pausa material
 
 CASMI-99 completó el intercambio de espectros con pesos y azar congelados:
