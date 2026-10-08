@@ -8,10 +8,10 @@ architecture_status: candidate
 experiment_status: not_started
 evidence_status: fuentes matemáticas/físicas consultadas; transferencia a señales y química sin prueba local
 decision_status: preserved
-updated: 2026-09-30
-verified_at: 2026-09-30
-valid_at: 2026-09-30
-recorded_at: 2026-09-30
+updated: 2026-10-08
+verified_at: 2026-10-08
+valid_at: 2026-10-08
+recorded_at: 2026-10-08
 evidence_commit: e917a8772560058f64045902c011d3045f2b5e1c
 source_paths:
   - Biblioteca/Grassmanniano_Positivo_Amplituhedro/CROSS_REPORT.md
@@ -28,7 +28,16 @@ tangents: [algebra-geometrica-clifford, front-atencion-armonica, front-escalon-3
 
 ¿Qué operación de consistencia, invariancia o composición podría conservar relaciones útiles del fenómeno al trasladarse a Phideus/CASMI? La [investigación de septiembre](../../../Biblioteca/Grassmanniano_Positivo_Amplituhedro/NARRATED_REPORT.md) amplía el antecedente R32 de agosto con física, avances de 2025, herramientas numéricas y lectura del modelo CASMI actual. SRC-GRASSMANN-POSITIVE-TRANSFER conserva la síntesis; los cuatro crudos permanecen separados.
 
-La evidencia es documental y matemática dentro de los supuestos de sus fuentes. Las candidatas no fueron implementadas ni evaluadas. La investigación se hizo durante la pausa de CASMI-48. Mariano reanudó después el trabajo CPU el 30 de septiembre: CASMI-48 cerró desde su interfaz auditada, CASMI-49 completó la conversión observable, CASMI-50 cerró roles/procedencias, CASMI-51 autenticó admisión metadata y CASMI-52 cerró el backend de supervisión acotado, auditado en el commit411cfee del repo CASMI. CASMI-53 cerró el enlace contextual en una consulta observable (472scores/25celdas), auditada en commit7e22a34. CASMI-54 cerró el runner recuperable auditado con updates reales y75intentos libres rechazados sin refill. CASMI-55 cerró el roster completo con24,128elegibles/27,660claves, sin teacher bank ni gradients; sigue el selector/exposición, sin extender el smoke ni inferir calidad predictiva. La GPU sigue suspendida y el primer brazo conserva prioridad; esta reanudación no activa las candidatas geométricas. El checkout CASMI consultado fue c534fe572269eb730bdf9b75737bb29e232624c2, distinto de la base de evidencia de esta wiki.
+La evidencia es documental y matemática dentro de los supuestos de sus fuentes.
+Las candidatas de esta página no fueron implementadas ni evaluadas. La
+investigación se hizo durante la pausa de CASMI-48; el programa experimental
+posterior continuó por su propia cadena. El [estado actual del inverso](../../../../Phideus-CASMI/docs/wiki/geometria-del-inverso.md)
+y el [contraste108](../../../../Phideus-CASMI/docs/RESULTS_CASMI108_FIXED_WEIGHT.md)
+distinguen mejora del soporte químico de recuperación estructural. Esos
+resultados no validan el traslado del Grassmanniano ni promueven estas candidatas.
+La GPU local volvió a habilitarse el8/10, sin abrir reservas ni infraestructura
+remota. El corte de fuentes matemáticas de esta página sigue siendo septiembre;
+la actualización operativa no altera sus garantías ni límites.
 
 ## Las separaciones que permiten reutilizar
 

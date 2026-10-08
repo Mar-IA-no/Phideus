@@ -1,5 +1,25 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+
+## 2026-10-08 — CASMI108 cerrado: validez y recuperación son resultados distintos
+
+El [contraste de política con pesos fijos](../../../Phideus-CASMI/docs/RESULTS_CASMI108_FIXED_WEIGHT.md)
+completó 21600 slots comparados y su auditoría independiente. El filtro de
+valencia, capacidad e hidrógenos conserva los 886 docentes y aumenta las
+propuestas válidas de 306 a 815 en contexto y de 302 a 816 en el modelo completo,
+sobre 3600 por celda. Sin embargo, la recuperación permanece en cero y una de
+144 moléculas. La mejora del instrumento químico no resolvió la identificación.
+
+La permutación de intensidades cambió las 144 consultas y dejó iguales todas
+las elecciones observadas. La auditoría verificó que sí cambian probabilidades
+en estados inspeccionados; la observación no autoriza declarar independencia
+espectral. El siguiente contraste preguntará si, con idénticos pesos completos,
+el espectro dirige más probabilidad hacia una trayectoria correcta que una
+ablación de sus canales. La candidata de aprendizaje con alternativas de igual
+fórmula queda preservada, sin adoptarla todavía. La generación nueva tomó
+580,44 segundos y la evaluación 318,05, sólo CPU y sin reintentos. No hubo
+promoción, apertura de reservas ni uso de la GPU autorizada para esta etapa.
+
 ## 2026-10-08 — CASMI107 cerrado: soporte geométrico y química terminal
 
 El [diagnóstico de las propuestas guardadas](../../../Phideus-CASMI/docs/RESULTS_CASMI107_FAILURE_LOCALIZATION.md)

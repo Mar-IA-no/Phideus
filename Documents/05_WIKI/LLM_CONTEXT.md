@@ -1955,3 +1955,29 @@ denominador452y la exposición histórica del desarrollo permanecen explícitos.
 Se conserva la ampliación de unidades/Hcomo alternativa posterior; no se
 prolonga el censo ni el ajuste sobre cuatrofit. GPU local habilitada y reservas
 cerradas; no hay promoción arquitectónica ni evaluación confirmatoria.
+
+
+## 2026-10-08 — CASMI106–108: del soporte a la utilidad del espectro
+
+La [comparación106](../../../Phideus-CASMI/docs/RESULTS_CASMI106_HELD_OUT_LEARNING.md)
+con 886 estructuras de entrenamiento y 144 de desarrollo separadas dejó una
+recuperación en el modelo completo y ninguna en contexto. El catálogo procede
+sólo de entrenamiento, pero el desarrollo tiene exposición histórica: no es
+confirmación fresca. El [diagnóstico107](../../../Phideus-CASMI/docs/RESULTS_CASMI107_FAILURE_LOCALIZATION.md)
+localizó desajustes de hidrógenos y obstrucciones de ensamblaje; la garantía
+geométrica de continuación con enlaces simples no garantizaba química completa.
+
+El [contraste108](../../../Phideus-CASMI/docs/RESULTS_CASMI108_FIXED_WEIGHT.md)
+probó una política conjunta a pesos fijos: válidos 306→815 y 302→816 sobre3600,
+sin nuevas identidades recuperadas. Son 21600 slots autenticados y reproducidos,
+con auditoría412 integrada. Cambiar intensidades en las144consultas no cambió
+las elecciones, aunque sí probabilidades en las trazas inspeccionadas. Masas,
+pérdidas y selección de picos se conservaron: no se demuestra independencia
+espectral. El siguiente diagnóstico mantiene los pesos completos y pregunta
+por la probabilidad de trayectorias verdaderas con espectro real o ablación de
+canales0/1/3. No convierte una trayectoria en probabilidad marginal de molécula.
+
+Se conserva la [alternativa de contraste entre estructuras de igual fórmula](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/413_SAME_FORMULA_CONTRAST_CANDIDATE.md)
+sin implementarla. GPU local autorizada desde8/10;108 fueCPU por costo medido.
+Reservas y GPU remota cerradas, sin promoción. El [calendario comprobado](../../../Phideus-CASMI/Biblioteca/CASMI2026_DEADLINE_20261008.md)
+fija entrega final14/12/2026 a23:59UTC, sujeto a cambios oficiales.

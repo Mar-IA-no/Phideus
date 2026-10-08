@@ -1,6 +1,6 @@
 # Índice de la wiki de Phideus
 
-> Actualizado: 2026-09-30
+> Actualizado: 2026-10-08
 > Corte base de la incorporación conceptual: `e917a8772560058f64045902c011d3045f2b5e1c`; cada página conserva el corte de su evidencia.
 
 ## Entradas
@@ -27,6 +27,7 @@
 
 ## Frentes experimentales
 
+- [CASMI: geometría del inverso y estado canónico](../../../Phideus-CASMI/docs/wiki/geometria-del-inverso.md)
 - [Escalón 1 y BIAS_CONTROL](fronts/escalon-1-bias-control.md)
 - [Gate 6 AMT](fronts/gate-6-amt.md)
 - [Escalón 2: Speech ↔ EGG](fronts/escalon-2.md)
