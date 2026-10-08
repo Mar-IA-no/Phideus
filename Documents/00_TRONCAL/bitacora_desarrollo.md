@@ -1,5 +1,22 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI107 cerrado: soporte geométrico y química terminal
+
+El [diagnóstico de las propuestas guardadas](../../../Phideus-CASMI/docs/RESULTS_CASMI107_FAILURE_LOCALIZATION.md)
+localizó 3099 desajustes exclusivamente de hidrógenos. De los 1758 bloqueos de
+ensamblaje, 919 estaban impuestos por el árbol elegido y 839 aparecieron al
+consumir capacidad con los enlaces. La auditoría probó que el grado restante
+acotado por la capacidad garantiza alguna continuación de enlaces simples
+dentro del soporte actual; esa propiedad no garantiza fórmula ni química válida.
+
+La distinción abre un contraste concreto con pesos fijos: modificar el soporte
+sin atribuir al aprendizaje una mejora del decodificador. La próxima prueba
+debe conservar docentes admisibles, medir el costo y agregar una intervención
+espectral emparejada con idénticos pesos. Así podrá distinguir mejora común de
+factibilidad de sensibilidad a la información espectral. No se cambiaron
+propuestas anteriores ni se promovió una arquitectura; la pasada CPU tomó
+23,72 segundos y mantuvo desconocidas las identidades que no pudieron resolverse.
+
 ## 2026-10-08 — CASMI106 cerrado: aprendizaje fuera de los cuatro casos
 
 La [comparación en estructuras separadas](../../../Phideus-CASMI/docs/RESULTS_CASMI106_HELD_OUT_LEARNING.md)
