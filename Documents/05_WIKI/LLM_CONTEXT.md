@@ -1394,6 +1394,18 @@ compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
 
+## 2026-10-08 — CASMI101 cerrado; lectura neuronal102 en diseño
+
+El soporte conjunto de hidrógenos y puertos completó85combinaciones únicas del
+roster800 en82,73s CPU:44admiten terminación entera y41no, sin consultas inconclusas.
+Los testigos lexicográficos dieron41terminales válidos,2rechazos decodec y1identidad
+inconclusa. Son certificados y diagnósticos, no propuestas neuronales ni aciertos
+contra respuestas. La auditoría independiente369 corroboró el resultado;137045
+artefactos históricos se conservaron. Sigue un contraste de lectura con pesos100
+congelados, máscara local de enlaces y los controles originales, sin prolongar el
+solver ni entrenar de nuevo. GPU local autorizada; remoto yreservas cerrados.
+Ver [resultado101](../../../Phideus-CASMI/docs/RESULTS_CASMI101_JOINT_SUPPORT.md).
+
 CASMI-100 completó el ajuste de preferencia espectral tras la nueva cesión de
 GPU del 8 de octubre. El contraste mostró dirección molecular en la pareja0/1,
 pero el brazo completo contrastivo cayó de75a54propuestas válidas y de39a29aciertos

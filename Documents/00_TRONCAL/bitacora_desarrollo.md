@@ -1,5 +1,18 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI101 cerrado; lectura neuronal102 en diseño
+
+El soporte conjunto de hidrógenos y puertos completó85combinaciones únicas del
+roster800 en82,73s CPU:44admiten terminación entera y41no, sin consultas inconclusas.
+Los testigos lexicográficos dieron41terminales válidos,2rechazos decodec y1identidad
+inconclusa. Son certificados y diagnósticos, no propuestas neuronales ni aciertos
+contra respuestas. La auditoría independiente369 corroboró el resultado;137045
+artefactos históricos se conservaron. Sigue un contraste de lectura con pesos100
+congelados, máscara local de enlaces y los controles originales, sin prolongar el
+solver ni entrenar de nuevo. GPU local autorizada; remoto yreservas cerrados.
+Ver [resultado101](../../../Phideus-CASMI/docs/RESULTS_CASMI101_JOINT_SUPPORT.md).
+
+
 ## 2026-10-08 — CASMI100 cerrado: dirección localizada y deterioro propio
 
 CASMI-100 completó el ajuste de preferencia espectral tras la nueva cesión de
