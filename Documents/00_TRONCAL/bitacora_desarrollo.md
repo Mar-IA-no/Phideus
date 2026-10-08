@@ -1,6 +1,21 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
 
+## 2026-10-08 — CASMI111: continuación aprendida en ejecución
+
+La comparación abandona el endpoint fijo y entrena cuatro variantes desde los
+mismos pesos106, cruzando entrada completa/contexto con objetivo ordinario/margen.
+El primer piloto se detuvo antes de actualizar pesos por dos discrepancias de
+gradiente CPU/GPU. Una revisión independiente motivó la
+[enmienda432](../../../Phideus-CASMI/docs/CASMI111_NUMERIC_AMENDMENT432.md):
+publicar esa diferencia como diagnóstico y conservar controles de valores,
+finitud y referencia FP64. El piloto revisado completó ocho actualizaciones por
+variante; ya cuentan hacia las448 previstas. La continuación principal corre
+con checkpoints recuperables. Los presupuestos de entrenamiento, generación y
+replay quedaron fijados antes de observar resultados finales. La generación
+libre y su evaluación siguen pendientes; no hay nueva recuperación que informar.
+
+
 ## 2026-10-08 — CASMI110 cerrado: pasar del diagnóstico al aprendizaje
 
 El [contraste de cuatro pares de igual fórmula](../../../Phideus-CASMI/docs/RESULTS_CASMI110_RECIPROCAL_MARGIN.md)

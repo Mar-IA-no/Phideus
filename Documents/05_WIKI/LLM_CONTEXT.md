@@ -2003,3 +2003,14 @@ con pesos inicialesfull106 comunes, exposición/selección comparables y generac
 libre144×25 como lectura decisiva. Contexto conserva historia espectral previa:
 el estimando es continuación. Diseño y piloto pendientes; sin promoción ni
 apertura de reservas, GPUlocal autorizada y remoto cerrado.
+
+## 2026-10-08 — CASMI111 en ejecución
+
+Cuatro continuaciones desde full106: entrada completa/contexto ×objetivo
+ordinario/margen. Piloto original detenido sin updates, revisión independiente432
+y enmienda numérica explícita; piloto revisado8por variante, contados hacia448.
+Training principal en GPU local, checkpoints recuperables. Decisión previa:
+2800s training,2200s exportación/generaciónCPU4,900s replay/evaluación.14400propuestas
+aún pendientes, sin nueva recuperación afirmada. Contexto conserva historia
+espectral106; desarrollo histórico, fórmula oráculo y única inicialización
+limitan inferencias. Reservas cerradas; auditoría434 del evaluador en curso.
