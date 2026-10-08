@@ -1,5 +1,27 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI106 cerrado: aprendizaje fuera de los cuatro casos
+
+La [comparación en estructuras separadas](../../../Phideus-CASMI/docs/RESULTS_CASMI106_HELD_OUT_LEARNING.md)
+completó 16 épocas en 886 moléculas y generó 25 propuestas por brazo para cada
+una de las 144 de desarrollo. El brazo completo recuperó una molécula y el
+control contexto ninguna. La auditoría independiente reconstruyó los 1792
+updates, las 7200 propuestas y las métricas; no encontró un bloqueo de integridad.
+Dos propuestas conservan identidad desconocida por el límite del normalizador.
+
+El ajuste de las decisiones docentes mejoró en ambos brazos, pero la validez
+de la generación libre quedó alrededor del 8,4%. Esta distancia exige localizar
+las obstrucciones de composición, árbol, puertos y conversión química antes de
+invertir en más entrenamiento. La siguiente pasada será CPU sobre las trazas
+guardadas; no reparará muestras ni convertirá un acierto en evidencia de ventaja
+general del espectro. El desarrollo fue excluido del ajuste de pesos, pero ya
+había sido expuesto históricamente, con fórmula conocida y una sola semilla.
+
+El entrenamiento restante tomó unos cinco minutos y la generación CPU siete;
+checkpoints, estados de optimizadores, RNG y trazas completas quedan conservados.
+La GPU está libre, aunque sigue autorizada. El denominador original de 452
+conserva sus exclusiones y no se abrió ninguna reserva ni se promovió arquitectura.
+
 ## 2026-10-08 — CASMI105 cerrado: soporte fuera del catálogo de cuatro casos
 
 El [catálogo construido sólo con entrenamiento](../../../Phideus-CASMI/docs/RESULTS_CASMI105_TRAIN_ONLY_CATALOGUE.md)
