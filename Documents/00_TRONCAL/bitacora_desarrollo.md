@@ -1,5 +1,20 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI104 implementado, revisión de lanzamiento en curso
+
+La nueva consulta de picos desde el prefijo y el inventario residual quedó
+integrada en un ejecutor propio. Conserva pesos iniciales, receta, datos y cuatro
+brazos100; no añade parámetros. La primera auditoría382 confirmó la intervención y dejó cuatro correcciones de
+recuperación y control operativo. Ya se integraron:35pruebas del ejecutor y7de
+análisis/prefijo libre pasaron; los4tests delmodelo conservan su evidencia. El gate sintéticoCPU/GPU también pasó48comprobaciones;
+no constituye entrenamiento ni evidencia molecular. La auditoría independiente385 revisa ahora
+las correcciones de esa frontera, sin repetir la revisión numérica. La operación prevista producirá400raws iniciales
+propios y800finales, con checkpoints y parada recuperable; aún no se lanzó.
+GPUlocalautorizada, remoto/reservas cerrados. Después de este contraste único,
+la revisión debe atender el poder discriminante del protocolo, sin más afinaciones
+sobre los mismos cuatro casosfit. Ver [plan104](../../../Phideus-CASMI/docs/CASMI104_STATE_CONDITIONED_M_PLAN.md).
+
+
 ## 2026-10-08 — CASMI103 cerrado: consulta espectral y decisiones
 
 La lectura de800pares guardados terminó en4,77s CPU sin nuevos forwards. La
