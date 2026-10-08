@@ -2014,3 +2014,14 @@ Training principal en GPU local, checkpoints recuperables. Decisión previa:
 aún pendientes, sin nueva recuperación afirmada. Contexto conserva historia
 espectral106; desarrollo histórico, fórmula oráculo y única inicialización
 limitan inferencias. Reservas cerradas; auditoría434 del evaluador en curso.
+
+## 2026-10-08 — CASMI111 cerrado y auditado438
+
+Cuatro448updates,14400propuestas/replay:1/144@25en todas. Margen cambia acierto
+query126rank8→query28rank5también en contexto, interacción0en1/5/10/25. Válidos
+fullordinary804/fullmargin761/contextordinary797/contextmargin717por3600. Updates
+margen≈6,4×coste; pérdidaauxmenor no demuestra reconstrucción.438recompone144filas y
+1792logs, sin bloqueos. Continúa candidata439: bloquesvariables/H/puertos, contrato
+constructivo y experimento finito antes deotrotraining; no reabrirλ ni repetir
+ROOT/ATTACH/CLOSE18–32como novedad. Mayorsoporte no pruebausoMS/MS.452preservado,
+reserva cerrada, fórmulaoracle, desarrolloexpuesto y unainicialización, no promoción.

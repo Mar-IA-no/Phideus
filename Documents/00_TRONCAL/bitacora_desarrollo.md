@@ -1,6 +1,24 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
 
+## 2026-10-08 — CASMI111 cerrado: el margen no aumenta recuperación total
+
+Las cuatro continuaciones completaron448actualizaciones y la misma exposición.
+La [evaluación de14400propuestas](../../../Phideus-CASMI/docs/RESULTS_CASMI111_CONTROLLED_MARGIN.md)
+y su replay recuperaron una consulta de144por variante dentro de25intentos.
+El objetivo de margen cambia cuál se acierta y la adelanta al top5también con
+contexto, sin interacción favorable del contenido espectral. Produce menos
+propuestas válidas y requiere alrededor de6,4veces más tiempo de updates.
+La menor pérdida auxiliar de entrenamiento no se convirtió en más recuperación.
+
+La auditoría438recompuso conteos desde los crudos y exposición desde1792logs,
+sin bloqueos materiales. Se cierra el experimento y se detiene el ajuste de ese
+auxiliar. La siguiente candidata revisa bloques variables, hidrógenos y puertos
+para una construcción molecular ejecutable; no repite el decoder atómico con
+cierres ya ensayado ni promete que más soporte resolverá el uso del espectro.
+Reservas cerradas, datos históricos y una inicialización; no promoción científica.
+
+
 ## 2026-10-08 — CASMI111: continuación aprendida en ejecución
 
 La comparación abandona el endpoint fijo y entrena cuatro variantes desde los
