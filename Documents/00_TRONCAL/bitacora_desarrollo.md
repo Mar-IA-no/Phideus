@@ -1,5 +1,20 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI102 cerrado: validez sin nueva dirección espectral
+
+La lectura con soporte conjunto terminó800posiciones con pesos congelados:
+683válidas y117con soporte vacío, sin rellenar candidatos. En elbrazo completo
+contrastivoOWN, la validez subió54→75por100, pero losaciertos quedaron29; eldocente
+pasó39→40aciertos y esa ganancia apareció también bajoSWAP. Ninguna dirección
+espectral mejoró. La auditoría independiente375 corroboró el resultado y los
+controles. Operación947,23sCPU y análisis21,81s;138907artefactos previos intactos.
+Sigue103, una lectura finita de entradas e historias comunes ya guardadas para
+localizar una incertidumbre de condicionamiento; la sensibilidad2/3 ya existe
+en los crudos100, por lo que no se repetirá esa pregunta. Sin másDP/lossrescue.
+GPUlocalautorizada; remoto/reservas cerrados y sin promoción científica.
+Ver [resultado102](../../../Phideus-CASMI/docs/RESULTS_CASMI102_SUPPORT_READOUT.md).
+
+
 ## 2026-10-08 — CASMI101 cerrado; lectura neuronal102 en diseño
 
 El soporte conjunto de hidrógenos y puertos completó85combinaciones únicas del
