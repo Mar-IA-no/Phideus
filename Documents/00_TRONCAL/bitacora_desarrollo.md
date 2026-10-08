@@ -1,5 +1,21 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-08 — CASMI100 cerrado: dirección localizada y deterioro propio
+
+CASMI-100 completó el ajuste de preferencia espectral tras la nueva cesión de
+GPU del 8 de octubre. El contraste mostró dirección molecular en la pareja0/1,
+pero el brazo completo contrastivo cayó de75a54propuestas válidas y de39a29aciertos
+propios por100frente al objetivo docente; la pareja2/3no mostró dirección. Los
+controles de contexto conservaron pesos, gradientes y trazas iguales. Se completaron
+512updates,800propuestas nuevas y592probes en615,50s, con todos los checkpoints y
+los78173archivos históricos preservados. La auditoría independiente364 corroboró
+el resultado mixto sin hallazgos materiales; se cierra esta configuración sin
+prolongarla ni promoverla. El siguiente diseño examinará soporte conjunto de
+fórmula completa y puertos con pesos congelados, sin targets en generación ni
+nuevas reservas. La GPU local sigue autorizada y quedó libre. Evidencia en el
+[resultado100](../../../Phideus-CASMI/docs/RESULTS_CASMI100_SPECTRAL_CONDITIONING.md).
+
+
 ## 2026-10-08 — GPU local habilitada; CASMI100 reanudado
 
 Mariano vuelve a habilitar la GPU local y pide continuar. La comprobación inicial

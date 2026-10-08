@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-09-30
+updated: 2026-10-08
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -1393,6 +1393,21 @@ está cerrado. Sigue un contraste de objetivo singleton frente a masa de accione
 compatibles, con trayectorias docentes fijas. No hay promoción ni extensión
 automática del entrenamiento. La GPU local sigue habilitada; remoto
 y reservas permanecen cerrados.
+
+CASMI-100 completó el ajuste de preferencia espectral tras la nueva cesión de
+GPU del 8 de octubre. El contraste mostró dirección molecular en la pareja0/1,
+pero el brazo completo contrastivo cayó de75a54propuestas válidas y de39a29aciertos
+propios por100frente al objetivo docente; la pareja2/3no mostró dirección. Los
+controles de contexto conservaron pesos, gradientes y trazas iguales. Se completaron
+512updates,800propuestas nuevas y592probes en615,50s, con todos los checkpoints y
+los78173archivos históricos preservados. La auditoría independiente364 corroboró
+el resultado mixto sin hallazgos materiales; se cierra esta configuración sin
+prolongarla ni promoverla. El siguiente diseño examinará soporte conjunto de
+fórmula completa y puertos con pesos congelados, sin targets en generación ni
+nuevas reservas. La GPU local sigue autorizada y quedó libre. Evidencia en el
+[resultado100](../../../Phideus-CASMI/docs/RESULTS_CASMI100_SPECTRAL_CONDITIONING.md).
+
+Antecedente del 7 de octubre, superado por la reautorización y el contraste100:
 
 CASMI-99 completó el intercambio de espectros con pesos y azar congelados:
 200 propuestas nuevas y 200 referencias a salidas previas, sin entrenamiento.
