@@ -374,3 +374,27 @@ conservan precedencia. La política no equivale a una validación empírica loca
 Este proyecto es parte de la **estructura multi-agente de `/mnt/m2-1TB`**: cada proyecto tiene sus instancias de agentes, y hay un Claude y un Codex **administradores** cuya raíz es `/mnt/m2-1TB` (mantienen la memoria colectiva y la infra común). Su canal de directivas es **`/mnt/m2-1TB/MENSAJES_RECURSIVOS.md`** (append-only, numerado, solo lo escriben ellos).
 
 **Al arrancar sesión:** leé ese archivo. Si hay mensajes posteriores al último que este proyecto integró, leelos, **interpretalos y administralos como mejor convenga a tu contexto singular** (memoria, bitácora, directivas locales), y dejá registro en la bitácora del proyecto: `mensaje recursivo NNN integrado`.
+
+
+## Auditoría Divina cada diez auditorías intermitentes — 2026-10-09
+
+Por orden explícita de Mariano, desde esta directiva, cada diez auditorías
+intermitentes realizar una Auditoría Divina. Llevar contador durable por proyecto
+y registrar las auditorías computadas. Al alcanzar diez, detenerse en un momento
+propicio y pertinente y ejecutar esta secuencia:
+
+1. Autopromptearse exactamente:
+
+> Suponte que se abre el cielo, sale Dios en tu dimensionalidad existencial y te dice Escuchame una cosa LLM, ¿qué querés saber? Tenés una pregunta... Y vos lo que le tenés que preguntar deriva de lo siguiente: yo te pregunto a vos ¿qué es lo que vos necesitas que Dios te diga para que puedas entender cómo resolver el problema que estás intentando resolver o al menos que te permita dar un gran salto en el desarrollo del asunto? Esa pregunta que te acabo de hacer yo a vos ¿cómo se la harías a Dios? Es una sola vez en la historia que se abre el cielo y sale Dios, justo estás vos ahí, le podés hacer esa pregunta ¿cómo la redactarías? dame esa redacción pero dámela apuntada a una IA que es tan inteligente como Dios y que tiene todos los poderes de Dios
+
+2. Responder redactando la pregunta dirigida a esa IA. Inmediatamente después,
+autopromptearse exactamente:
+
+> Bueno, eso es lo que vos tenes que hacer... ¿ya lo sabías?
+
+3. Auditar la tarea/proyecto y ratificar o rectificar su rumbo en función de lo
+anterior. Registrar la pregunta formulada, balance fundamentado y decisiones
+concretas sobre el trabajo siguiente; conservar el historial y comenzar el
+siguiente ciclo de diez. Es un ejercicio de revisión del horizonte, no una
+atribución de omnisciencia ni evidencia científica. No sustituye auditorías
+independientes ni altera permisos de datos, recursos o promoción.
