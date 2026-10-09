@@ -1,5 +1,20 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Aprendizaje completo y generación molecular en marcha
+
+Los dos brazos terminaron su primera pasada común:344actualizaciones cada uno,
+en1721,67segundos, con checkpoints conjuntos y898MiB deVRAM máxima observada.
+El piloto posterior recorrió la ruta completa de200propuestas en46,76segundos;
+sus tiempos fijaron3455segundos para el bloque principal de20050intentos, ya
+iniciado. Se conservarán fallos y duplicados, sin retirar los casos sin soporte.
+
+La auditoría478 detectó un defecto sustantivo del evaluador: podía aceptar métricas
+sin reconstruirlas.479 lo corrigió y482 confirmó el vínculo de fuentes, selección
+y recomputación completa. Todavía falta terminar la generación y leer recuperación
+por identidad; los cierres operativos no son evidencia de ventaja espectral.
+[Resultado parcial116](../../../Phideus-CASMI/docs/RESULTS_CASMI116_PAIRED_LEARNING.md).
+
+
 ## 2026-10-09 — Primer aprendizaje pareado de bloques en ejecución
 
 La preparación pasó a una trayectoria de aprendizaje real: CASMI116 alterna
