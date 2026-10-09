@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-10-08
+updated: 2026-10-09
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -136,6 +136,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
 # Contexto integral de Phideus para LLMs
+
+CASMI116 — ACTIVE, 9/10: plan472 y ejecutor473 auditado476, integrado477;
+training GPU local en ejecución (b6a5fa0), no terminado. Banco2747,344updates
+por modo,2700s y checkpoints por actualización. Desarrollo401 de452originales,
+373soportados/28sinsoporte/51excluidos; generación prevista25intentos por modo.
+Transporte/generación/evaluación en revisión independiente478. Sin recuperación
+medida ni promoción. [Plan116](../../../Phideus-CASMI/docs/CASMI116_PAIRED_LEARNING_PLAN.md).
 
 CASMI115 — CLOSED,9/10: banco2747 y391exclusiones,416,63sCPU, auditor467/468.
 CostoGPU6casos42,02s,894MiBVRAM, auditor470/471. Presupuesto inicial45mintraining

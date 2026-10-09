@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Primer aprendizaje pareado de bloques en ejecución
+
+La preparación pasó a una trayectoria de aprendizaje real: CASMI116 alterna
+contexto y espectro completo sobre las mismas 2747 filas, desde pesos iniciales
+idénticos y con optimizadores persistentes. La auditoría independiente del plan
+fijó el costo de la consulta generativa completa y la conservación de precisión;
+la revisión del ejecutor comprobó exposición y recuperación antes del lanzamiento.
+Las pruebas CPU de entrenamiento pasaron y el arranque GPU quedó verificado.
+
+El presupuesto inicial es de 45 minutos para 344 actualizaciones por brazo, con
+checkpoint conjunto tras cada update. Durante la corrida se revisan el transporte
+de las 401 observaciones elegibles y la generación de 25 intentos por modo. Los
+51 casos excluidos conservan su lugar en el denominador original de 452. La caída
+de pérdida docente no cerrará el experimento: faltan propuestas libres, sello de
+resultados y evaluación por identidad. No hay aún nueva recuperación molecular.
+Fuentes: [plan116](../../../Phideus-CASMI/docs/CASMI116_PAIRED_LEARNING_PLAN.md) e
+[integración pre-GPU477](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/477_CASMI116_TRAIN_INTEGRATION.md).
+
 ## 2026-10-09 — Banco completo de bloques y costo GPU auditados
 
 La política de bloques dejó de depender del prefijo de ocho casos: el banco115
