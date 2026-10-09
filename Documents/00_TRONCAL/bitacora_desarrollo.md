@@ -1,5 +1,21 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Localización del error y límite de la etiqueta literal
+
+La lectura CPU de las trazas del control local tomó 19,2 segundos y fue verificada
+independientemente. Elegir el bloque que se añade y el átomo al que se conecta
+concentra el 79,87% de la pérdida residual, con presencia en los ocho ejemplos.
+La mayoría de los intentos se aparta de la trayectoria conocida en las dos
+primeras acciones; eso no implica que toda ruta alternativa pierda la identidad.
+
+La auditoría precisó otro límite: el cierre ocurre al agotarse el inventario de
+átomos pesados, de modo que encontrar desajustes sólo de H está condicionado por
+esa política. El [resultado130](../../../Phideus-CASMI/docs/RESULTS_CASMI130_TRACE_LOCALIZATION.md)
+no identifica una causa única. Sigue comparar la probabilidad del parent literal
+con la masa asignada a posiciones estructuralmente equivalentes. Ese control
+acotado puede separar penalización de una etiqueta arbitraria y preferencia por
+otra clase, sin ampliar entrenamiento ni convertir esa masa en probabilidad molecular.
+
 ## 2026-10-09 — Aprendizaje local sin recuperación libre observada
 
 El controlCASMI129 completó200actualizaciones sobre ocho moléculas conocidas,

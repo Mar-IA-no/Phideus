@@ -137,6 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI130 cerrado, auditoría553 integrada554. Lectura19,193sCPU: type+parent
+79,874% de NLL118 residual, en ocho casos;194/200divergencias literales tempranas
+por endpoint. H-only entre estados convertibles está condicionado por STOP,
+no causa identificada. Sigue control finito parent literal vs órbita estructural
+exacta, sin modelos/training; no igualar equivalencia con logits o fórmula.
+[Resultado130](../../../Phideus-CASMI/docs/RESULTS_CASMI130_TRACE_LOCALIZATION.md).
+
 CASMI129 cerrado, auditoría551 integrada552. Ocho training,
 200updates full116/AdamW heredado; recuperación0/8 antes/después@1/@5/@25.
 Intentos aceptados25→31/200; teacher114NLL4,041993→3,362446 y1183,850147→3,202994.
