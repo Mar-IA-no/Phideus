@@ -1,5 +1,26 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — La validez local no garantiza completar la fórmula
+
+CASMI123 comparó búsqueda ordenada por probabilidad con muestreo, usando pesos
+y soporte congelados y un presupuesto común de consultas al modelo. En seis
+casos elegidos sólo por observables, ninguno recuperó la respuesta correcta.
+El muestreo produjo192terminales válidos; la búsqueda agotó sus prefijos
+retenidos y no produjo ninguno. Su costo real fue menor que el presupuesto
+ofrecido, por lo que no se presenta como un contraste de igual tiempo o FLOPs.
+
+Los384cierres rechazados tenían los átomos pesados pedidos y eran moléculas
+neutras, sin radicales ni isótopos, pero sobraban entre10y24hidrógenos. La
+auditoría521reconstruyó esos estados por una vía independiente y confirmó tanto
+el diagnóstico como la evaluación. Eso localiza esos rechazos; no explica por
+sí solo el ranking general ni la recuperación nula del muestreo.
+
+La GPU se calibró y no aceleró la muestra corta:22,6segundos frente a21,6CPU.
+Por esa medición el piloto corrió enCPU durante12minutos, más86,8segundos de
+evaluación posterior al sello. El resultado está cerrado e integrado522. Sigue
+un único contrasteCPU de detección anticipada conservadora de incompletabilidad,
+con controles válidos y baseline intacto; no aumentar anchos ni entrenar por inercia.
+
 ## 2026-10-09 — Los373testigos son accesibles; sigue la prueba de generación libre
 
 CASMI122 recorrió las373construcciones conservadas en dos condiciones y confirmó

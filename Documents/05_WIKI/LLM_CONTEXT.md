@@ -137,6 +137,15 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI123cerrado, auditor521integrado522: piloto6casos/2métodos,0/6@1/@5/@25
+en512/2048/8192heads. Búsqueda agotada sin terminales; muestreo192terminales y
+141entregados sumando seis top25. Los384STOP de búsqueda sólo fallanHfinal:
+inventario pesado correcto,10–24Hexcedentes, reconstrucción independiente.
+719,93sCPUgeneración+86,76s evaluación. CalibraciónGPU no aceleró muestra;
+GPUlocal sigue autorizada. [Resultado123](../../../Phideus-CASMI/docs/RESULTS_CASMI123_FREE_SEARCH.md).
+Sigue prueba conservadora de completabilidad antes de STOP; baseline congelado,
+sin nuevos trainings, reservas ni promoción. No procesos experimentales activos.
+
 CASMI122cerrado, auditor515integrado516:373testigos/746trayectorias confirmadas,
 327componentes;370perturbaciones efectivas/3no-op.432,20sCPU/~1,11GiB/489,55MB,
 GPU0. NLLcanónica mediana41,96475; ventaja total positiva372/373. Deltas pequeños
