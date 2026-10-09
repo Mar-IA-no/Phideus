@@ -137,6 +137,15 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI126cerrado, auditor537integrado538: seis testigos/12pares caso-motor,
+primera pérdida factorada idéntica123/125, rangos3/4/95/750/3/162 a0–3acciones.
+14prefijos/24cabezas canónicas por motor, sin inferencia sobre todas las rutas.
+12,602sCPU/450544KiBRSS;17tests, consume independiente6,844s/1thread/sin torch.
+[Resultado126](../../../Phideus-CASMI/docs/RESULTS_CASMI126_PATH_SURVIVAL.md).
+Sigue diseño de diversificación local target-free con pesos/soporte congelados,
+recuperación y costo; no repetir sampling123ni barridos/training por inercia.
+GPUlocalhabilitada; fuentes112–126congeladas, remota/reservas cerradas.
+
 CASMI125cerrado, auditor533integrado534: poda postselección activa6196/6196,
 416descartes,21594heads frente a24890;0terminales y0/6@1/@5/@25en tres cortes.
 187,534sCPUgeneración+29,344s evaluación; sin GPU/training. Se cierra esta

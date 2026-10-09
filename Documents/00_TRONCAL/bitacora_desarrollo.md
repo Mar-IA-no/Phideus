@@ -1,5 +1,22 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Localizar dónde se pierde una construcción compatible
+
+CASMI126 cruzó los recorridos completos conocidos con las trazas de búsqueda
+guardadas. En los seis casos, el primer descarte observable ocurrió al conservar
+sólo dos alternativas por etapa. La poda posterior no cambió esa primera pérdida.
+Dos recorridos quedaron cerca del corte; otros aparecieron en posiciones95,162
+y750. El resultado permite terminar la búsqueda de una explicación en esa poda,
+pero no demuestra que un pequeño aumento de ancho resuelva la recuperación.
+
+La [evidencia auditada](../../../Phideus-CASMI/docs/RESULTS_CASMI126_PATH_SURVIVAL.md)
+se produjo en12,6segundosCPU, sin ejecutar el modelo. La revisión independiente
+reprodujo las doce filas y conservó la distinción entre un recorrido canónico y
+todas las construcciones posibles de una molécula. El siguiente diseño comparará
+una diversificación local concreta con la selección determinista, manteniendo
+pesos y soporte; tendrá que volver a estructuras recuperadas y costo, porque el
+muestreo anterior produjo más terminales sin aciertos en estos seis casos.
+
 ## 2026-10-09 — Anticipar el fallo no produjo mejores candidatos
 
 CASMI125 incorporó la cota de hidrógenos después de seleccionar acciones y antes
