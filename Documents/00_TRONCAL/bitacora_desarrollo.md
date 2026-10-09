@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Primer contraste aprendido de bloques cerrado y auditado
+
+La comparación completó20050propuestas y evaluaciónCPU con el denominador
+original de452casos. Ambos brazos identificaron la misma consulta entre401
+eligibles a@5/@25y ninguna a@1. La recuperación baja coexiste con una pérdida
+masiva del presupuesto generativo: sólo181y217intentos aceptados de10025por
+brazo; ninguna lista supera cinco candidatos. Una pasada no permite declarar
+techo ni concluir que el espectro carezca de información.
+
+La auditoría independiente483recompuso los resultados y verificó procedencia,
+exposición yrecursos. Una muestra de250slots mostró rechazos locales de valencia
+y fallos de fórmula al cierre, incluso con elecciones permitidas por las máscaras.
+La pregunta siguiente será dónde aparece esa incompatibilidad y qué exige una
+restricción local frente a razonamiento de completabilidad. Se usan las trazas
+existentes enCPU; no se prolonga entrenamiento por reflejo ni se modifica116.
+[Resultado y límites](../../../Phideus-CASMI/docs/RESULTS_CASMI116_PAIRED_LEARNING.md).
+
+
 ## 2026-10-09 — Aprendizaje completo y generación molecular en marcha
 
 Los dos brazos terminaron su primera pasada común:344actualizaciones cada uno,

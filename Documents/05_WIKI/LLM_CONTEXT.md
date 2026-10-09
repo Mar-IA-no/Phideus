@@ -137,11 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
-CASMI116 — ACTIVE, 9/10: training344/344 aceptado1721,67s, VRAM898MiB.
-Piloto200slots aceptado46,76s; principal20050slots activo con presupuesto3455s.
-Desarrollo401/452originales,373soportados/28sinsoporte/51excluidos. Evaluador
-corregido479, revisión independiente482 sin bloqueantes; aún sin recuperación
-ni promoción. [Evidencia116](../../../Phideus-CASMI/docs/RESULTS_CASMI116_PAIRED_LEARNING.md).
+CASMI116 — CLOSED,9/10, auditor483 integrado484:344/344updates,20050slots,
+recuperación1/401compartido@5/@25,0@1;1/452original.181/217aceptados de10025;
+131/158consultas con candidatos, máximos5/4. No ventaja de recuperación ni techo.
+Muestra483localiza191rechazos de valencia enadjunción y49defórmulaenSTOP sobre
+250slots, sin extrapolar. Sigue117CPU: primera incompatibilidad máscara/kernel,
+separando legalidadlocal ycompletabilidadglobal desdecrudos. Sinmás trainingpor
+inercia; GPUlocalhabilitada, reservas cerradas. [Resultado116](../../../Phideus-CASMI/docs/RESULTS_CASMI116_PAIRED_LEARNING.md).
 
 CASMI115 — CLOSED,9/10: banco2747 y391exclusiones,416,63sCPU, auditor467/468.
 CostoGPU6casos42,02s,894MiBVRAM, auditor470/471. Presupuesto inicial45mintraining
