@@ -1,5 +1,20 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Probabilidad sobre construcciones ya existentes
+
+La revisión posterior a CASMI119 encontró que373moléculas ya tenían trayectorias
+completas conservadas y autenticadas. CASMI120 recortó el diagnóstico para
+reutilizarlas: medir la probabilidad del recorrido correcto con pesos congelados
+y un control que reasigna intensidades entre las masas del mismo espectro.
+
+CASMI121 implementó ese diagnóstico y completó un preflight de tres casos en
+23,8segundosCPU, con las tres identidades confirmadas y sin GPU. Los cambios de
+probabilidad fueron diminutos; ni esa muestra ni la ventaja frente a elecciones
+uniformes por factor equivalen a recuperación libre de moléculas. Las auditorías
+509y511 quedaron integradas510y512; se corrigieron y probaron la comprobación de
+trazas, el cierre ante parada y la separación de fallos. Sigue un presupuesto
+finito de373casos, sin nuevo entrenamiento ni apertura de reservas.
+
 ## 2026-10-09 — Más validez local, recuperación exacta sin aumento
 
 CASMI119 terminó generación y evaluación con los pesos116 congelados. El soporte

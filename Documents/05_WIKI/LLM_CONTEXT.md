@@ -137,6 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI120/121cerrados: diseño y preflight retrospectivo con373testigos completos
+ya existentes112/116. Tres casos probados en23,78sCPU,~1,06GiB RSS;3identidades
+confirmadas, sin GPU. Deltas masa/intensidad~1e-5sin interpretación general.
+Auditorías509/511 integradas510/512;17pruebas y28mutaciones verifican correcciones.
+[Resultado121](../../../Phideus-CASMI/docs/RESULTS_CASMI121_WITNESS_PREFLIGHT.md).
+Sigue diagnóstico373presupuestado900sCPU/4GiB/2GiB, todavía no ejecutado.
+
 CASMI118 — CLOSED, 9/10, auditor499 integrado500. Soporte local exacto ATTACH,
 ROOT/STOP ypesos116preservados. PerfilCPU11,96s; pilotoGPU200slots108,05s,
 486MiBVRAM.13/17aceptados contexto/full,12/17seleccionados;166STOP,4typevacío,
