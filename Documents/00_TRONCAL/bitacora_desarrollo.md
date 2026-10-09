@@ -1,5 +1,22 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Control local de aprendizaje diseñado y auditado
+
+CASMI128 fija una pregunta más directa después de cerrar la diversificación:
+si una exposición concentrada a ocho ejemplos conocidos cambia su recuperación
+por generación libre. Los casos se seleccionaron sólo desde el banco de
+entrenamiento; se proponen 200 actualizaciones con el estado AdamW heredado y
+25 intentos por caso antes y después, sin cambiar el generador entre endpoints.
+
+La auditoría independiente Astra Medium reprodujo la selección y comprobó los
+recibos JSON históricos. El [plan corregido](../../../Phideus-CASMI/docs/CASMI128_LOCAL_LEARNING_CONTROL_PLAN.md)
+cuenta el costo de guardar cada checkpoint y exige restauración completa de
+pesos, momentos y azar tras la calibración. Aún debe implementarse y comprobarse
+esa operación, incluido el soporte químico de los ocho caminos. El diseño no
+constituye una corrida ni demuestra que el presupuesto alcance. Una mejora
+local tampoco demostraría generalización o uso del espectro.
+
+
 ## 2026-10-09 — Diversificar produjo candidatos, pero no respuestas correctas
 
 CASMI127 conservó la mejor extensión local y sorteó una segunda ponderada por

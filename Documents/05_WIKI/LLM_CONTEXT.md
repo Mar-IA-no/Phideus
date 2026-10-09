@@ -137,6 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI128 diseño cerrado, auditor545 integrado546. Ocho casos training,200updates
+full116/AdamW heredado y generación118 fija25slots antes/después. Gate incluye
+checkpoint durable, preparación/cierre; restore completo y replay118 pendientes
+de implementación. Sin training nuevo, reservas ni promoción. Sigue implementar,
+calibrar y ejecutar finitamente.
+[Plan128](../../../Phideus-CASMI/docs/CASMI128_LOCAL_LEARNING_CONTROL_PLAN.md).
+
 CASMI127cerrado, auditor543integrado544.18caso-semilla, tres semillas11301–11303:
 4/28/32únicos,4/31/33terminales,0/6@1/@5/@25en512/2048/8192todas.74307heads,
 18agotamientos;615,785sCPUgen+83,897seval. Consume independiente80,710s/4threads,
