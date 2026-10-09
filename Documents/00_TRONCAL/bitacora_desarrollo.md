@@ -1,5 +1,28 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Anticipar el fallo no produjo mejores candidatos
+
+CASMI125 incorporó la cota de hidrógenos después de seleccionar acciones y antes
+de retener sus hijos en la búsqueda. La condición se pudo calcular en los6196
+prefijos revisados y descartó416. La búsqueda consumió21594consultas al modelo,
+frente a24890de su referencia, pero volvió a extinguirse sin terminales válidos
+ni respuestas recuperadas en los seis casos. No fue un filtro inactivo ni una
+corrida incompleta: ambos aspectos quedaron verificados en la auditoría533.
+
+Se cierra esta intervención particular. La disminución de cierres rechazados
+no constituye una mejora molecular cuando las ramas mueren antes del cierre.
+Tampoco demuestra que las restricciones globales sean inútiles: la selección
+factorada ya había descartado opciones y la poda posterior no las recupera.
+La integración534orienta el próximo análisis hacia la primera pérdida observable
+de un recorrido compatible, distinguiendo soporte, recorte factorado y retención.
+Se reutilizarán las trazas existentes; donde los prefijos difieran, faltará
+observación y no se inventará una explicación del modelo.
+
+El experimento requirió187,5segundosCPU más29,3de evaluación, sin nuevo training.
+Los pesos, el baseline y los artefactos anteriores permanecen congelados; código,
+evidencia y documentación conservan recuperación. No se amplían anchos, límites
+ni semillas para prolongar esta optimización.
+
 ## 2026-10-09 — Una restricción permite anticipar algunos cierres imposibles
 
 CASMI124 derivó una cota inferior de hidrógenos para el operador que agrega

@@ -137,6 +137,15 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI125cerrado, auditor533integrado534: poda postselección activa6196/6196,
+416descartes,21594heads frente a24890;0terminales y0/6@1/@5/@25en tres cortes.
+187,534sCPUgeneración+29,344s evaluación; sin GPU/training. Se cierra esta
+optimización: anticipa agotamiento sin candidatos útiles. No invalida restricciones
+globales. Siguiente: primera pérdida observable de recorridos compatibles usando
+122/123/125; prefijos diferentes se marcan no observados, sin extrapolar logits.
+[Resultado125](../../../Phideus-CASMI/docs/RESULTS_CASMI125_CONSERVATIVE_PRUNING.md).
+GPUlocal sigue habilitada; no nuevas reservas ni promoción.
+
 CASMI124cerrado, auditor527integrado528: cota necesaria de H detecta
 incompletabilidad en12/12caminos fallidos seleccionados, antes de sus últimos
 ATTACH.14/36prefijos IMPOSSIBLE y22UNKNOWN;18controles de6caminos conservan
