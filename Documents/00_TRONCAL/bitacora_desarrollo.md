@@ -1,5 +1,24 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Los373testigos son accesibles; sigue la prueba de generación libre
+
+CASMI122 recorrió las373construcciones conservadas en dos condiciones y confirmó
+todas sus identidades. El trabajo terminó en432,2segundosCPU, con~1,11GiB de RAM
+y sin GPU. Las746trayectorias preservan logits, máscaras, estados y procedencia.
+La auditoría515consumió independientemente el resultado, sin cargar pesos ni
+modelo, y quedó integrada516; las79fuentes congeladas permanecen intactas.
+
+La NLL canónica mediana fue41,96y la ventaja total frente a uniforme condicional
+positiva en372casos. La reasignación de intensidades dio cambios pequeños y de
+ambos signos en370casos efectivos; no mide ausencia de señal espectral ni masa
+marginal molecular. Los327componentes se conservan como unidades de dependencia.
+
+El próximo experimento será un piloto de generación libre con pesos y kernel
+congelados. La revisión exige comparar esfuerzo:119tenía25intentos, no25candidatos
+únicos. Orden de exploración, ranking, expansiones y parada deben fijarse antes
+de ejecutar, con selección observable y evaluación posterior al sello. No hay
+promoción científica ni entrenamiento adicional por inercia.
+
 ## 2026-10-09 — Probabilidad sobre construcciones ya existentes
 
 La revisión posterior a CASMI119 encontró que373moléculas ya tenían trayectorias

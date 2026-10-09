@@ -137,12 +137,14 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
-CASMI120/121cerrados: diseño y preflight retrospectivo con373testigos completos
-ya existentes112/116. Tres casos probados en23,78sCPU,~1,06GiB RSS;3identidades
-confirmadas, sin GPU. Deltas masa/intensidad~1e-5sin interpretación general.
-Auditorías509/511 integradas510/512;17pruebas y28mutaciones verifican correcciones.
-[Resultado121](../../../Phideus-CASMI/docs/RESULTS_CASMI121_WITNESS_PREFLIGHT.md).
-Sigue diagnóstico373presupuestado900sCPU/4GiB/2GiB, todavía no ejecutado.
+CASMI122cerrado, auditor515integrado516:373testigos/746trayectorias confirmadas,
+327componentes;370perturbaciones efectivas/3no-op.432,20sCPU/~1,11GiB/489,55MB,
+GPU0. NLLcanónica mediana41,96475; ventaja total positiva372/373. Deltas pequeños
+ambos signos, no masa molecular ni prueba del uso de todo el espectro.
+[Resultado122](../../../Phideus-CASMI/docs/RESULTS_CASMI122_FULL_WITNESS.md).
+Sigue piloto de búsqueda libre con pesos/kernel congelados y esfuerzo comparable;
+119fue25intentos, no25únicos. Sin jobs activos ni entrenamiento nuevo.
+Diseño/preflight anteriores cerrados120/121: [resultado121](../../../Phideus-CASMI/docs/RESULTS_CASMI121_WITNESS_PREFLIGHT.md).
 
 CASMI118 — CLOSED, 9/10, auditor499 integrado500. Soporte local exacto ATTACH,
 ROOT/STOP ypesos116preservados. PerfilCPU11,96s; pilotoGPU200slots108,05s,
