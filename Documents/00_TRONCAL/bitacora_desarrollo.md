@@ -1,5 +1,22 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Aprendizaje local sin recuperación libre observada
+
+El controlCASMI129 completó200actualizaciones sobre ocho moléculas conocidas,
+con el optimizador heredado y el generador fijo antes y después. La pérdida
+sobre trayectorias conocidas bajó en las ocho filas bajo ambos soportes, pero
+ninguna estructura apareció entre los25intentos por caso de ninguno de los dos
+endpoints. Los intentos aceptados químicamente aumentaron de25a31sobre200;
+ese cambio no equivale a recuperar la molécula buscada.
+
+El ajuste consumió8minutos48segundos y866MiBde VRAM. La calibración comprobó
+restauración exacta y los costos quedaron dentro de los presupuestos previstos.
+Los checkpoints, trazas y evaluación pareada se preservan. La auditoría final
+corroboró el [resultado](../../../Phideus-CASMI/docs/RESULTS_CASMI129_LOCAL_LEARNING.md)
+y recomendó localizar errores por caso y etapa reutilizando las trazas guardadas.
+Esa lectura CPU será el siguiente contraste. Una mejora de teacher sin aciertos no
+justifica declarar un límite arquitectónico ni prolongar entrenamiento por rutina.
+
 ## 2026-10-09 — Control local de aprendizaje diseñado y auditado
 
 CASMI128 fija una pregunta más directa después de cerrar la diversificación:
