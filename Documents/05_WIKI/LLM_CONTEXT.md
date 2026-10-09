@@ -137,6 +137,15 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI124cerrado, auditor527integrado528: cota necesaria de H detecta
+incompletabilidad en12/12caminos fallidos seleccionados, antes de sus últimos
+ATTACH.14/36prefijos IMPOSSIBLE y22UNKNOWN;18controles de6caminos conservan
+continuación aceptada. Primer corte observado a2ATTACHen10caminos y4en2;
+no primer prefijo imposible ni eficacia general.60,542sCPU, sin nueva generación.
+[Resultado124](../../../Phideus-CASMI/docs/RESULTS_CASMI124_HYDROGEN_COMPLETION.md).
+Sigue un contraste generativo finito de poda, pesos congelados y evaluación
+separada; factibilidad no demuestra recuperación. GPUlocal habilitada.
+
 CASMI123cerrado, auditor521integrado522: piloto6casos/2métodos,0/6@1/@5/@25
 en512/2048/8192heads. Búsqueda agotada sin terminales; muestreo192terminales y
 141entregados sumando seis top25. Los384STOP de búsqueda sólo fallanHfinal:

@@ -1,5 +1,28 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Una restricción permite anticipar algunos cierres imposibles
+
+CASMI124 derivó una cota inferior de hidrógenos para el operador que agrega
+bloques mediante puentes. La condición conserva los atributos existentes y
+sólo cuenta el carbono ordinario acíclico cuyo comportamiento quedó justificado.
+Cuando la cota excede la fórmula, ese prefijo no puede completarse dentro del
+operador; cuando no la excede, el comprobador se abstiene.
+
+La prueba sobre caminos guardados detectó los doce fallos seleccionados antes
+del final y preservó los dieciocho prefijos de control. En diez caminos faltaban
+dos adjunciones al aparecer el primer rechazo observado; en dos faltaban cuatro.
+Los cortes intermedios no fueron inspeccionados. La selección condicionada a
+fallos y la dependencia entre caminos de una misma molécula limitan cualquier
+generalización. La auditoría527 verificó el sello y recalculó los certificados
+por otra cuenta; quedó integrada528. El experimento completo tomó60,5segundosCPU.
+
+El paso siguiente es comprobar si esa restricción mejora la generación efectiva.
+Eliminar un camino imposible puede liberar presupuesto, pero también puede
+limitarse a anticipar el mismo fallo cuando las alternativas útiles ya fueron
+eliminadas. Un contraste finito con pesos congelados separará validez, recuperación
+y costo. No se promueve una arquitectura ni se inicia entrenamiento por este
+resultado; los artefactos y el baseline permanecen recuperables.
+
 ## 2026-10-09 — La validez local no garantiza completar la fórmula
 
 CASMI123 comparó búsqueda ordenada por probabilidad con muestreo, usando pesos
