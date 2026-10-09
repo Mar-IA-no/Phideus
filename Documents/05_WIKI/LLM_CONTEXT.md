@@ -137,6 +137,15 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI127cerrado, auditor543integrado544.18caso-semilla, tres semillas11301–11303:
+4/28/32únicos,4/31/33terminales,0/6@1/@5/@25en512/2048/8192todas.74307heads,
+18agotamientos;615,785sCPUgen+83,897seval. Consume independiente80,710s/4threads,
+no_models124. Se cierra diversificación; no barridos ni promoción. Siguiente:
+control train-only antes/después de generación libre, diseño aún pendiente;
+no inferir convergencia de344updates ni generalización de memorización.
+[Resultado127](../../../Phideus-CASMI/docs/RESULTS_CASMI127_LOCAL_DIVERSIFICATION.md).
+GPUlocalautorizada, fuentes112–127congeladas, remota/reservas cerradas.
+
 CASMI126cerrado, auditor537integrado538: seis testigos/12pares caso-motor,
 primera pérdida factorada idéntica123/125, rangos3/4/95/750/3/162 a0–3acciones.
 14prefijos/24cabezas canónicas por motor, sin inferencia sobre todas las rutas.

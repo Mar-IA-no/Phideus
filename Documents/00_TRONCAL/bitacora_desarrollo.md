@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Diversificar produjo candidatos, pero no respuestas correctas
+
+CASMI127 conservó la mejor extensión local y sorteó una segunda ponderada por
+sus scores, manteniendo pesos, soporte químico y retención de caminos. Las tres
+semillas fijadas antes de generar entregaron4,28y32candidatos únicos, sumados por
+caso, frente a ninguno del control determinista. Ninguna recuperó la identidad
+buscada entre sus primeros25candidatos en los seis casos. La variación produjo
+moléculas aceptadas, pero esa mejora no equivale a resolver el problema inverso.
+
+La [evidencia y auditoría](../../../Phideus-CASMI/docs/RESULTS_CASMI127_LOCAL_DIVERSIFICATION.md)
+cierran este contraste:10,3minutosCPU de generación y1,4de evaluación, sin nuevo
+entrenamiento ni GPU. No se ampliarán anchos, temperaturas o semillas por este
+resultado. La pregunta siguiente pasa al aprendizaje local con generación antes
+y después sobre un subconjunto de training seleccionado sin datos de desarrollo.
+Su diseño debe conservar explícita la diferencia entre política de entrenamiento
+y soporte de generación, y no confundir mejora docente o memorización con
+recuperación en estructuras nuevas. No hay arquitectura promovida.
+
 ## 2026-10-09 — Localizar dónde se pierde una construcción compatible
 
 CASMI126 cruzó los recorridos completos conocidos con las trazas de búsqueda
