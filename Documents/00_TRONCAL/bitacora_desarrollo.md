@@ -1,5 +1,29 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Soporte local exacto implementado y piloto cerrado
+
+CASMI118 convirtió el diagnóstico de rechazos en una intervención concreta sobre
+el generador. Cada opción parcial de adjunción conserva ahora un testigo de acción
+local completa legal; los pesos aprendidos y las reglas ROOT/STOP permanecen
+iguales. La equivalencia se contrastó con el kernel y con trazas preservadas,
+separando legalidad local, fórmula terminal e identidad molecular.
+
+El piloto completó 200 intentos en 108 segundos, con 486 MiB de VRAM. Aceptó 13
+y 17 intentos por modo, de los cuales 12 y 17 llegaron a la selección métrica.
+Una conversión incompleta explica la diferencia en contexto. Los 166 rechazos
+finales quedaron en STOP y cuatro intentos sin soporte; no hubo adjunciones
+seleccionadas rechazadas. La auditoría independiente reprodujo el cierre externo
+y verificó pesos, fuentes y límites. No se evaluó recuperación ni se infiere una
+ventaja espectral desde cuatro consultas de entrenamiento.
+
+El siguiente contraste mantiene los 401 casos y sus denominadores originales.
+El escenario medido de consultas ronda 4,73 horas, antes de preparación y cierre;
+ese costo debe presupuestarse antes de lanzar. No hay evidencia para atribuirlo
+a una pieza específica y abrir otra campaña de optimización. La prueba pendiente
+es molecular y comparada, no otra certificación del soporte.
+[Resultado118](../../../Phideus-CASMI/docs/RESULTS_CASMI118_LEGAL_ATTACHMENT_SUPPORT.md).
+
+
 ## 2026-10-09 — La frontera local de legalidad quedó localizada
 
 CASMI117 censó las20050trazas guardadas en24,47segundosCPU. La mayor pérdida

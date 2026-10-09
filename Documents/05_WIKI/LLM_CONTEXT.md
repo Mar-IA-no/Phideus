@@ -137,6 +137,15 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI118 — CLOSED, 9/10, auditor499 integrado500. Soporte local exacto ATTACH,
+ROOT/STOP ypesos116preservados. PerfilCPU11,96s; pilotoGPU200slots108,05s,
+486MiBVRAM.13/17aceptados contexto/full,12/17seleccionados;166STOP,4typevacío,
+sin rechazo deATTACH seleccionado. No recuperación medida, queriestraining.
+Sigue119comparación401conbaseline116sellado, escenario consultas4,73h antesdel
+cierre; fijar presupuesto total, sin más training ni optimización no medida.
+[Resultado118](../../../Phideus-CASMI/docs/RESULTS_CASMI118_LEGAL_ATTACHMENT_SUPPORT.md).
+
+
 CASMI117 — CLOSED,9/10, auditor488 integrado489. Censo20050:16424rechazos
 locales,3173terminales,55parentvacío,398kernelaceptados;24,47sCPU. Replay24en
 6,23sCPU:6O0valencia3locales,5/6sinbondlegal;5terminalesHdiscrepantey1sin
