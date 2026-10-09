@@ -137,6 +137,12 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI133: [censo y codec](../../../Phideus-CASMI/docs/RESULTS_CASMI133_CHEMISTRY_CENSUS.md)
+cerrados571/572;20212/27660soportadas, fit18262/selección1950sin solapamiento
+por componente,418,07sCPU/74tests. No red ni CUDA. Siguiente134modelo/tensorizador
+y calibración finita; evidencia de generación libre y efecto parental después.
+Contador vigente3/20. Mensajes041–044integrados; no promoción.
+
 CASMI132: [contrato auditado](../../../Phideus-CASMI/docs/CASMI132_GRAPH_EDITOR_PILOT_PLAN.md)
 cerrado566/567. Siguiente133codec/máscaras/filtros y censo training51/55CPU.
 Sin red ni entrenamiento132; selección por score de padres desde dos alternativas,

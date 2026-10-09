@@ -8644,3 +8644,13 @@ desde dos alternativas. Se concretaron elegibilidad común ante límites de sopo
 y consumo de todos los picos. Sigue código químico y censo training autenticado
 antes de construir/entrenar la red. Contador compartido CASMI2/20; ningún usoGPU
 ni resultado experimental nuevo en este hito. Fuentes y plan en Phideus-CASMI.
+
+## 2026-10-09 — representación y censo CASMI133
+
+El codec que reconstruye grafos desde elementos y órdenes pasó sus pruebas,
+incluidas modificaciones que conservan fórmula y cierran ciclos. El censo de
+training admitido terminó en6minutos58segundosCPU:20212de27660identidades
+soportadas;18262para aprendizaje y1950para selección, con componentes separados.
+La auditoría571integrada572corroboró artefactos y conteos. Las7448exclusiones
+siguen explícitas: no se interpreta soporte como precisiónCASMI. Sigue red y
+calibración finita. Contador3/20, sin GPU en este hito ni nuevas reservas.
