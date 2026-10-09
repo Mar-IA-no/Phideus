@@ -1,5 +1,16 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Calibración GPU de bloques completada y auditada
+
+El adaptador de la política de bloques completó16actualizaciones por brazo y
+32intentos en114,59segundos, con cuatro paridades numéricas satisfechas y874MiB
+deVRAM observada. La auditoría460 verificó estados y trazas; detectó auxiliares
+que no quedaron enlazados por hash al cierre y conservó su manifiesto posterior,
+sin atribuirles un sello retroactivo. La evidencia habilita el siguiente banco
+pareado, pero todavía no evalúa recuperación ni demuestra aceleraciónGPU.
+El primer intento abortó antesCUDA por representación tupla/lista; se corrigió
+bajo revisión independiente sin relajar tolerancia. Ambos intentos se preservan.
+
 ## 2026-10-09 — GPU habilitada: calibración de la política de bloques
 
 Mariano habilitó nuevamente la GPU local. La preparación CPU113, ya auditada,
