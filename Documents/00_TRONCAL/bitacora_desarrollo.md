@@ -1,5 +1,21 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — La simetría parent explica una parte pequeña de la pérdida
+
+El control CASMI131 resolvió exactamente los 74 prefijos conocidos, conservando
+atributos químicos, pertenencia a bloques, raíz y árbol con sus puertos. Sólo dos
+prefijos tienen otra posición equivalente. Sumar su probabilidad reduce la
+contribución parent de 0,89125 a 0,88024: el 1,23% de la pérdida residual de esa
+cabeza. La auditoría independiente corroboró las 798 decisiones de equivalencia,
+incluidas las negativas, y no encontró defectos materiales.
+
+El [resultado](../../../Phideus-CASMI/docs/RESULTS_CASMI131_PARENT_ORBITS.md)
+acota esa explicación, sin abarcar todas las equivalencias moleculares. El siguiente
+contraste examinará colisiones estructurales suficientes del encoder real: dos
+rondas de mensajes y promedio de nodos pueden no separar algunas alternativas.
+Se calculará su peso como cota en aritmética ideal sobre los datos existentes,
+sin nuevos entrenamientos ni pretensión de describir toda la capacidad del modelo.
+
 ## 2026-10-09 — Localización del error y límite de la etiqueta literal
 
 La lectura CPU de las trazas del control local tomó 19,2 segundos y fue verificada
