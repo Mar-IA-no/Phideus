@@ -1,5 +1,21 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Banco completo de bloques y costo GPU auditados
+
+La política de bloques dejó de depender del prefijo de ocho casos: el banco115
+transportó2747observaciones y teachers admitidos, verificó sus trayectorias y
+conservó las391exclusiones. La preparación tardó416,63segundosCPU; la auditoría
+independiente contrastó población, procedencia, acciones y carga desde fuentes
+guardadas. El nuevo cierre enlaza también los auxiliares de evidencia.
+
+La mediciónGPU de tres cargas por cada modo completó seis primeros updates
+independientes en42,02segundos, con894MiB observados. La auditoría verificó pesos,
+AdamW, RNG, aritmética y recursos. Los2,46–3,04segundos por lote permiten un
+presupuesto inicial de45minutos para un primer recorrido pareado, con parada
+recuperable y sin garantía de cubrir toda cola de carga. Sigue aprender y generar
+moléculas libremente; esta evidencia aún no demuestra recuperación ni ventaja
+espectral. No se promueve arquitectura ni se abren reservas.
+
 ## 2026-10-09 — Calibración GPU de bloques completada y auditada
 
 El adaptador de la política de bloques completó16actualizaciones por brazo y

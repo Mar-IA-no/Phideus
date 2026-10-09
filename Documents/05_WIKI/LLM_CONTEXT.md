@@ -137,6 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI115 — CLOSED,9/10: banco2747 y391exclusiones,416,63sCPU, auditor467/468.
+CostoGPU6casos42,02s,894MiBVRAM, auditor470/471. Presupuesto inicial45mintraining
+pareado justificado con incertidumbre; no recuperación molecular ni aceleración
+poblacional. GPUlocal habilitada. Sigue116: contrasteaprendido y generaciónlibre,
+con plan/auditoría y evaluaciónhistórica autorizada; reservas cerradas.
+Ver [resultado115](../../../Phideus-CASMI/docs/RESULTS_CASMI115_PAIRED_BANK.md).
+
 CASMI114 — CLOSED,9/10: GPUlocal habilitada. Calibración114,59s,16updates/brazo,
 32intentos, cuatro paridades; auditor460 integrado461. No recuperación evaluada
 ni aceleraciónGPU demostrada. Auxiliares autenticados después, no todos sellados
