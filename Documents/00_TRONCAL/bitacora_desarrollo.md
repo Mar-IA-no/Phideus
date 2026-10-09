@@ -1,5 +1,21 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Contraste completo del soporte de adjunción en curso
+
+CASMI119 inició la generación de 401 casos con los pesos y observables del
+baseline116, cambiando el soporte de adjunción por la relación exacta ya probada.
+Las revisiones independientes501y503 cubrieron ejecutor, costo y ajuste de disco.
+El preflight encontró la GPU libre; el arranque observado usó486MiB y guardó sus
+primeras consultas. Se conservan25intentos por modo y caso, sin rellenar fallos,
+con seis horas totales y parada recuperable. El umbral de entrada de disco se
+ajustó antes de ejecutar, sin borrar artefactos; las guardas no garantizan espacio
+frente a escrituras ajenas ni una transacción excepcional.
+
+La evaluación sigue pendiente: la adaptación CPU autentica el sello completo
+antes de leer respuestas, conserva el reductor116 y compara aciertos por molécula,
+modo y subconjunto. Las pruebas sintéticas no son resultados de recuperación.
+Código de lanzamiento b60032b y corte operativo3a2643b en el repositorio CASMI.
+
 ## 2026-10-09 — Soporte local exacto implementado y piloto cerrado
 
 CASMI118 convirtió el diagnóstico de rechazos en una intervención concreta sobre

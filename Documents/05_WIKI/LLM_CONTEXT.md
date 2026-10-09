@@ -141,8 +141,9 @@ CASMI118 — CLOSED, 9/10, auditor499 integrado500. Soporte local exacto ATTACH,
 ROOT/STOP ypesos116preservados. PerfilCPU11,96s; pilotoGPU200slots108,05s,
 486MiBVRAM.13/17aceptados contexto/full,12/17seleccionados;166STOP,4typevacío,
 sin rechazo deATTACH seleccionado. No recuperación medida, queriestraining.
-Sigue119comparación401conbaseline116sellado, escenario consultas4,73h antesdel
-cierre; fijar presupuesto total, sin más training ni optimización no medida.
+CASMI119activo: generación401×25×2 iniciada, auditorías501/503 integradas502/504,
+límite6h,486MiBVRAM observados, código b60032b. EvaluaciónCPU pareada en preparación;
+no recuperación119 evaluada ni promoción. No cambiar fuentes congeladas durante job.
 [Resultado118](../../../Phideus-CASMI/docs/RESULTS_CASMI118_LEGAL_ATTACHMENT_SUPPORT.md).
 
 
