@@ -1,5 +1,20 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Más validez local, recuperación exacta sin aumento
+
+CASMI119 terminó generación y evaluación con los pesos116 congelados. El soporte
+exacto de adjunción aumentó los candidatos únicos por consulta sumados sobre el
+panel:178→1087 en contexto y215→1093 con espectro completo. La recuperación
+conservó el mismo único acierto a@5/@25 entre401casos y ninguno a@1. Se mantienen
+452originales,373con soporte,28sin soporte y51excluidos; la mejora de validez
+química no demuestra por sí sola avance hacia la identidad molecular correcta.
+
+La generación sellada duró8218,01s con486MiBVRAM; evaluación432,14s sóloCPU,
+ambas con salida0 y sin retries. La auditoría independiente507 confirmó resultados,
+comparabilidad y horizonte; integración508 y cierre CASMI119. Los raws, rankings y pesos
+siguen preservados; no hubo nuevo training ni apertura de reservas.
+
+
 ## 2026-10-09 — Contraste completo del soporte de adjunción en curso
 
 CASMI119 inició la generación de 401 casos con los pesos y observables del
