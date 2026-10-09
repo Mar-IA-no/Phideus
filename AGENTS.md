@@ -398,3 +398,11 @@ concretas sobre el trabajo siguiente; conservar el historial y comenzar el
 siguiente ciclo de diez. Es un ejercicio de revisión del horizonte, no una
 atribución de omnisciencia ni evidencia científica. No sustituye auditorías
 independientes ni altera permisos de datos, recursos o promoción.
+
+
+## Phideus/CASMI: goals según necesidad material — 2026-10-09
+
+Mariano autoriza fijar goals propios cuando el trabajo o cómputo sostenido lo
+requiera y ayude a mantener continuidad; deja esa decisión al agente. No abrir
+goals sólo para mantenerse activo. Esta precisión rige la cadena autónoma:
+entregables finitos y útiles, sin actividad artificial ni ampliación de recursos.

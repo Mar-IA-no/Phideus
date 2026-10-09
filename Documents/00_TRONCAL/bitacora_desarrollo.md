@@ -1,5 +1,30 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Volver a la información que distingue moléculas
+
+La pregunta de Mariano motivó una revisión del problema inverso, contrastada
+con fuentes primarias, datos locales y una auditoría independiente Astra Medium.
+El espectro agrega productos de muchos eventos: sus picos no entregan una
+historia de ensamblaje ni una partición de la molécula. La propuesta es aprender
+a revisar estructuras completas y usar su compatibilidad con los fragmentos
+para decidir cuáles generan descendientes. Esto permitiría examinar si la
+información espectral cambia la cobertura de la búsqueda, además de su ranking.
+
+La [síntesis](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/561_INVERSE_RECONSTRUCTION_SYNTHESIS.md)
+conserva el estatuto de candidata: no se implementó ni entrenó esta arquitectura.
+La auditoría precisó el primer contraste, con editor sin entrada espectral y
+selector real, donante o prior; la fórmula y el presupuesto son comunes. También
+se corrigió una ambigüedad de100: bajaron propuestas correctas y validez, pero
+ambos métodos recuperaron las cuatro identidadesfitentre25. El resultado119
+recibió fórmula verdadera y no mide el problema completo desde observables.
+
+El diagnóstico del encoder que se había propuesto tras131queda diferido. Sigue
+un contrato concreto de edición y selección antes de implementar y calibrar;
+no otra cadena de diagnósticos sin una decisión experimental que los necesite.
+La investigación quedó en559/560, revisión562 e integración563. Es la primera
+auditoría computable del nuevo ciclo de diez; no dispara aún la Auditoría Divina.
+La directiva de abrir goals sólo cuando ayuden materialmente quedó persistida.
+
 ## 2026-10-09 — La simetría parent explica una parte pequeña de la pérdida
 
 El control CASMI131 resolvió exactamente los 74 prefijos conocidos, conservando

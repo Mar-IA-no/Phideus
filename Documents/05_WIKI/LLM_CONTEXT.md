@@ -137,10 +137,19 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+Revisión del inverso2026-10-09: investigación559/560, síntesis561, auditoría562
+integrada563; cicloDivina1/10. Propuesta de editor neuronal de grafos completos
+con selector espectral durante descendencia. Piloto: proponente sin fragmentos,
+score22congelado y controles prior/real/donante con fórmula/presupuesto comunes.
+No implementación ni promoción.116/119usó fórmula verdadera; el esquema de
+inputs oficial requiere cotejo antes del ensayo.132delencoderqueda diferido;
+próximo contrato finito y calibración local antes de presupuestar entrenamiento.
+[Síntesis y fuentes](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/561_INVERSE_RECONSTRUCTION_SYNTHESIS.md).
+
 CASMI131 cerrado, auditoría557 integrada558.74prefijos exactos,72singleton y2
 órbitas tamaño2; corrección1,23% del parent residual.17,417sCPU sin forwards.
-Sigue probe de colisiones suficientes del encoder114 (dos rondas+mean), cota
-literal/orbital con aritmética ideal explícita; no explicación global ni training.
+El probe del encoder114propuesto al cierre queda diferido por la revisión posterior;
+no explicación global ni training.
 [Resultado131](../../../Phideus-CASMI/docs/RESULTS_CASMI131_PARENT_ORBITS.md).
 
 CASMI130 cerrado, auditoría553 integrada554. Lectura19,193sCPU: type+parent
