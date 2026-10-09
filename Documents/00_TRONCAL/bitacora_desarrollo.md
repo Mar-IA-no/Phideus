@@ -1,5 +1,15 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — GPU habilitada: calibración de la política de bloques
+
+Mariano habilitó nuevamente la GPU local. La preparación CPU113, ya auditada,
+queda cerrada con sus límites; CASMI114 prepara la adaptación y una calibración
+finita de paridad numérica antes de actualizar pesos. La comprobación inicial
+no mostró procesos de cómputoGPU. La receta requiere revisión independiente
+y no constituye todavía entrenamiento comparativo ni resultado predictivo.
+El mensaje recursivo 040 integrado: avisos imprescindibles por el grupo vigente,
+sin progreso rutinario ni alteración de permisos.
+
 ## 2026-10-08 — CASMI113: preparación CPU auditada y pausa ante GPU
 
 La [política de bloques y puertos](../../../Phideus-CASMI/docs/RESULTS_CASMI113_CPU_POLICY.md)

@@ -137,6 +137,10 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI114 — ACTIVE,9/10: GPUlocal habilitada, preparación113 cerrada por evidencia
+453. Calibración aditiva con paridadprevia aoptimizer en preparación/revisión.
+Aún no resultadoGPU114. La pausa8/10 de abajo es antecedente histórico.
+
 CASMI113 — PAUSED por GPU suspendida, preparación CPU auditada453.
 Política de bloques/puertos132293parámetros, catálogo2365; ocho casos de training,
 32slots,0updates, perfil33,185sCPU y1,42GiB RSS. Gradientes finitos y paridad1/4
