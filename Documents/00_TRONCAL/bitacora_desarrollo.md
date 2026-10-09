@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — La frontera local de legalidad quedó localizada
+
+CASMI117 censó las20050trazas guardadas en24,47segundosCPU. La mayor pérdida
+es local:16424adjunciones rechazadas, frente3173fallos terminales y55casos de
+parentvacío. Un replay posterior de24casos,6,23segundosCPU, reprodujo la cadena
+completa y permitió identificar en los seis rechazos locales elegidos oxígeno
+neutro con valencia explícita3. Cinco de ellos carecen de cualquier bondlegal
+bajo las elecciones previas, por lo que filtrar sólo el último factor no basta.
+
+Dos auditorías independientes contrastaron censo, diseño y replay sin invalidar
+los resultados. La frecuencia atómica de la muestra no se extrapola al censo;
+los terminales tampoco permiten localizar el primer prefijo globalmente inviable.
+La siguiente comparación usará pesos congelados y soportes locales con testigos
+legales para cada opción parcial de adjunción. Tendrá que probar equivalencia
+y costo antes de inferir utilidad: legalidad no identifica la molécula verdadera.
+[Resultado117](../../../Phideus-CASMI/docs/RESULTS_CASMI117_REJECTION_GEOMETRY.md).
+
+
 ## 2026-10-09 — Primer contraste aprendido de bloques cerrado y auditado
 
 La comparación completó20050propuestas y evaluaciónCPU con el denominador

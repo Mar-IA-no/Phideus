@@ -137,6 +137,14 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI117 — CLOSED,9/10, auditor488 integrado489. Censo20050:16424rechazos
+locales,3173terminales,55parentvacío,398kernelaceptados;24,47sCPU. Replay24en
+6,23sCPU:6O0valencia3locales,5/6sinbondlegal;5terminalesHdiscrepantey1sin
+conversión; primerprefijoinviableunknown. No extrapolarcausasatómicas ni cambiar
+1/401de116. Sigue118soporteexactolocal tipo/parent/port/bond con testigos deacción
+legal: diseño,paridadycosto, sintrainingporinercia ysinpromesadecompletabilidad.
+[Resultado117](../../../Phideus-CASMI/docs/RESULTS_CASMI117_REJECTION_GEOMETRY.md).
+
 CASMI116 — CLOSED,9/10, auditor483 integrado484:344/344updates,20050slots,
 recuperación1/401compartido@5/@25,0@1;1/452original.181/217aceptados de10025;
 131/158consultas con candidatos, máximos5/4. No ventaja de recuperación ni techo.
