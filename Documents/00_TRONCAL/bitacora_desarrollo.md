@@ -1,5 +1,21 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Protocolo de auditoría actualizado y piloto en diseño
+
+mensaje recursivo 041 integrado; mensaje recursivo 042 integrado;
+mensaje recursivo 043 integrado; mensaje recursivo 044 integrado.
+Se releyeron Mandinga Init Workspace y su referencia completa. Las auditorías
+sustantivas usan una instancia nueva sin conversación heredada y fuentes del
+problema fundante; revisan implementación y dirección. El contador canónico de
+CASMI conserva la auditoría562y pasa a1/20. La secuencia de cinco pasos queda
+íntegra en ambosAGENTS; el umbral cambia sin reiniciar el historial. No se
+reinicializó el workspace ni se modificaron permisos o recursos compartidos.
+
+Se abrióCASMI132para concretar el piloto de edición molecular: revisión separada
+de inputs/datos y del operador neuronal, seguida de auditoría independiente del
+contrato. El objetivo sigue siendo recuperar estructuras desconocidas gracias
+al espectro. El diagnóstico del encoder anteriormente sugerido queda diferido.
+
 ## 2026-10-09 — Volver a la información que distingue moléculas
 
 La pregunta de Mariano motivó una revisión del problema inverso, contrastada
@@ -8618,3 +8634,13 @@ marcó dos residuos acotados. Se actualizó el párrafo de recuperación que aú
 trataba el smoke como futuro y se restringió el rótulo del control genérico a
 lo realmente igualado —parámetros, shapes e inicialización, no FLOPs—. El lint
 y la consistencia documental volvieron a pasar.
+
+## 2026-10-09 — contrato CASMI132 auditado
+
+El diseño del editor molecular quedó cerrado con la auditoría independiente566
+e integración567. La revisión encontró que el presupuesto podía dejar inactiva
+la intervención espectral: ahora el score cambia probabilidades de elegir padres
+desde dos alternativas. Se concretaron elegibilidad común ante límites de soporte
+y consumo de todos los picos. Sigue código químico y censo training autenticado
+antes de construir/entrenar la red. Contador compartido CASMI2/20; ningún usoGPU
+ni resultado experimental nuevo en este hito. Fuentes y plan en Phideus-CASMI.

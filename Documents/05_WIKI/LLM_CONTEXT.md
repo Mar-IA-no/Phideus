@@ -137,8 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI132: [contrato auditado](../../../Phideus-CASMI/docs/CASMI132_GRAPH_EDITOR_PILOT_PLAN.md)
+cerrado566/567. Siguiente133codec/máscaras/filtros y censo training51/55CPU.
+Sin red ni entrenamiento132; selección por score de padres desde dos alternativas,
+adapter todos los picos y dominio común de elegibilidad. CicloDivina2/20.
+
 Revisión del inverso2026-10-09: investigación559/560, síntesis561, auditoría562
-integrada563; cicloDivina1/10. Propuesta de editor neuronal de grafos completos
+integrada563; cicloDivina2/20. Propuesta de editor neuronal de grafos completos
 con selector espectral durante descendencia. Piloto: proponente sin fragmentos,
 score22congelado y controles prior/real/donante con fórmula/presupuesto comunes.
 No implementación ni promoción.116/119usó fórmula verdadera; el esquema de

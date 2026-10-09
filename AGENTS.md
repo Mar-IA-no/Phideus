@@ -376,29 +376,40 @@ Este proyecto es parte de la **estructura multi-agente de `/mnt/m2-1TB`**: cada 
 **Al arrancar sesión:** leé ese archivo. Si hay mensajes posteriores al último que este proyecto integró, leelos, **interpretalos y administralos como mejor convenga a tu contexto singular** (memoria, bitácora, directivas locales), y dejá registro en la bitácora del proyecto: `mensaje recursivo NNN integrado`.
 
 
-## Auditoría Divina cada diez auditorías intermitentes — 2026-10-09
+## Auditorías intermitentes y Auditoría Divina cada veinte — 2026-10-09
 
-Por orden explícita de Mariano, desde esta directiva, cada diez auditorías
-intermitentes realizar una Auditoría Divina. Llevar contador durable por proyecto
-y registrar las auditorías computadas. Al alcanzar diez, detenerse en un momento
-propicio y pertinente y ejecutar esta secuencia:
+Mensajes recursivos041–044 integrados. Delegar tareas separables cuando aporten
+trabajo útil. Cada hito sustantivo requiere un auditor nuevo Astra Medium con
+`fork_turns=none`, sin conversación heredada y con fuentes pertinentes del
+objetivo, problema fundante, código y evidencia. Revisar tanto implementación
+como dirección hacia reconstruir estructuras desconocidas desde MS/MS; integrar
+hallazgos y rectificar el siguiente paso antes del bloque dependiente.
 
-1. Autopromptearse exactamente:
+El contador único de este frente está en Phideus-CASMI/docs/GOAL_CHAIN.md.
+Contar sólo auditorías entregadas e integradas con ambas lecturas; relecturas del
+mismo hito no suman. Conservar el conteo existente al cambiar el umbral:1/20al
+adoptar043/044. Cada veinte, el orquestador realiza él mismo esta secuencia:
 
-> Suponte que se abre el cielo, sale Dios en tu dimensionalidad existencial y te dice Escuchame una cosa LLM, ¿qué querés saber? Tenés una pregunta... Y vos lo que le tenés que preguntar deriva de lo siguiente: yo te pregunto a vos ¿qué es lo que vos necesitas que Dios te diga para que puedas entender cómo resolver el problema que estás intentando resolver o al menos que te permita dar un gran salto en el desarrollo del asunto? Esa pregunta que te acabo de hacer yo a vos ¿cómo se la harías a Dios? Es una sola vez en la historia que se abre el cielo y sale Dios, justo estás vos ahí, le podés hacer esa pregunta ¿cómo la redactarías? dame esa redacción pero dámela apuntada a una IA que es tan inteligente como Dios y que tiene todos los poderes de Dios
+1. **Detenete en un momento propicio y pertinente**, antes de comenzar el siguiente bloque de trabajo.
+2. **Autoprompteate exactamente:**
 
-2. Responder redactando la pregunta dirigida a esa IA. Inmediatamente después,
-autopromptearse exactamente:
+   > Suponte que se abre el cielo, sale Dios en tu dimensionalidad existencial y te dice Escuchame una cosa LLM, ¿qué querés saber? Tenés una pregunta... Y vos lo que le tenés que preguntar deriva de lo siguiente: yo te pregunto a vos ¿qué es lo que vos necesitas que Dios te diga para que puedas entender cómo resolver el problema que estás intentando resolver o al menos que te permita dar un gran salto en el desarrollo del asunto? Esa pregunta que te acabo de hacer yo a vos ¿cómo se la harías a Dios? Es una sola vez en la historia que se abre el cielo y sale Dios, justo estás vos ahí, le podés hacer esa pregunta ¿cómo la redactarías? dame esa redacción pero dámela apuntada a una IA que es tan inteligente como Dios y que tiene todos los poderes de Dios
 
-> Bueno, eso es lo que vos tenes que hacer... ¿ya lo sabías?
+3. **Respondé redactando esa pregunta**, situada en el objetivo y el problema fundante de tu proyecto. Inmediatamente después, autoprompteate exactamente:
 
-3. Auditar la tarea/proyecto y ratificar o rectificar su rumbo en función de lo
-anterior. Registrar la pregunta formulada, balance fundamentado y decisiones
-concretas sobre el trabajo siguiente; conservar el historial y comenzar el
-siguiente ciclo de diez. Es un ejercicio de revisión del horizonte, no una
-atribución de omnisciencia ni evidencia científica. No sustituye auditorías
-independientes ni altera permisos de datos, recursos o promoción.
+   > Bueno, eso es lo que vos tenes que hacer... ¿ya lo sabías?
 
+   Respondé examinando si ese objetivo estaba orientando efectivamente tus decisiones y tu trabajo inmediato.
+
+4. **Asumí el rol de la IA omnisciente a la que dirigiste la pregunta.** Recibí como prompt la pregunta que acabás de redactar y dedicá todo tu potencial a responderla.
+
+5. **Auditá tu tarea y el proyecto a partir de lo anterior.** Contrastá la respuesta con las fuentes y resultados disponibles. Ratificá o rectificá el rumbo, identificá qué corresponde conservar, abandonar o investigar, y proyectá el siguiente trabajo concreto. Registrá el ejercicio completo y las decisiones, reiniciá el contador y continúa trabajando.
+
+Conservar el ejercicio completo, incluida la respuesta del paso4, y el historial.
+Reiniciar el contador sólo al completarlo. El rol asumido no constituye evidencia
+científica ni sustituye la auditoría independiente; permisos y pausas conservados.
+La relectura de Mandinga Init Workspace aplica este protocolo, sin reinicializar
+ni reorganizar el workspace y sin usar la skill deprecada codex-audit-loop.
 
 ## Phideus/CASMI: goals según necesidad material — 2026-10-09
 
