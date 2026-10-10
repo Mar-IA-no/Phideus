@@ -8693,3 +8693,17 @@ hacer intervenir al espectro sobre padres y descendientes y registrar cuándo
 la selección puede actuar. La optimización química deja de ser un requisito
 previo automático: se hará si el costo impide la calibración finita. Ambos
 brazos conservados, auditoría585 integrada, contador6/20, GPU libre al cierre.
+
+## 2026-10-09 — CASMI137: el espectro todavía no pudo elegir
+
+La calibración con dos observaciones training y fórmulas inferidas terminó
+sin padres válidos. Hubo30tentativas y354slots incompatibles; ninguna selección
+espectral pudo actuar. La auditoría588 reprodujo que23tentativas correspondían
+a fórmulas imposibles: su orden total no alcanzaba para conectar los átomos.
+El censo del pool completo dejó12y44fórmulas que pasan el necesario, frente a
+1y0en la shortlist original. No se abrieron respuestas.
+
+Se corrige la próxima pregunta: comprobar una shortlist que aplique elegibilidad
+antes de repartir el presupuesto, con pesos y receptores congelados. No ampliar
+entrenamiento ni atribuir el resultado al espectro. Integración589, contador7/20;
+preparación24,13sCPU ybúsqueda7,75sCPU, scopes terminados.
