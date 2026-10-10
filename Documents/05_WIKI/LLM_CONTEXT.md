@@ -137,6 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI140: [reconstrucción libre](../../../Phideus-CASMI/docs/RESULTS_CASMI140_FREE_RECONSTRUCTION.md)
+cerrada600/602, contador10/20. CPU900,374s,14completos+1Fvacía+1parcial;
+0/14A/B y0/1C, sin respuesta en archivo de196cierres. Sigue diagnósticoCPU141
+composición/dominio/cuota por fórmula con respuestas ya admitidas, sin modificar140.
+GPU nuevamente suspendida por orden posterior del9/10(10/10UTC), persistida enAGENTS.
+No entrenamiento ni optimización de ranking por inercia;604paralelismo diferido.
+
 CASMI139: [censo de controles](../../../Phideus-CASMI/docs/RESULTS_CASMI139_CONTROL_CENSUS.md)
 cerrado596/598, contador9/20.431/452 receptores,3026/3138donantes;81enumeraciones
 completas,23matches. Roster16prefijado:1match/energía desconocida. Sigue piloto

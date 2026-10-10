@@ -1,3 +1,16 @@
+## Phideus/CASMI: GPU suspendida hasta nuevo permiso — 2026-10-09 (2026-10-10 UTC)
+
+Mariano ordena «necesito que no uses el gpu hasta que yo te lo vuelva a dar el
+permiso». Esta instrucción posterior revoca la habilitación local del9/10.
+No iniciar CUDA, entrenamiento/inferencia GPU, relanzadores ni sustitución por
+GPU remota. Conservar checkpoints y no intervenir procesos ajenos. CASMI140
+está ejecutando el piloto ya fijado exclusivamente en CPU,900s/8GiB, con CUDA
+oculta; puede concluir junto con evaluación sellada y auditoría. Continuar sólo
+trabajo CPU materialmente pertinente. Cuando el siguiente avance razonable
+requiera GPU, informar, pausar el goal y detener la cadena sin tareas cosméticas
+ni entrenamiento CPU largo sustitutivo. Esperar nuevo permiso explícito.
+Fuente: pedido directo de Mariano, registrado2026-10-10 01:49:58UTC.
+
 ## Phideus/CASMI: GPU local habilitada y continuidad — 2026-10-09
 
 Mariano autoriza «ya dispones del gpu para seguir». Levanta la suspensión

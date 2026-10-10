@@ -1,5 +1,26 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — La respuesta todavía no entra entre las propuestas
+
+CASMI140 completó el piloto libre de dieciséis receptores excluidos del ajuste:
+catorce búsquedas completas, una lista de fórmulas vacía y una búsqueda parcial
+por el límite prefijado de quince minutos. Los196 cierres válidos para el codec
+entre2.888 intentos no incluyeron ninguna respuesta. La recuperación fue0/14
+para selección uniforme y espectro real,0/1 para el donante de energía desconocida.
+Esto localiza una ausencia anterior al ranking, sin demostrar un límite de la
+arquitectura ni insuficiencia informativa del espectro.
+
+La auditoría600 reprodujo la evaluación sellada y sus5.937 artefactos; integración602,
+contador canónico10/20. Corrigió antes de correr el registro de acceso a respuestas
+ante excepciones posteriores. El siguiente diagnósticoCPU141 distingue cobertura
+de fórmula, dominio del codec y exposición de búsqueda sin retocar140. La candidata
+de paralelismo se preserva en604, diferida frente a esa pregunta.
+
+Durante el cierre Mariano suspendió la GPU hasta nuevo permiso. La directiva
+quedó persistida globalmente y en ambos repositorios; este piloto ya era sóloCPU.
+No se iniciará CUDA ni infraestructura remota. Recursivo044 reconsultado y vigente;
+los cinco untracked ajenos de Phideus se conservan. Scopes140 inactive/dead.
+
 ## 2026-10-09 — Casos y controles para generación libre
 
 CASMI139 completó el censo en43segundosCPU entre sus dos fases. Hay vistas
