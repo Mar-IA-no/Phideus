@@ -8654,3 +8654,16 @@ soportadas;18262para aprendizaje y1950para selección, con componentes separados
 La auditoría571integrada572corroboró artefactos y conteos. Las7448exclusiones
 siguen explícitas: no se interpreta soporte como precisiónCASMI. Sigue red y
 calibración finita. Contador3/20, sin GPU en este hito ni nuevas reservas.
+
+## 2026-10-09 — editor molecular CASMI134 operativo
+
+El editor de grafos completos ya tiene red, tensorizador y sampler. Las32pruebas
+pertinentes y un preflight CPU comprobaron separación entre entradas y respuestas,
+simetría y recuperación exacta de checkpoint. La auditoría independiente576,
+integrada577, ratificó pasar a calibración; el contador conserva4/20.
+
+Las dos muestras desde fórmula, con pesos sin entrenar, fallaron y se conservaron.
+El resultado acredita implementación, todavía no aprendizaje ni recuperación de
+moléculas desconocidas. La próxima medición separará tiempo de red y filtros
+químicos antes de asignar entrenamiento: el número pequeño de forwards no
+asegura una búsqueda barata cuando crece la estructura.
