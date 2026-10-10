@@ -137,6 +137,12 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI138: [selección composicional y búsqueda](../../../Phideus-CASMI/docs/RESULTS_CASMI138_FORMULA_ELIGIBILITY.md)
+cerrada592/593, contador8/20. CPU89,98s,384intentos/33cierres/48ediciones;
+12posiciones pareadas con oportunidad, cinco padres distintos en un receptor.
+Salidas12/8porrama; no identidad correcta evaluada. Sigue censo de vistas sobre
+componentes excluidos y donantes estrictos con receta138 común; no training extra.
+
 CASMI137: [calibración de búsqueda](../../../Phideus-CASMI/docs/RESULTS_CASMI137_SPECTRAL_SEARCH.md)
 cerrada588/589, contador7/20. CPU24,13sprep+7,75sbúsqueda;30intentos fallidos,
 354slots incompatibles,0padres/oportunidades. T<N−1hace imposibles3/4F débiles;

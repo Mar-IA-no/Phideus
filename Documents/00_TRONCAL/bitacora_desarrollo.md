@@ -1,5 +1,23 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — La selección espectral empieza a cambiar propuestas
+
+La pruebaCASMI138 corrigió la asignación de fórmulas antes de generar, usando
+los pools inferidos y los pesos anteriores. En90segundosCPU completó384 intentos
+y33 cerraron estructuras válidas para el codec. En un receptor, elegir padres
+por compatibilidad espectral cambió cinco elecciones y dejó dos identidades
+exclusivas por rama; en el segundo cambió el orden final, conservando el conjunto.
+Esto permite examinar una intervención efectiva sobre búsqueda. Su beneficio
+para recuperar la molécula todavía no está medido: son dos casos training y no
+se abrieron respuestas. La auditoría independiente592, integrada593, corroboró
+artefactos, probabilidades, linaje y rankings; contador canónico8/20. Sigue medir
+vistas y donantes estrictos disponibles para un contraste sobre estructuras
+excluidas del ajuste. No se amplía entrenamiento por este resultado.
+
+Mensajes recursivos reconsultados:044 sigue como último; integración vigente
+conservada. Sin CUDA ni recursos Orca nuevos; los cinco archivos ajenos no
+versionados permanecen intactos.
+
 ## 2026-10-09 — Protocolo de auditoría actualizado y piloto en diseño
 
 mensaje recursivo 041 integrado; mensaje recursivo 042 integrado;
