@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-10-09
+updated: 2026-10-10
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -136,6 +136,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
 # Contexto integral de Phideus para LLMs
+
+CASMI141: [cobertura composicional](../../../Phideus-CASMI/docs/RESULTS_CASMI141_COMPOSITION_COVERAGE.md)
+cerrada607/608, contador11/20.16casos:5fuera±0,001Da,3excluidos porS,8incluidos
+compatibles sin propuesta. CPU9,605+0,546s,79fixtures, replay exacto. Agenda liga
+F y reinicio, dejando nF4/F0sin edición aun con padres; sigue142CPU deagenda/modos
+sinlabels/modelos. Diseño612 todavía no implementado. GPU local/remota suspendidas;
+pausar ante dependencia material de ese recurso. No ajustar tolerancia por16casos.
 
 CASMI140: [reconstrucción libre](../../../Phideus-CASMI/docs/RESULTS_CASMI140_FREE_RECONSTRUCTION.md)
 cerrada600/602, contador10/20. CPU900,374s,14completos+1Fvacía+1parcial;

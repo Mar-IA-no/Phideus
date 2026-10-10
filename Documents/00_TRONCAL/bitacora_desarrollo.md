@@ -1,5 +1,26 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-10 UTC — Composición y oportunidad de usar el espectro
+
+CASMI141 completó en9,605segundosCPU el diagnóstico de los dieciséis casos
+sellados140. Cinco fórmulas estaban fuera del pool inferido, tres fueron
+excluidas por azufre y ocho estaban incluidas y eran representables, pero no
+produjeron la identidad. El complemento de masa,0,546segundosCPU, confirmó
+que las cinco ausentes excedían±0,001Da sin exceder bounds. Se conserva la
+receta; no se ajusta tolerancia mirando estas respuestas.
+
+La auditoría607 reprodujo ambos resultados e identificó que fórmula y modo de
+propuesta están acoplados por la agenda: con cuatro fórmulas, una recibe sólo
+reinicios aun teniendo padres válidos. Sigue142CPU para corregir y probar esa
+exposición, con callbacks sintéticos y sin datos de respuestas ni modelos.
+Integración608, contador canónico11/20.79fixtures pertinentes pasan. Ningún
+hallazgo demuestra mejora molecular ni promueve arquitectura.
+
+GPU local/remota suspendidas y directiva persistida. Los ejecutores finalizaron
+con exit0; sus scopes transitorios ya no permanecen cargados. La consulta
+inicial sin LoadState no se usa como prueba independiente. Recursivo044 sigue
+último e integrado; los cinco archivos untracked ajenos se preservan.
+
 ## 2026-10-09 — La respuesta todavía no entra entre las propuestas
 
 CASMI140 completó el piloto libre de dieciséis receptores excluidos del ajuste:
