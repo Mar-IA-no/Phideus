@@ -1,3 +1,13 @@
+## Phideus/CASMI: pausa solicitada para otra tarea — 2026-10-10 UTC
+
+Mariano pide pausar en el siguiente momento pertinente y operativo. Se aplica
+ahora, a las02:25:29UTC: CASMI141 cerrado, auditado y subido; CASMI142 conserva
+sólo diseño/plan, sin implementación ni corridas. Detener la cadena autónoma,
+incluido trabajoCPU, hasta que Mariano indique retomarla. No quedan trabajos
+experimentales propios en ejecución ni delegaciones activas pendientes.
+La GPU local/remota continúa suspendida y requiere permiso explícito aparte.
+Conservar fuentes, checkpoints, artefactos y contador11/20; no marcar142completo.
+
 ## Phideus/CASMI: GPU suspendida hasta nuevo permiso — 2026-10-09 (2026-10-10 UTC)
 
 Mariano ordena «necesito que no uses el gpu hasta que yo te lo vuelva a dar el
