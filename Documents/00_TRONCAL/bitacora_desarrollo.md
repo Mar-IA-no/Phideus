@@ -8667,3 +8667,15 @@ El resultado acredita implementación, todavía no aprendizaje ni recuperación 
 moléculas desconocidas. La próxima medición separará tiempo de red y filtros
 químicos antes de asignar entrenamiento: el número pequeño de forwards no
 asegura una búsqueda barata cuando crece la estructura.
+
+## 2026-10-09 — CASMI135 localizó el costo material
+
+La red admite lotes de64hasta103átomos, pero los filtros químicos consumen casi
+todo el tiempo de generación en el extremo grande. El contraste de costo tomó
+15,54sGPUy159,48sCPU. El segundo conservó un error de integridad porque un worker
+añadió metadata mientras corría; reconstrucción exacta y auditoría580 corroboraron
+que el cálculo no cambió. Se preserva el error y se corrige el orden del freeze.
+
+Sigue aprendizaje finito y prueba interna de generación. La optimización de los
+filtros queda justificada para la búsqueda amplia, con equivalencia comprobada
+y sin cambiar química. Integración581, contador5/20; ninguna promoción científica.
