@@ -1,5 +1,17 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-09 — Casos y controles para generación libre
+
+CASMI139 completó el censo en43segundosCPU entre sus dos fases. Hay vistas
+utilizables para431de452 receptores de desarrollo y3026 donantes training.
+El matching estricto deja23 receptores emparejables. Entre los16 fijados por
+hash antes de fórmulas hay uno solo y su energía es desconocida: no se cambiará
+la selección para mejorar ese número. La auditoría596 corrigió antes de correr
+un redondeo que podía igualar energías originales distintas y corroboró después
+los86 artefactos. Integración598, contador9/20. Sigue un piloto libre con y sin
+selección espectral, control de donante sólo donde existe y evaluación de
+identidad posterior al sello. No se cargaron modelos ni GPU en el censo.
+
 ## 2026-10-09 — La selección espectral empieza a cambiar propuestas
 
 La pruebaCASMI138 corrigió la asignación de fórmulas antes de generar, usando

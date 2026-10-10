@@ -137,6 +137,11 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI139: [censo de controles](../../../Phideus-CASMI/docs/RESULTS_CASMI139_CONTROL_CENSUS.md)
+cerrado596/598, contador9/20.431/452 receptores,3026/3138donantes;81enumeraciones
+completas,23matches. Roster16prefijado:1match/energía desconocida. Sigue piloto
+libre A/B en16 y C sólo allí, sin cambiar roster, nuevosholdouts o training.
+
 CASMI138: [selección composicional y búsqueda](../../../Phideus-CASMI/docs/RESULTS_CASMI138_FORMULA_ELIGIBILITY.md)
 cerrada592/593, contador8/20. CPU89,98s,384intentos/33cierres/48ediciones;
 12posiciones pareadas con oportunidad, cinco padres distintos en un receptor.
