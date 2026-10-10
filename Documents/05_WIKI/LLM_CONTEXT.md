@@ -137,6 +137,14 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI136: [aprendizaje y generación interna](../../../Phideus-CASMI/docs/RESULTS_CASMI136_EDITOR_LEARNING.md)
+cerrados584/585, contador6/20. Cuatro épocas/1144updates,116,27sGPU; válidaslibres
+0→5/16fit y0→6/16selección, parciales3→5/16y3→8/16, exactas0. CE global baja
+pero enlaces empeoran. Sigue búsqueda132 training admisible con pesos congelados,
+linaje y oportunidades reales del selector22; fórmula inferida del contrato,
+no prolongar el régimen de fórmula verdadera136 al endpoint. Optimizar según costo.
+
+
 CASMI135: [costo calibrado](../../../Phideus-CASMI/docs/RESULTS_CASMI135_EDITOR_CALIBRATION.md),
 auditoría580/581, contador5/20. B64N103cabe6,21GiBreserved; filtros dominan
 generaciónCPU hasta71,58s. ErrorCPU de integridad por sólo metadata conservado

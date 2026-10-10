@@ -8679,3 +8679,17 @@ que el cálculo no cambió. Se preserva el error y se corrige el orden del freez
 Sigue aprendizaje finito y prueba interna de generación. La optimización de los
 filtros queda justificada para la búsqueda amplia, con equivalencia comprobada
 y sin cambiar química. Integración581, contador5/20; ninguna promoción científica.
+
+## 2026-10-09 — CASMI136: validez aprendida y límite de la pérdida
+
+Cuatro épocas del editor completaron1.144actualizaciones en116segundos. Con
+los mismos casos y semillas, la selección interna pasó de0a6cierres válidos
+desde fórmula y de3a8desde estructura parcial, sobre16en cada modo. Ninguna
+identidad exacta se recuperó. La auditoría584 encontró que la pérdida global
+baja principalmente al predecir no-enlaces, mientras la de enlaces empeora.
+
+Se integró ese límite y se congelaron los pesos. El próximo contraste debe
+hacer intervenir al espectro sobre padres y descendientes y registrar cuándo
+la selección puede actuar. La optimización química deja de ser un requisito
+previo automático: se hará si el costo impide la calibración finita. Ambos
+brazos conservados, auditoría585 integrada, contador6/20, GPU libre al cierre.
