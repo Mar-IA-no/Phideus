@@ -1,3 +1,16 @@
+## Corte2026-10-15 CASMI149 cerrado
+
+El diagnóstico congelado completó5408exposiciones sobre165fit y4selección
+interna expuesta. Products es sensible a espectros intercambiados, con cambios
+pequeños y signos mixtos, sin ventaja uniforme; Context exactamente invariante.
+FULL conserva limitación de simetría. Sin generación ni recuperación molecular
+nueva; no inferir inutilidadMS2 o equivalencia. Auditor655 integrada658, contador
+19/20;1197fuentes anteriores intactas, crudos y pesos preservados. Sigue150:
+diseñar contraste de objetivos de alineación con mismoencoder/datos/presupuesto
+y control de emparejamiento roto, antes de ampliar entrenamiento. GPUlocal
+autorizada, jobs terminados; remota/reservas cerradas.
+Resultado: Phideus-CASMI/docs/RESULTS_CASMI149_FROZEN_ALIGNMENT.md.
+
 ## Corte2026-10-15 CASMI148 cerrado
 
 El contraste con productos espectrales frente a contexto completó ambos ajustes,
