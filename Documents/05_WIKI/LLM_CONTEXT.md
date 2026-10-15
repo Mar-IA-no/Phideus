@@ -135,6 +135,26 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI158 cerrado: retroceso y retorno a moléculas completas — 2026-10-15
+
+Motor aditivo de retroceso limitado comprobado en96combinaciones sintéticas:
+abandono/retroceso/reinicio22/46/46cierres y614/947/1610callbacks. El retroceso
+preserva los22cierres del abandono; frente al reinicio hay28éxitos comunes y18
+exclusivos por política. Menor coste observado con callbacks de juguete no prueba
+superioridad molecular.156 conserva cobertura/top25 de0/16 en desarrollo expuesto.
+
+Auditor706 rederivó trazas y costes con reductor independiente, reprodujo74pruebas
+y leyó completos708 y el contrato siguiente. Sin hallazgos materiales abiertos;
+integración única, ciclo2:8/20.98fuentes históricas intactas; panel4,636sCPU.
+Pausa/JSON/RNG recuperables entre operaciones, sin promesa de reanudar callbacks
+interrumpidos ni de certificar frescura de snapshots antiguos. Crudos conservados.
+
+Sigue159: integrar y perfilar la comparación molecular de las tres políticas con
+CE original156 congelado, agenda/fórmulas/scorer y top25 conservados. Adaptador y
+presupuesto real pendientes; sellar antes de leer desarrollo. No nuevo training,
+promoción ni apertura de reservas. GPU local autorizada cuando aporte, remota cerrada.
+Fuente: [resultado158](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/708_CASMI158_BACKTRACKING_RESULTS.md).
+
 ## CASMI157 cerrado: qué cambia con el espectro y qué falta construir — 2026-10-15
 
 El contraste con pesos congelados completó 5408 exposiciones principales y sus

@@ -1,3 +1,25 @@
+## CASMI158 cerrado: revisar decisiones antes de abandonar — 2026-10-15
+
+La construcción molecular puede quedar atrapada por una decisión previa aun
+cuando exista alguna continuación válida. Se implementó un retroceso limitado
+que conserva los pares inicialmente visibles, vuelve a sortear alternativas y
+registra también el coste de los caminos descartados. En96combinaciones sintéticas
+produjo46cierres frente a22del abandono y46de los reinicios. Retroceso y reinicio
+resolvieron casos distintos; el primero consumió947callbacks frente a1610del
+segundo. Esto comprueba un mecanismo de rescate, sin demostrar todavía que alcance
+la identidad correcta desde un espectro. CASMI156 mantiene cobertura/top25 de0/16.
+
+La auditoría independiente706 revisó diseño, implementación,74pruebas y las trazas
+completas mediante otro reductor, y leyó la síntesis708 y el contrato siguiente.
+No quedan hallazgos materiales abiertos; integración única, ciclo2:8/20. El panel
+tomó4,636sCPU y se preservaron98fuentes históricas. El siguiente contraste159 usará
+el endpoint CE original156 congelado para comparar las tres políticas dentro de
+la agenda molecular. Antes requiere adaptar el productor y medir su coste real;
+después, sellar propuestas y evaluar cobertura y top25. GPU local autorizada,
+sin nuevos entrenamientos por este resultado; remota y reservas cerradas.
+
+Fuente: [resultado158](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/708_CASMI158_BACKTRACKING_RESULTS.md).
+
 ## CASMI157 cerrado: qué cambia con el espectro y qué falta construir — 2026-10-15
 
 El contraste con pesos congelados completó 5408 exposiciones principales y sus
