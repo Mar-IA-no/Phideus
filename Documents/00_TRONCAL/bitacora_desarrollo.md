@@ -8779,3 +8779,41 @@ Se corrige la próxima pregunta: comprobar una shortlist que aplique elegibilida
 antes de repartir el presupuesto, con pesos y receptores congelados. No ampliar
 entrenamiento ni atribuir el resultado al espectro. Integración589, contador7/20;
 preparación24,13sCPU ybúsqueda7,75sCPU, scopes terminados.
+
+## 2026-10-11 — Revisión de KTransformers
+
+La documentación y el código revisados, junto con una lectura independiente
+Astra Medium, permiten conservar KTransformers como candidata para ejecutar
+un futuro MoE con utilidad química comprobada. El perfil CASMI140 concentra
+el costo en viabilidad química, y la respuesta falta antes del ranking:
+acelerar la red no resuelve esa cobertura. Informe, fuentes fijadas y crudo
+en `Biblioteca/KTransformers_20261011/`. Sin instalación ni ejecución;
+CASMI142 sigue pausado, GPU suspendida y contador11/20 intacto.
+
+Mensaje recursivo045 integrado: preservar el runtime bajo `/root/.cache/orca`.
+Mensaje recursivo046 integrado: la guía vigente se denomina `orca-agent`,
+con capacidades dependientes del harness verificado. Sin cambios de sesiones.
+
+## 2026-10-15 — Reanudación de CASMI
+
+La autorización directa de Mariano reanuda la cadena y habilita la GPU local.
+CASMI142 retoma primero la prueba sintética de agenda: la revisión independiente
+identificó que fallar en inicialización no impide un rescate por propuestas
+completas posteriores. El control distingue ausencia persistente de padres y
+recuperación al finalizar una ronda. El contraste generativo queda después del
+cierre mecánico; aún no hay nueva evidencia de recuperación molecular.
+
+Mensaje recursivo047 integrado: Archify disponible para diagramas cuando ayuden,
+sin obligación de usarlo. La cesión PMP del15/10 registra LAB/Qwen inactivos;
+comprobación local sin procesos de cómputo GPU. No se intervino ningún servicio.
+
+## 2026-10-15 — cierre CASMI142
+
+Agenda verificada en25cardinalidades y51tests sintéticos;997fuentes anteriores
+intactas. Auditorías independientes614/615 integradas616 una vez, contador12/20.
+La exposición local queda garantizada por fórmula, pero también cambia el tiempo
+de reinicios: no atribuir efectos químicos a una sola causa. Censo2,587sCPU,
+límites de1GiB/60s comprobados durante ejecución. Sin modelos ni GPU utilizada.
+Resultado canónico en Phideus-CASMI/docs/RESULTS_CASMI142_FORMULA_MODE_AGENDA.md.
+Sigue diseño143 de piloto generativo con pesos y casos ya admitidos. GPU local
+habilitada por Mariano, sin extensión remota ni apertura de reservas.

@@ -1,3 +1,13 @@
+## Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-15
+
+Mariano indica «tenes el gpu para vos hasta nuevo aviso, avanza» y reanuda
+el goal formal. Levanta la pausa del10/10 y la suspensión GPU local para
+Phideus/CASMI. Retomar142 según su contrato sintético CPU; continuar luego
+con experimentos pertinentes y auditados, usando GPU local cuando aporte.
+Comprobar ocupación/ownership, conservar checkpoints y parada recuperable;
+no intervenir procesos ajenos ni extender el permiso a GPU remota o reservas.
+La autorización no certifica resultados ni marca142 completo.
+
 ## Phideus/CASMI: pausa solicitada para otra tarea — 2026-10-10 UTC
 
 Mariano pide pausar en el siguiente momento pertinente y operativo. Se aplica

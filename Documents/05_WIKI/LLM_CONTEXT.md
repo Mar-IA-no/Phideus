@@ -137,12 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
-CASMI141: [cobertura composicional](../../../Phideus-CASMI/docs/RESULTS_CASMI141_COMPOSITION_COVERAGE.md)
-cerrada607/608, contador11/20.16casos:5fuera±0,001Da,3excluidos porS,8incluidos
-compatibles sin propuesta. CPU9,605+0,546s,79fixtures, replay exacto. Agenda liga
-F y reinicio, dejando nF4/F0sin edición aun con padres; sigue142CPU deagenda/modos
-sinlabels/modelos. Diseño612 todavía no implementado. GPU local/remota suspendidas;
-pausar ante dependencia material de ese recurso. No ajustar tolerancia por16casos.
+CASMI142: [agenda por fórmula](../../../Phideus-CASMI/docs/RESULTS_CASMI142_FORMULA_MODE_AGENDA.md)
+cerrada614/615/616 el15/10, contador12/20.51tests y25casos sintéticos;16reinicios
+/48locales con exposición por fórmula. Cambia también la distribución temporal,
+sin demostrar mejora química. Sigue diseño143 con pesos136/roster139 y evaluación
+sellada. GPU local habilitada por Mariano; remota/reservas cerradas.141 conserva
+su diagnóstico:5fuera±0,001Da,3excluidos porS,8incluidos sin propuesta; no ajustar
+tolerancia a esas respuestas.
 
 CASMI140: [reconstrucción libre](../../../Phideus-CASMI/docs/RESULTS_CASMI140_FREE_RECONSTRUCTION.md)
 cerrada600/602, contador10/20. CPU900,374s,14completos+1Fvacía+1parcial;
