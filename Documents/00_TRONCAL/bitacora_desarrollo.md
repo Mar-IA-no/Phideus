@@ -5,8 +5,9 @@ conservan CE basal, inicial148 y endpoint128. Generación libre, cobertura y top
 forman parte del mismo experimento. La revisión672 reprodujo53pruebasCPU;
 integración676, códigoCASMI0d73a9c. La preparación real terminó en125,971s y el
 perfil de entrenamiento completó15celdas y12controles numéricosCPU/GPU:
-12,558s de cómputo, máximo7,582GiB reservados. El perfil de generación sigue
-pendiente; no hay aún entrenamiento científico ni resultado molecular152.
+12,558s de cómputo, máximo7,582GiB reservados. El perfil de generación también pasó; se fijó presupuesto conjunto13950s.
+TrainingGPU completó3×128updates sin censura en91,890s de cómputo, auditado672.
+La generaciónCPU de seis colecciones está iniciada; no hay resultado molecular152.
 
 GPUlocal habilitada; remota/reservas cerradas. El addendum presupuestará también
 química, escritura y lectura antes del entrenamiento. Auditoría152 abierta y
