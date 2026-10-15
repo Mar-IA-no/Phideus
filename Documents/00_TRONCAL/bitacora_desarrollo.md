@@ -1,3 +1,20 @@
+## CASMI150 cerrado: objetivo de alineación sin mejora uniforme — 2026-10-15
+
+Seis trayectorias completas y auditadas compararon CE, alineación y control roto,
+con representación148 fija. La alineación no aumentó la ventaja mediaLOCAL del
+espectro correcto frente a CE en los dos streams/particiones. Las pequeñas
+reducciones globales de error no fueron uniformes en enlaces. No hubo generación
+nueva ni evidencia de transferencia; selección4 expuesta e inicial común.
+
+Auditor660 replicó42.588filas/126agregados, error≤1,78e−15; integración664.
+Lectura incremental completa171,309s, sin censura; crudos y pesos preservados.
+Auditoría20/20 integrada y revisión Divina665 completa: ciclo2 en0/20.
+Sigue151: diseño/preflight de consulta espectral condicionada al estado/par,
+con control comparable y retorno explícito a generación; no sumar épocas150.
+GPUlocal habilitada, sin jobs experimentales activos; remota/reservas cerradas.
+
+Resultado: Phideus-CASMI/docs/RESULTS_CASMI150_ALIGNMENT_OBJECTIVE.md.
+
 ## Corte2026-10-15 CASMI149 cerrado
 
 El diagnóstico congelado completó5408exposiciones sobre165fit y4selección
