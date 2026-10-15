@@ -8828,3 +8828,13 @@ no atribuir a exposición aislada porque cambia tiempo de reinicios.47tests,
 Rumbo: primero censo/replay fit136 sin forward, no activar diagnóstico623 completo
 ni ampliar training. GPU local disponible; CPU elegida por costo de filtros.
 Resultado canónico Phideus-CASMI/docs/RESULTS_CASMI143_AGENDA_PILOT.md.
+
+## 2026-10-15 — CASMI144 recorta el diagnóstico del proponente
+
+El replay verificó32trazasfit históricas sinforward en10,776s:10cierres y22fallos.
+Hay21colas de1–6pares pendientes, sólo cuatro con más de una categoría admisible.
+39tests y1122fuentes previas intactas; auditor626 integrada627, contador14/20.
+Sigue145 con esos cuatro estados ycontroles, oráculo terminal separado del filtro;
+medir masa de próxima decisión sin terminación, no probabilidad global de rutas.
+No ampliar corte por resultado ni activar testigo forzado623. GPUlocal disponible,
+no necesaria en replay. Resultado canónico CASMI/docs/RESULTS_CASMI144_FIT_TRACE_REPLAY.md.
