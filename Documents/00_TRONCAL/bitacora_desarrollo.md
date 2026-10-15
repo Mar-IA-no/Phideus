@@ -8817,3 +8817,14 @@ límites de1GiB/60s comprobados durante ejecución. Sin modelos ni GPU utilizada
 Resultado canónico en Phideus-CASMI/docs/RESULTS_CASMI142_FORMULA_MODE_AGENDA.md.
 Sigue diseño143 de piloto generativo con pesos y casos ya admitidos. GPU local
 habilitada por Mariano, sin extensión remota ni apertura de reservas.
+
+## 2026-10-15 — CASMI143: más exploración sin recuperación
+
+El piloto con agenda142 completó14búsquedas, dejó una lista vacía y un parcial
+al límite900s. Ninguna identidad correcta en A/B/C ni en archivo químico.
+En los mismos14casos, locales307→340 y descendencias distintas A/B9→18;
+no atribuir a exposición aislada porque cambia tiempo de reinicios.47tests,
+5946artefactos autenticados; auditor620 integrada621, contador13/20.
+Rumbo: primero censo/replay fit136 sin forward, no activar diagnóstico623 completo
+ni ampliar training. GPU local disponible; CPU elegida por costo de filtros.
+Resultado canónico Phideus-CASMI/docs/RESULTS_CASMI143_AGENDA_PILOT.md.

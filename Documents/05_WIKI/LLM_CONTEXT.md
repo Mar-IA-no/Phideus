@@ -137,6 +137,13 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 # Contexto integral de Phideus para LLMs
 
+CASMI143: [piloto de agenda](../../../Phideus-CASMI/docs/RESULTS_CASMI143_AGENDA_PILOT.md)
+cerrado620/621, contador13/20. Identidad0/14A/B y0/1C; ninguna respuesta entre
+propuestas válidas. Más edición/variación que140, sin mejora de recuperación.
+47tests;5946artefactos autenticados;900,408sCPU,14completos+1vacío+1parcial.
+Sigue144 censo/replay de trazas fit existentes sin forward antes de activar623.
+GPU local habilitada, remota y reservas cerradas; no entrenamiento por inercia.
+
 CASMI142: [agenda por fórmula](../../../Phideus-CASMI/docs/RESULTS_CASMI142_FORMULA_MODE_AGENDA.md)
 cerrada614/615/616 el15/10, contador12/20.51tests y25casos sintéticos;16reinicios
 /48locales con exposición por fórmula. Cambia también la distribución temporal,
