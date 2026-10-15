@@ -1,3 +1,18 @@
+## Corte2026-10-15 CASMI147 cerrado
+
+El banco pareado quedó completo y auditado:2.236pares,2.023fit/213selección
+interna,1.852/198componentes sin solapamiento. Preparación46,595sCPU,58pruebas,
+1.172fuentes intactas;642 integrada644, contador17/20. Se conservaron826
+exclusionescodec y76sinvista; selección133 es interna expuesta. No se entrenó
+ni demostró mejora molecular. Sigue diseño148 de proponente con productos
+frente a contexto entrenado desde640/645, con inicialización/streams/loss
+emparejados y endpoint de recuperaciónMS2. GPUlocal autorizada; comprobar
+ocupación antes de cargar. Remota/reservas cerradas y cinco untracked ajenos
+preservados. No reejecutar147 ni prolongar146 por inercia.
+
+Resultado: Phideus-CASMI/docs/RESULTS_CASMI147_SPECTRAL_BANK.md.
+Manifest local147:5c0ce2e7aae9781bb08b8556685bcbb8576e4573067542661f621298c4d43526.
+
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
 ## 2026-10-15 — Más estructuras válidas sin reconstrucción exacta
