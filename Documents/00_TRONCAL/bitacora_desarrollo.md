@@ -1,3 +1,30 @@
+## CASMI156 cerrado: la validez química aumenta y la identidad sigue pendiente — 2026-10-15
+
+La comparación entre la pérdida original y el equilibrio de enlaces/no-enlaces
+terminó con entrenamientos pareados, generación completa y evaluación auditada.
+En la rama principal, el modelo equilibrado produjo 236 candidatas químicamente
+válidas frente a 90 del original, sumadas por consulta. Tras limitar las listas
+a 25 por caso quedaron 194 frente a 90. Ninguna condición recuperó la identidad
+correcta en los 16 casos, tampoco antes de ordenar; no hubo resultados desconocidos
+por interrupción. Los controles de intercambio espectral también dieron cero en
+su único receptor. El cambio favorece la construcción de grafos válidos en esta
+corrida, pero todavía no demuestra reconstrucción desde espectros.
+
+La explicación siguiente debe distinguir mayor propensión a enlazar de utilidad
+espectral. Se conservarán los endpoints para comparar espectro propio e
+intercambiado sobre los mismos prefijos y máscaras, midiendo si el propio mejora
+la etiqueta correcta por clase. Antes se revisarán los donantes ya admitidos y
+el diagnóstico149; un offset global será sólo un control auxiliar. Su residuo
+no decide arquitectura ni demuestra uso del espectro. No se prolonga entrenamiento
+ni se amplía el conjunto de datos por estos ceros.
+
+La auditoría696 rederivó las cuatro colecciones y leyó697/698 completos, sin
+hallazgos materiales abiertos. Integración única del hito, ciclo2:6/20; 85 fuentes
+preservadas y 2516,872s para las tres fases principales. GPU local autorizada y
+sin procesos experimentales propios activos al cierre; remota/reservas cerradas.
+El panel es desarrollo expuesto y no acredita transferencia ciega.
+Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/697_CASMI156_MOLECULAR_LOSS_RESULTS.md.
+
 ## CASMI155 cerrado: continuación correcta y pérdida de entrenamiento — 2026-10-15
 
 El diagnóstico de continuación forzada confirmó que los filtros permiten las
