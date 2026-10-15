@@ -1,5 +1,26 @@
 # Bitácora de Desarrollo - Proyecto Phideus v5.0
 
+## 2026-10-15 — Más estructuras válidas sin reconstrucción exacta
+
+CASMI146 completó el contraste de pérdida con dos entrenamientos emparejados
+de cuatro épocas. Equilibrar enlaces y no enlaces produjo más estructuras
+válidas, pero no mejoró reconstrucción: cobertura libre@8 cero en16casos de
+fit y16de selección para ambos; MS2 cero identidades en los pools ytop25,
+con15paresBcompletos (14con fórmulas y uno vacío) y una consulta censurada.
+En B la suma por caso de candidatas químicas distintas pasó126→252; esto
+no equivale a recuperar la molécula correcta ni demuestra un techo global.
+
+Auditor638 integrado639, contador16/20:50tests independientes y11.552artefactos
+MS2 comprobados,1128fuentes previas intactas. Todas las corridas propias terminaron.
+Sigue preparación147 del banco espectral51×133 desde candidata640: comprobar
+datos/vistas/splits antes de contrastar proponente con productos frente contexto
+entrenado. El espectro ya interviene por padres/ranking; se investigará su aporte
+directo a logits, sin extender146 ni promover arquitectura. GPUlocal autorizada;
+remota/reservas cerradas. Los cinco untracked ajenos se preservan.
+
+Resultado y fuentes en Phideus-CASMI/docs/RESULTS_CASMI146_BALANCED_LOSS.md.
+
+
 ## 2026-10-10 UTC — Composición y oportunidad de usar el espectro
 
 CASMI141 completó en9,605segundosCPU el diagnóstico de los dieciséis casos
