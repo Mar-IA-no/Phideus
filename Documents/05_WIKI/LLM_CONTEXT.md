@@ -135,6 +135,22 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI153 cerrado: reconstrucción y oportunidades reales — 2026-10-15
+
+El diagnóstico de las búsquedas152 conservó las barreras de soporte ya conocidas:
+cinco fórmulas ausentes del pool, tres moléculas con azufre fuera del editor y ocho
+con soporte. En estas últimas, cada variante principal recibió273intentos físicos
+bajo la fórmula correcta y produjo92/74/78/74cierres, pero ninguna respuesta.
+La validez química y la reconstrucción de identidad siguen siendo problemas distintos.
+
+La auditoría680 verificó las11904trazas terminales y sus fuentes; el diagnóstico
+concluyó en72,539segundosCPU, sin modelos ni nuevas generaciones. Contador ciclo2
+actualizado a3/20. Sigue un contraste con pesos congelados entre composición sola
+y revelación parcial de estructuras admitidas: debe medir el efecto de esa
+información, sin presentarse como identificación ciega ni mejora espectral.
+GPUlocal autorizada; remota/reservas cerradas. Resultado y límites en
+Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/682_CASMI153_DIAGNOSTIC_RESULTS.md.
+
 ## CASMI152 cerrado: sin recuperación exacta en este contraste — 2026-10-15
 
 La comparación entre consulta espectral antes y después del promedio completó
