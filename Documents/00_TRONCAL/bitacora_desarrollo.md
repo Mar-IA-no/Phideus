@@ -8838,3 +8838,14 @@ Sigue145 con esos cuatro estados ycontroles, oráculo terminal separado del filt
 medir masa de próxima decisión sin terminación, no probabilidad global de rutas.
 No ampliar corte por resultado ni activar testigo forzado623. GPUlocal disponible,
 no necesaria en replay. Resultado canónico CASMI/docs/RESULTS_CASMI144_FIT_TRACE_REPLAY.md.
+
+## 2026-10-15 — CASMI145 cierra la comprobación de colas
+
+CASMI145 enumeró24.576asignaciones de seis prefijos fit sin censuras. No encontró
+falsos rechazos allí; en dos decisiones informativas el prior asigna1,20% y1,77%
+a opciones inviables frente50% uniforme. Un prefijo ramificado ya era inviable;
+no inferir causa anterior ni cobertura de identidades.45tests,1.125fuentes intactas,
+auditor631 integrada632, contador15/20. Se cierra diagnóstico y sigue contraste
+de aprendizaje enlace/no enlace desde evidencia136/633, con control y endpoint
+generativo. GPUlocal habilitada; remota/reservas cerradas.
+Resultado: Phideus-CASMI/docs/RESULTS_CASMI145_EXACT_TAIL.md.
