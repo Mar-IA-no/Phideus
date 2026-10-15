@@ -1,3 +1,19 @@
+## CASMI152 en curso: ejecutor auditado y calibración — 2026-10-15
+
+El contraste PRE/POST de consulta espectral por par y su control de contexto
+conservan CE basal, inicial148 y endpoint128. Generación libre, cobertura y top25
+forman parte del mismo experimento. La revisión672 reprodujo53pruebasCPU;
+integración676, códigoCASMI0d73a9c. La preparación real terminó en125,971s y el
+perfil de entrenamiento completó15celdas y12controles numéricosCPU/GPU:
+12,558s de cómputo, máximo7,582GiB reservados. El perfil de generación sigue
+pendiente; no hay aún entrenamiento científico ni resultado molecular152.
+
+GPUlocal habilitada; remota/reservas cerradas. El addendum presupuestará también
+química, escritura y lectura antes del entrenamiento. Auditoría152 abierta y
+contador ciclo2,1/20, sin contar relecturas como hitos nuevos. Fuentes y resultados
+canónicos: Phideus-CASMI/docs/CASMI152_GENERATIVE_PAIR_QUERY_PLAN.md y
+Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/676_CASMI152_IMPLEMENTATION_INTEGRATION.md.
+
 ## CASMI151 cerrado: consulta por par comprobada en sintético — 2026-10-15
 
 Se implementó una compuerta espectral antes/después del promedio, con9216
