@@ -135,7 +135,7 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI159 activo: coste real antes de la comparación molecular — 2026-10-15
+## CASMI159 activo: generación completa y evaluación CPU — 2026-10-15
 
 Adaptador y consumidor aditivos implementados. El perfil neuronal con CE156
 congelado completó36referencias,12retomas equivalentes,14callbacks y3support en
@@ -143,8 +143,10 @@ congelado completó36referencias,12retomas equivalentes,14callbacks y3support en
 de referencias frente47,040s CUDA; la construcción/verificación domina el coste.
 Tres procesos CPU completaron en20,761s y1,197GiB agregados, con estados/logits
 exactamente iguales a las referencias y verificación independiente710. Presupuesto
-revisado y fijado; las tres colecciones CPU están en ejecución, sin respuestas.
-Siguen sellado, admisión semántica, lectura y auditoría del resultado. La recuperación CLI no está integrada: si hiciera
+revisado y fijado; las tres colecciones CPU completaron16casos cada una en
+4040,510s de fase. Manifest y comprobación exterior completos,117+3fuentes
+conservadas. Lectura CPU iniciada23:56:29UTC: admisión semántica antes de respuestas,
+resultado y auditoría todavía pendientes. La recuperación CLI no está integrada: si hiciera
 falta, exige host/recibo revisado y cobro de todo el trabajo previo. No hay retry.
 156 conserva0/16; validez y rendimiento informático no acreditan identidad.
 CASMI159 activo, contador8/20. GPU suspendida por pedido posterior del15/10 a

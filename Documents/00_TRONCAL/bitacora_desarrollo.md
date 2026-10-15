@@ -1,3 +1,20 @@
+## CASMI159: generación completa, evaluación CPU en marcha — 2026-10-15
+
+Las tres formas de construcción —abandonar, retroceder y reiniciar— terminaron
+los16casos previstos, con15búsquedas y una lista vacía en cada colección. La fase
+CPU tomó4040,510s; el pico de memoria del cgroup fue8GiB, que incluye caché de
+archivos. No se modificaron las117fuentes originales ni las3de la extensión.
+Se conservaron las trazas y los costes para la evaluación, aún sin nuevos
+resultados de identidad. El contador sigue8/20 y el goal permanece activo.
+
+La comprobación exterior detectó que systemd había retirado el cgroup después
+del cierre exitoso. Se conservó el rechazo inicial y el auditor718 revisó el
+ajuste para admitir únicamente ese estado comprobado, con ausencia de los
+procesos propios. Después del chequeo se cerró la unidad terminada y se verificó
+su ausencia. A23:56:29UTC comenzó el lectorCPU, que autentica las trazas antes de
+abrir las respuestas de desarrollo autorizadas. Siguen resultado, auditoría y
+entrega completa; la GPU continúa suspendida hasta nuevo permiso de Mariano.
+
 ## CASMI159 continúa enCPU; GPU suspendida — 2026-10-15
 
 Mariano pide dejar de usar la GPU y avanzar sólo hasta necesitarla nuevamente.
