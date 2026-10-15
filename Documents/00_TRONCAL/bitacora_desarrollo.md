@@ -1,3 +1,15 @@
+## CASMI159 continúa enCPU; GPU suspendida — 2026-10-15
+
+Mariano pide dejar de usar la GPU y avanzar sólo hasta necesitarla nuevamente.
+A23:23:30UTC no había procesos de cómputo GPU y la comparación159 ya corría
+exclusivamente enCPU, con CUDA oculta. Esa ejecución puede terminar junto con
+el sellado, la evaluación y la auditoría; la cesión anterior queda revocada.
+El goal conserva su objetivo completo y sigue activo por ese trabajo material.
+Cuando el avance razonable requiera GPU, se pausará y se informará la prueba
+pendiente, sin sustituirla por trabajo periférico o entrenamientoCPU prolongado.
+Fuentes, checkpoints y artefactos se conservan; no se intervinieron procesos
+ajenos. No hay nuevo resultado molecular ni incremento del contador8/20.
+
 ## CASMI158 cerrado: revisar decisiones antes de abandonar — 2026-10-15
 
 La construcción molecular puede quedar atrapada por una decisión previa aun

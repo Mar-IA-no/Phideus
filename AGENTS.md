@@ -1,3 +1,16 @@
+## Phideus/CASMI: GPU suspendida; continuidad sólo CPU — 2026-10-15
+
+Mariano pide dejar de usar la GPU y avanzar únicamente hasta necesitarla.
+Esta orden posterior revoca la cesión local del15/10: no iniciar CUDA,
+entrenamiento/inferencia GPU, relanzadores ni sustitución por GPU remota hasta
+nuevo permiso explícito. Preservar checkpoints y no intervenir procesos ajenos.
+CASMI159 ya corre exclusivamente en CPU, con CUDA oculta; puede completar
+generación, lectura sellada y auditoría. Continuar sólo CPU materialmente útil;
+al llegar al siguiente avance que requiera GPU, avisar, pausar el goal y detener
+la cadena, sin tareas periféricas ni entrenamiento CPU largo sustitutivo.
+Comprobación23:23:30UTC: sin procesos de cómputo GPU;159 activo sóloCPU.
+Fuente: pedido directo de Mariano del15/10/2026.
+
 ## Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-15
 
 Mariano indica «tenes el gpu para vos hasta nuevo aviso, avanza» y reanuda

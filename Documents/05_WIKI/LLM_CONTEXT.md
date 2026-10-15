@@ -147,7 +147,10 @@ revisado y fijado; las tres colecciones CPU están en ejecución, sin respuestas
 Siguen sellado, admisión semántica, lectura y auditoría del resultado. La recuperación CLI no está integrada: si hiciera
 falta, exige host/recibo revisado y cobro de todo el trabajo previo. No hay retry.
 156 conserva0/16; validez y rendimiento informático no acreditan identidad.
-CASMI159 activo, contador8/20. GPUlocal autorizada, remota/reservas cerradas.
+CASMI159 activo, contador8/20. GPU suspendida por pedido posterior del15/10 a
+23:23:30UTC; continúan generación, lectura y auditoríaCPU con CUDA oculta.
+Al necesitar GPU para el siguiente avance material, pausar y avisar; remota y
+reservas cerradas. Las habilitaciones históricas no reanudan el dispositivo.
 Fuente: [perfil159](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/716_CASMI159_REAL_PROFILE_RESULTS.md).
 
 ## CASMI158 cerrado: retroceso y retorno a moléculas completas — 2026-10-15
