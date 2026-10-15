@@ -135,6 +135,34 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI157 cerrado: qué cambia con el espectro y qué falta construir — 2026-10-15
+
+El contraste con pesos congelados completó 5408 exposiciones principales y sus
+controles. La pérdida balanceada aumenta la sensibilidad a intercambiar el
+espectro, pero no produce una mejora direccional uniforme: los enlaces del panel
+fit conservan una ventaja media negativa y la media positiva de selección se
+sostiene en un solo grafo. Los cuatro casos de selección están expuestos y no
+permiten afirmar transferencia. Un ajuste global de propensión a enlazar aproxima
+buena parte del cambio entre modelos, sin identificar la causa del aumento de
+validez ni convertirlo en reconstrucción. CASMI156 conserva cobertura y top25 de0/16.
+
+La auditoría independiente700 reprodujo las métricas críticas, comprobó controles
+y leyó el informe704. No hay hallazgos materiales abiertos; contador ciclo2:7/20,
+una sola integración del hito. Ejecución y lecturaCPU terminaron completas en
+165,984 y198,659 segundos, con98fuentes conservadas. La GPU local continúa
+habilitada; esta prueba usóCPU por coste medido y no dejó procesos experimentales
+propios activos al cerrar.
+
+El próximo diseño158 se concentra en construcción: contrastar retroceso limitado
+frente al abandono actual cuando no queda una categoría de enlace admisible,
+con pesos congelados y costes comparables. Es una candidata por comprobar y debe
+volver a moléculas completas, cobertura y top25. Los objetivos de alineación150
+y consulta por par151/152 ya fueron ensayados; no se vuelven a presentar como
+faltantes. Fórmula/azufre y construcción de identidades representables conservan
+sus obstáculos separados. Sin nuevos datos, reservas ni entrenamiento por inercia.
+
+Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/704_CASMI157_SPECTRAL_UTILITY_RESULTS.md.
+
 ## CASMI156 cerrado: la validez química aumenta y la identidad sigue pendiente — 2026-10-15
 
 La comparación entre la pérdida original y el equilibrio de enlaces/no-enlaces
