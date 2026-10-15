@@ -1,3 +1,15 @@
+## Corte2026-10-15 CASMI148 cerrado
+
+El contraste con productos espectrales frente a contexto completó ambos ajustes,
+pero no recuperó identidades en los13casos conocidos comunes:0/13en pools y
+hasta25candidatos;3casos permanecen desconocidos. El lector aditivo auditado
+conservó los errores y sellos originales. No es0/16, equivalencia ni inutilidad
+deMS2. Auditor646 integrada653, contador18/20;1177fuentes previas intactas.
+Sigue diseñar149 con pesos congelados: espectros correctos/intercambiados,
+máscaras locales/completas y fit/selección expuesta separados, antes de ampliar
+entrenamiento o búsqueda. GPUlocal autorizada; remota/reservas cerradas.
+Resultado: Phideus-CASMI/docs/RESULTS_CASMI148_PAIRED_PROPOSER.md.
+
 ## Corte2026-10-15 CASMI147 cerrado
 
 El banco pareado quedó completo y auditado:2.236pares,2.023fit/213selección
