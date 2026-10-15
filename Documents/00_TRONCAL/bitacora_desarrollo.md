@@ -1,19 +1,22 @@
-## CASMI152 en curso: ejecutor auditado y calibración — 2026-10-15
+## CASMI152 cerrado: sin recuperación exacta en este contraste — 2026-10-15
 
-El contraste PRE/POST de consulta espectral por par y su control de contexto
-conservan CE basal, inicial148 y endpoint128. Generación libre, cobertura y top25
-forman parte del mismo experimento. La revisión672 reprodujo53pruebasCPU;
-integración676, códigoCASMI0d73a9c. La preparación real terminó en125,971s y el
-perfil de entrenamiento completó15celdas y12controles numéricosCPU/GPU:
-12,558s de cómputo, máximo7,582GiB reservados. El perfil de generación también pasó; se fijó presupuesto conjunto13950s.
-TrainingGPU completó3×128updates sin censura en91,890s de cómputo, auditado672.
-La generaciónCPU de seis colecciones está iniciada; no hay resultado molecular152.
+La comparación entre consulta espectral antes y después del promedio completó
+entrenamiento, generación y evaluación. Ninguna variante incluyó la estructura
+correcta en sus pools:0/16 en las cuatro condiciones principales y0/1 en cada
+control de intercambio. Cada condición principal incluye15búsquedas completas
+y una lista de fórmulas vacía; no hay resultados pendientes por interrupción.
+La caída del error de entrenamiento no produjo recuperación molecular observada.
 
-GPUlocal habilitada; remota/reservas cerradas. El addendum presupuestará también
-química, escritura y lectura antes del entrenamiento. Auditoría152 abierta y
-contador ciclo2,1/20, sin contar relecturas como hitos nuevos. Fuentes y resultados
-canónicos: Phideus-CASMI/docs/CASMI152_GENERATIVE_PAIR_QUERY_PLAN.md y
-Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/676_CASMI152_IMPLEMENTATION_INTEGRATION.md.
+La auditoría independiente672 reautenticó las seis colecciones y recalculó todas
+las filas y contrastes, sin hallazgos materiales abiertos. Integración678,
+contador ciclo2 en2/20. Se conservan pesos, trazas y fuentes; el siguiente paso
+es localizar las pérdidas de soporte y construcción antes de ampliar entrenamiento.
+Esta evidencia procede de desarrollo expuesto y una sola inicialización; no
+establece equivalencia entre arquitecturas ni un techo del método. GPUlocal
+habilitada, remota y reservas cerradas.
+
+Fuentes canónicas: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/678_CASMI152_MOLECULAR_RESULTS.md
+y Phideus-CASMI/docs/GOAL_CHAIN.md.
 
 ## CASMI151 cerrado: consulta por par comprobada en sintético — 2026-10-15
 
