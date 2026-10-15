@@ -9098,3 +9098,16 @@ medir concurrencia de tres procesos antes del presupuesto de generación.
 No nuevas colecciones ni aciertos:156 conserva0/16. Contador8/20, goal159activo.
 GPUlocal autorizada, remota/reservas cerradas; cinco untracked ajenos preservados.
 Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/716_CASMI159_REAL_PROFILE_RESULTS.md.
+
+
+## 2026-10-15 — CASMI159 verifica la ejecución paralela
+
+La medición de tres políticas concurrentes terminó en20,761s y aproximadamente
+1,197GiB de memoria agregada. El auditor710 comprobó estados semánticos, entradas
+y logits idénticos a las referencias CPU;117fuentes originales y3de extensión
+permanecen intactas. El servicio propio terminó y se retiró, con cierre verificado.
+Este avance permite presupuestar la comparación molecular, cuya propuesta está
+pendiente de revisión. Todavía no hay colecciones159 ni nuevos aciertos: el último
+contraste real conserva0/16. Goal activo y contador8/20, sin nuevo entrenamiento.
+GPU local habilitada, no utilizada en este perfil; remota y reservas cerradas.
+Fuente: [perfil159](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/716_CASMI159_REAL_PROFILE_RESULTS.md).
