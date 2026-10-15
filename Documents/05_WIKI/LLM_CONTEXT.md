@@ -135,6 +135,22 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI154 cerrado: completación parcial sin recuperación exacta — 2026-10-15
+
+El contraste oracle completó144intentosCPU sin censura: ocho identidades y nueve
+encodings, cuatro réplicas, inicial/POSTproductos y FULL/HALF. Cierres químicos
+9/8/3/7respectivamente; identidad exacta0en las cuatro condiciones. HALF reveló
+6–21enlaces positivos y dejó7–21ocultos; no representa cercanía garantizada.
+No se infiere utilidad espectral, equivalencia ni techo del modelo.
+
+Perfil y presupuesto medidos justificaronCPU; GPU no utilizada. Auditor684
+rederivó resultados y leyó686 completo, sin hallazgos materiales abiertos;
+integración única, contador ciclo2:4/20. Evidencia en
+Biblioteca/Geometria_Problema_Inverso/686_CASMI154_COMPLETION_RESULTS.md.
+Sigue diseñar diagnóstico teacher-forced de admisibilidad/probabilidad del testigo
+con pesos congelados; distinguir probabilidad de ruta de identidad molecular.
+No aumentar entrenamiento por estos ceros. GPUlocal autorizada; remota/reservas cerradas.
+
 ## CASMI153 cerrado: reconstrucción y oportunidades reales — 2026-10-15
 
 El diagnóstico de las búsquedas152 conservó las barreras de soporte ya conocidas:
