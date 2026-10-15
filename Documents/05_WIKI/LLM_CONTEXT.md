@@ -135,6 +135,22 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI155 cerrado: continuación correcta y pérdida de entrenamiento — 2026-10-15
+
+El diagnóstico de continuación forzada confirmó que los filtros permiten las
+144rutas correctas del panel: no hubo exclusiones, underflow ni desconocidos.
+Esto separa accesibilidad de recuperación; no convierte los cierres forzados en
+aciertos del generador. Al comparar checkpoints, POST asignó más probabilidad a
+no-enlaces y menos a enlaces verdaderos. La pérdida vigente equilibra grafos,
+pero promedia todos sus pares ocultos sin equilibrar estas dos clases.
+
+Ese patrón justifica un contraste experimental de la pérdida, sin probar que
+sea la causa de los ceros ni que balancearla vaya a resolverlos. El siguiente
+diseño deberá conservar comparabilidad, comprobar calibración y volver a medir
+moléculas completas/top25. Auditor688 verificó rutas y leyó690 íntegro; contador
+ciclo2:5/20. SóloCPU y pesos congelados; GPUlocal disponible, remota/reservas cerradas.
+Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/690_CASMI155_WITNESS_RESULTS.md.
+
 ## CASMI154 cerrado: completación parcial sin recuperación exacta — 2026-10-15
 
 El contraste oracle completó144intentosCPU sin censura: ocho identidades y nueve
