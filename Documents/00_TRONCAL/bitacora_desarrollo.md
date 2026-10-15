@@ -9086,3 +9086,15 @@ auditor631 integrada632, contador15/20. Se cierra diagnóstico y sigue contraste
 de aprendizaje enlace/no enlace desde evidencia136/633, con control y endpoint
 generativo. GPUlocal habilitada; remota/reservas cerradas.
 Resultado: Phideus-CASMI/docs/RESULTS_CASMI145_EXACT_TAIL.md.
+
+
+## 2026-10-15 — CASMI159 completa el perfil neuronal
+
+El adaptador y consumidor están implementados en CASMI2aaef0c. Perfil CPU/GPU
+completo128,010s:36referencias,12retomas equivalentes,14callbacks y3support;
+117fuentes/219artefactos autenticados710. CPU fue más rápida en las tres sumas
+de trayectorias, con construcción/verificación como coste dominante. Sigue
+medir concurrencia de tres procesos antes del presupuesto de generación.
+No nuevas colecciones ni aciertos:156 conserva0/16. Contador8/20, goal159activo.
+GPUlocal autorizada, remota/reservas cerradas; cinco untracked ajenos preservados.
+Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/716_CASMI159_REAL_PROFILE_RESULTS.md.
