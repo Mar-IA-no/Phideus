@@ -9111,3 +9111,14 @@ pendiente de revisión. Todavía no hay colecciones159 ni nuevos aciertos: el ú
 contraste real conserva0/16. Goal activo y contador8/20, sin nuevo entrenamiento.
 GPU local habilitada, no utilizada en este perfil; remota y reservas cerradas.
 Fuente: [perfil159](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/716_CASMI159_REAL_PROFILE_RESULTS.md).
+
+
+## 2026-10-15 — CASMI159 inicia las tres colecciones moleculares
+
+El presupuesto medido recibió revisión independiente710 y quedó fijado antes
+de los efectos. Las tres políticas comenzaron en paralelo y ya conservan sus
+primeros intentos, con el mismo endpoint CE156, agenda, semillas y scorer. El
+límite conjunto es34200s y8GiB RAM; CPU800%,sin CUDA, sin nuevos entrenamientos
+ni acceso a respuestas. El lanzamiento no completa159: siguen las colecciones,
+sellos, lectura de cobertura/top25 y auditoría. Último resultado molecular0/16,
+contador8/20. Evidencia de presupuesto, ejecución y límites en perfil716 deCASMI.

@@ -142,8 +142,9 @@ congelado completó36referencias,12retomas equivalentes,14callbacks y3support en
 128,010s, sin respuestas.710 autenticó117fuentes y219artefactos. CPU sumó43,068s
 de referencias frente47,040s CUDA; la construcción/verificación domina el coste.
 Tres procesos CPU completaron en20,761s y1,197GiB agregados, con estados/logits
-exactamente iguales a las referencias y verificación independiente710. Sigue
-revisar el presupuesto antes de generar las tres colecciones. La recuperación CLI no está integrada: si hiciera
+exactamente iguales a las referencias y verificación independiente710. Presupuesto
+revisado y fijado; las tres colecciones CPU están en ejecución, sin respuestas.
+Siguen sellado, admisión semántica, lectura y auditoría del resultado. La recuperación CLI no está integrada: si hiciera
 falta, exige host/recibo revisado y cobro de todo el trabajo previo. No hay retry.
 156 conserva0/16; validez y rendimiento informático no acreditan identidad.
 CASMI159 activo, contador8/20. GPUlocal autorizada, remota/reservas cerradas.
