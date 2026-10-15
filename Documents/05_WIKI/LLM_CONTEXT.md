@@ -135,6 +135,22 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI151 cerrado: consulta por par comprobada en sintético — 2026-10-15
+
+Se implementó una compuerta espectral antes/después del promedio, con9216
+parámetros comunes y función inicial148 conservada.14pruebas sintéticas pasan,
+reproducidas independientemente por667 en1,98s; integración669, ciclo2 en1/20.
+Las pruebas distinguen operadores, verifican gradientes, simetrías y callback
+sin targets/cache de estado. No prueban utilidad molecular ni causa de150.
+
+Sigue152: fijar aprendizaje pareado y generación en un mismo contrato, calibrar
+GPUlocal incluyendo forward/backward, sellar pools/top25 y medir cobertura y
+ranking por separado. Mantener CE basal y controles espectrales; no añadir
+épocas150. GPUlocal autorizada, sin corridas propias activas en este corte;
+remota/reservas cerradas. Resultado: Phideus-CASMI/docs/RESULTS_CASMI151_PAIR_SPECTRAL_PREFLIGHT.md.
+
+
+
 ## CASMI150 cerrado: objetivo de alineación sin mejora uniforme — 2026-10-15
 
 Seis trayectorias completas y auditadas compararon CE, alineación y control roto,
