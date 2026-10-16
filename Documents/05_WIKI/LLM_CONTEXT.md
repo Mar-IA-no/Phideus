@@ -135,6 +135,16 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI161: comparación molecular en curso CPU — 2026-10-16 UTC
+
+El host y lector están implementados y revisados. El perfil de ocho ejecuciones
+conservó exactamente sus referencias, incluidas dos retomas, en29,183s. Tras
+revisión independiente de código, coste y horizonte, la generación está activa
+con pesos y exposición congelados; luego se admitirá y comparará con abandono159.
+Todavía no hay lectura de identidades161 ni incremento del contador10/20.
+La GPU local/remota permanece suspendida; pausar ante su necesidad material.
+[Plan y límites161](../../../Phideus-CASMI/docs/CASMI161_MOLECULAR_REFRESH_PLAN.md).
+
 ## CASMI160: preparación secuencial completa — 2026-10-16 UTC
 
 Actualización por par implementada con CE156/u128 congelado, química/RNG/orden

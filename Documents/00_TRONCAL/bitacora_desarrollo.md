@@ -1,3 +1,16 @@
+## CASMI161: generación molecular iniciada sólo en CPU — 2026-10-16 UTC
+
+La preparación quedó implementada, probada y revisada por el auditor725. El
+perfil del host produjo ocho estados equivalentes a sus referencias y completó
+dos retomas exactas en29,183segundos. Después de revisar la proyección y el
+presupuesto, comenzó la generación con dos procesos CPU, CUDA oculta y pesos
+congelados. Los límites son18000segundos para generar y14400para evaluar;
+no son una garantía de duración ni de finalización. Todavía no hay resultado
+de identidad161 y el goal continúa activo. La GPU permanece suspendida; el
+siguiente avance que la necesite materialmente detendrá la cadena.
+
+Fuente: [plan161](../../../Phideus-CASMI/docs/CASMI161_MOLECULAR_REFRESH_PLAN.md).
+
 ## CASMI160: preparación por decisión comprobada en CPU — 2026-10-16 UTC
 
 El predictor ya puede incorporar cada decisión antes de elegir el siguiente par,
