@@ -1,3 +1,22 @@
+## CASMI161: evaluación CPU terminada; cierre y pausa — 2026-10-16 UTC
+
+Mariano autorizó terminar solamente las evaluaciones. Se reutilizó la generación
+conservada y el lector completó la comparación con abandono159 en2502,169segundos,
+sin error ni GPU. Ambas colecciones tienen16 casos conocidos y cero desconocidos:
+cobertura química/elegible y top1/5/25 de0/16 en A/B. En la rama principal los
+válidos y candidatas finales pasaron de90a101; el aumento no recuperó identidades.
+La suma de callbacks pasó de22827a750538, con más tiempo activo por intento.
+
+La admisión exterior verificó fuentes, exit0 e identidad del proceso; el servicio
+quedó cerrado y ausente a13:28:33UTC. Se conservaron136 fuentes, checkpoint,
+crudos y cinco archivos ajenos. Auditor730 rederivó las30 búsquedas autenticadas
+y leyó la síntesis completa, sin hallazgos materiales abiertos. Integración
+única con725: contador11/20.
+Después de revisar y guardar el resultado se mantiene la pausa general, también
+CPU y cadena autónoma; GPU local/remota suspendida. No se abrió otro experimento.
+
+Fuente: [resultado161](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/729_CASMI161_MOLECULAR_REFRESH_RESULTS.md) y [recibos](../../../Phideus-CASMI/docs/GOAL_CHAIN.md).
+
 ## CASMI161: pausa solicitada antes de evaluar — 2026-10-16 UTC
 
 Se aplica la pausa completa pedida por Mariano. La generación CPU acababa de

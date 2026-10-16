@@ -135,16 +135,19 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI161: pausado antes de evaluar — 2026-10-16 UTC
+## CASMI161: evaluación completa y pausa general — 2026-10-16 UTC
 
-Pausa completa solicitada, incluido CPU y cadena autónoma, hasta retoma explícita.
-La generación terminó2880slots en2977,654s y obtuvo admisión exterior, con
-136fuentes conservadas. Servicio propio cerrado, ausencia verificada a04:47:52UTC.
-La evaluación no se inició: conservar la colección para admisión semántica y
-comparación con abandono159 al retomar, sin regenerarla. No hay medición de
-identidad161 ni incremento del contador10/20. Goal incompleto y pausado.
-La GPU local/remota continúa suspendida. [Recibos](../../../Phideus-CASMI/docs/GOAL_CHAIN.md).
-[Plan y límites161](../../../Phideus-CASMI/docs/CASMI161_MOLECULAR_REFRESH_PLAN.md).
+Excepción acotada: completar sólo la evaluación CPU, verificar, guardar y detenerse.
+Actualización por decisión y abandono159 tienen16 conocidos y cero desconocidos:
+cobertura química/elegible y top1/5/25 de0/16 en A/B. B válidos/finales90→101;
+A válidos95→106 y únicas/finales94→105.2880 intentos físicos por colección;
+la mayor validez no recuperó identidades. Una semilla y development expuesto no
+prueban un techo ni aporte causal del espectro. Lectura2502,169s;136 fuentes,
+checkpoint y cinco archivos ajenos conservados. Servicio lector cerrado y
+not-found a13:28:33UTC. Auditoría final730 integrada con725 una vez, sin hallazgos
+materiales abiertos; contador11/20. No se inicia otro goal, generación ni training.
+Pausa completa tras cierre, GPU local/remota suspendida. Candidata728 diferida.
+[Resultado161](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/729_CASMI161_MOLECULAR_REFRESH_RESULTS.md) y [ledger](../../../Phideus-CASMI/docs/GOAL_CHAIN.md).
 
 ## CASMI160: preparación secuencial completa — 2026-10-16 UTC
 

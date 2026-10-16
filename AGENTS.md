@@ -1,3 +1,18 @@
+## Phideus/CASMI: terminar únicamente las evaluaciones — 2026-10-16 UTC
+
+Mariano indica «terminá solamente con las evaluaciones». Autoriza completar
+la lectura CPU pendiente de CASMI161, verificar sus resultados y guardarlos.
+Reutilizar la generación terminada y el protocolo congelado; no nuevos
+experimentos, entrenamientos, generación ni encadenamiento de goals. Al concluir
+la evaluación y su cierre verificable, detenerse. GPU local/remota suspendida.
+La pausa general se conserva fuera de esta excepción acotada.
+
+Cierre16/10: lectura161 completa y auditada, cobertura/top25 de0/16 en A/B,
+sin desconocidos. Servicio lector cerrado y ausencia verificada a13:28:33UTC;
+fuentes y checkpoints conservados. Auditorías725/730 integradas una vez,
+contador11/20. Tras guardar la entrega, excepción agotada: mantener pausa
+completa, incluido CPU/cadena, hasta nueva orden. GPU sigue suspendida.
+
 ## Phideus/CASMI: pausa completa solicitada — 2026-10-16 UTC
 
 Mariano pide «necesito que hagas una pausa en tu trabajo». Detener la cadena
