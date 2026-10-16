@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-10-15
+updated: 2026-10-16
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -135,25 +135,25 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI159 activo: generación completa y evaluación CPU — 2026-10-15
+## CASMI159 cerrado: validez sin identidad — 2026-10-16 UTC
 
-Adaptador y consumidor aditivos implementados. El perfil neuronal con CE156
-congelado completó36referencias,12retomas equivalentes,14callbacks y3support en
-128,010s, sin respuestas.710 autenticó117fuentes y219artefactos. CPU sumó43,068s
-de referencias frente47,040s CUDA; la construcción/verificación domina el coste.
-Tres procesos CPU completaron en20,761s y1,197GiB agregados, con estados/logits
-exactamente iguales a las referencias y verificación independiente710. Presupuesto
-revisado y fijado; las tres colecciones CPU completaron16casos cada una en
-4040,510s de fase. Manifest y comprobación exterior completos,117+3fuentes
-conservadas. Lectura CPU iniciada23:56:29UTC: admisión semántica antes de respuestas,
-resultado y auditoría todavía pendientes. La recuperación CLI no está integrada: si hiciera
-falta, exige host/recibo revisado y cobro de todo el trabajo previo. No hay retry.
-156 conserva0/16; validez y rendimiento informático no acreditan identidad.
-CASMI159 activo, contador8/20. GPU suspendida por pedido posterior del15/10 a
-23:23:30UTC; continúan generación, lectura y auditoríaCPU con CUDA oculta.
-Al necesitar GPU para el siguiente avance material, pausar y avisar; remota y
-reservas cerradas. Las habilitaciones históricas no reanudan el dispositivo.
-Fuente: [perfil159](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/716_CASMI159_REAL_PROFILE_RESULTS.md).
+Las tres políticas de construcción completaron generación y lectura sellada:
+0/16 en cobertura química/elegible y top1/5/25, tanto A como B, sin desconocidos.
+En B los válidos fueron90/474/285 y las candidatas finales90/339/252 para
+abandono/retroceso/reinicio. Retroceso consume menos callbacks/probes y tiempo
+observado que reinicio, sin recuperar identidades. Desarrollo expuesto, sin
+atribución espectral ni transferencia; las barreras de fórmula/azufre permanecen.
+Auditor718 rederivó métricas/costes y leyó719 íntegro; hallazgos integrados.
+710/718 cuentan una sola auditoría159: ciclo2,9/20. Generación4040,510s y
+lectura7434,412s de pared, CPU; servicios cerrados, fuentes/crudos conservados.
+
+Sigue diseñar y comprobar enCPU un adaptador que actualice logits tras cada
+par frente a ocho grupos, pesos congelados. Fixture y perfil sin respuestas
+antes de presupuesto molecular; todavía no implementado. No aumentarB ni
+training por validez. GPU local/remota suspendida desde15/10 a23:23:30UTC;
+al necesitarla para avanzar, pausar goal/cadena y avisar. No sustituir por
+CPU larga ni trabajo periférico. Las habilitaciones históricas no la reanudan.
+Fuente: [resultado159](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/719_CASMI159_MOLECULAR_CONSTRUCTION_RESULTS.md).
 
 ## CASMI158 cerrado: retroceso y retorno a moléculas completas — 2026-10-15
 

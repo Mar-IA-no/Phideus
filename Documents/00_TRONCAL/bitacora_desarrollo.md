@@ -1,3 +1,32 @@
+## CASMI159 cerrado: más validez no recuperó la molécula — 2026-10-16 UTC
+
+La lectura sellada completó el contraste de abandono, retroceso y reinicio.
+Las tres políticas terminaron con cobertura y top1/5/25 de0/16, sin casos
+desconocidos, en ambas ramas. El retroceso produjo474cierres válidos en B frente
+a90del abandono y285del reinicio, pero sus339candidatas finales tampoco incluyeron
+una respuesta. El resultado separa capacidad de construir una molécula válida
+de capacidad de reconstruir la identidad a partir de la medición. No fija un
+techo ni demuestra que el espectro sea inútil; el panel de desarrollo está expuesto.
+
+La auditoría independiente718 rederivó métricas y costes desde las trazas,
+confirmó las tablas y leyó el informe completo. Se precisaron la equivalencia
+del perfil contra sus propias referencias y el conteo de probes que incluye
+admisión. Sin hallazgos materiales abiertos;710/718 integran un solo hito,
+ciclo2:9/20. Generación y lecturaCPU duraron4040,510 y7434,412segundos de pared.
+Los tres servicios propios finalizaron y se verificó su cierre. Se conservaron
+104fuentes históricas,117del freeze y3de extensión, checkpoint, crudos y los
+cinco archivos ajenos del espejo, coincidentes con el snapshot156.
+
+La revisión siguiente720 identifica una aproximación ya registrada623/633:
+la red no ve las decisiones nuevas hasta el siguiente grupo, aunque la química
+sí se actualiza. Prepararemos enCPU una intervención por decisión, con pesos
+congelados, prueba sintética y perfil sin respuestas antes de otra comparación.
+No se afirma que ésa sea la causa ni se ha implementado. La GPU local/remota
+continúa suspendida; cuando sea necesaria para un avance material, se pausará
+el goal y se informará, sin trabajo periférico ni entrenamientoCPU sustitutivo.
+
+Fuente: [resultado159](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/719_CASMI159_MOLECULAR_CONSTRUCTION_RESULTS.md).
+
 ## CASMI159: generación completa, evaluación CPU en marcha — 2026-10-15
 
 Las tres formas de construcción —abandonar, retroceder y reiniciar— terminaron
