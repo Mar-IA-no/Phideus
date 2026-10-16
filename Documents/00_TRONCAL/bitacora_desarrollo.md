@@ -1,3 +1,31 @@
+## CASMI160: preparación por decisión comprobada en CPU — 2026-10-16 UTC
+
+El predictor ya puede incorporar cada decisión antes de elegir el siguiente par,
+conservando el endpoint y la química. Las pruebas sintéticas y la revisión
+independiente comprobaron el mecanismo y la recuperación; el perfil real completó
+14 ejecuciones en29,359segundos sin leer respuestas. Las dos retomas fueron
+exactas y los seis controles coincidieron con el perfil anterior. Los callbacks
+pasaron de45a1447 en las referencias, pero el tiempo pasó de6,084a11,694segundos.
+Esto permite preparar el contraste completo en CPU y medir si cambia la cobertura;
+no convierte las construcciones del perfil en nuevas identidades recuperadas.
+
+La auditoría721 integró tres correcciones materiales antes de ejecutar: baseline
+recuperable, precondición de callback determinista y distinción entre memoria
+interrumpida y snapshot durable. Su reducción independiente y lectura de prosa
+confirmaron el resultado; una precisión separa medidas de callback de159.
+Auditoría computada una vez, ciclo2:10/20. Kernel/host:64/34pruebasCPU;51JSON de
+perfil,12,26MB, fuentes y archivos ajenos conservados, servicio propio cerrado.
+
+Sigue161: adaptar productor/lector y comprobar concurrencia antes de congelar
+el presupuesto de la comparación molecular. Se conserva abandono159 para
+reutilizarlo bajo admisión, sin repetir generación por rutina. Si la variante
+sólo vuelve a mejorar validez, no se prolongará rescate del endpoint por inercia.
+La GPU local/remota permanece suspendida: avisar y pausar al necesitarla, sin
+entrenamientoCPU largo sustitutivo ni actividad periférica.
+
+Fuente: [resultado160](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/723_CASMI160_REFRESH_PREFLIGHT_RESULTS.md) y
+[contrato siguiente](../../../Phideus-CASMI/docs/CASMI160_NEXT_MOLECULAR_CONTRAST.md).
+
 ## CASMI159 cerrado: más validez no recuperó la molécula — 2026-10-16 UTC
 
 La lectura sellada completó el contraste de abandono, retroceso y reinicio.

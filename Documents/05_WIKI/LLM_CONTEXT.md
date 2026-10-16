@@ -135,6 +135,22 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI160: preparación secuencial completa — 2026-10-16 UTC
+
+Actualización por par implementada con CE156/u128 congelado, química/RNG/orden
+conservados. Kernel/host64/34pruebasCPU; perfil29,359s,14ejecuciones+1callbackonly,
+2retomas exactas,6baselines iguales al perfilCPU159. Auditor721 de plan, código,
+evidencia, prosa y horizonte integrado una vez: ciclo2,10/20. Sin hallazgos
+materiales abiertos. Fuentes y cinco archivos ajenos preservados; servicio cerrado.
+
+El perfil es preparación, no evaluación de identidad.159 conserva0/16. Próximo161:
+host/lector compacto, concurrencia acotada, presupuesto revisado y generación
+completa/cobertura/top25; contrato candidato todavía sin implementación. El coste
+medido permite prepararCPU y no demuestra necesidadGPU. Conservar ambas ramas,
+prioridad del primer brazo y segundo como fuente de alternativas. GPU local/remota
+suspendida; al llegar a dependencia material, pausar goal/cadena y avisar.
+Fuente: [resultado160](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/723_CASMI160_REFRESH_PREFLIGHT_RESULTS.md).
+
 ## CASMI159 cerrado: validez sin identidad — 2026-10-16 UTC
 
 Las tres políticas de construcción completaron generación y lectura sellada:
