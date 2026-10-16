@@ -1,3 +1,13 @@
+## CASMI161: pausa solicitada antes de evaluar — 2026-10-16 UTC
+
+Se aplica la pausa completa pedida por Mariano. La generación CPU acababa de
+terminar:2880slots en2977,654segundos, fuentes conservadas y admisión exterior
+aceptada. El servicio propio quedó cerrado y su ausencia se verificó a04:47:52UTC.
+La evaluación no se inició; no hay nueva medición de identidad ni cierre del goal.
+Se conservan colección y checkpoints para retomar desde el lector, únicamente
+tras nueva indicación. La pausa incluye CPU y cadena autónoma; la GPU local/remota
+sigue suspendida. Contador10/20 intacto. [Recibos y siguiente paso](../../../Phideus-CASMI/docs/GOAL_CHAIN.md).
+
 ## CASMI161: generación molecular iniciada sólo en CPU — 2026-10-16 UTC
 
 La preparación quedó implementada, probada y revisada por el auditor725. El

@@ -1,3 +1,13 @@
+## Phideus/CASMI: pausa completa solicitada — 2026-10-16 UTC
+
+Mariano pide «necesito que hagas una pausa en tu trabajo». Detener la cadena
+autónoma y todo trabajo experimental, incluido CPU, hasta retoma explícita.
+CASMI161 terminó generación y admisión exterior; la evaluación no se inició.
+Servicio propio cerrado y ausencia verificada a04:47:52UTC; preservar artefactos,
+fuentes y checkpoints. Goal161 pausado, incompleto; contador10/20 sin cambio.
+La GPU local/remota continúa suspendida y requiere permiso explícito separado.
+No regenerar la colección al retomar: primero recuperar el corte del ledger.
+
 ## Phideus/CASMI: GPU suspendida; continuidad sólo CPU — 2026-10-15
 
 Mariano pide dejar de usar la GPU y avanzar únicamente hasta necesitarla.
