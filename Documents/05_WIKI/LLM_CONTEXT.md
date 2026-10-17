@@ -135,6 +135,30 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI165: mejora docente pequeña, identificación todavía pendiente — 2026-10-17
+
+El contraste completó72 rutas FULL con ambos checkpoints163, mismos nueve encodings
+expuestos y cuatro órdenes, refrescando logits después de cada par mediante el
+controlador docente165. Con prefijos correctos, la logprob filtrada media porpar
+con igual peso a identidades pasó de−0,306069 a−0,302707. Mejoró en26/36 parejas de
+rutas y7/8 identidades; no son réplicas independientes. Mejoró enlaces y empeoró
+no-enlaces: sólo41/956 enlaces quedaron primeros frente a35/956 del control.
+
+Son21400 decisiones forzadas con matrices completas conservadas, sin exclusiones,
+censura, empates o underflow. No son aciertos generativos ni causalidad espectral;
+164 conserva0/16. La continuación consumió459,233s yel lector35,455s sin forwards.
+Las cuatro unidades propias están cerradas,168 fuentes/163 históricas, checkpoints
+y cinco archivos ajenos conservados. Auditoría739 de resultados, prosa, horizonte y recursos integrada una sola vez:
+ciclo2:15/20, sin hallazgos materiales abiertos.
+
+Sigue diseñar un diagnóstico finito sobre los arrays existentes: ranking de
+existencia de enlace entre pares aún ocultos, separando prioridad relativa de
+masa absoluta. Fijar score/universo/vacíos/empates/agregación antes de leerlo; sin
+nuevos forwards o umbrales posthoc. No prolongar entrenamiento porCE. GPU local
+habilitada hasta aviso, no necesaria en165; remota y reservas siguen cerradas.
+
+[Resultado165](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/740_CASMI165_REFRESHED_WITNESS_RESULTS.md).
+
 ## CASMI164: más validez sin recuperación molecular — 2026-10-17
 
 El endpoint con prefijos docentes internos completó2880intentos y la lectura
