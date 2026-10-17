@@ -1,3 +1,64 @@
+## CASMI162: preparación docente y perfilGPU cerrados — 2026-10-17
+
+La exposición a posiciones internas quedó implementada y auditada conservando
+control/streams históricos. La preparación guardó256manifiestos:813619targets
+ocultos del control frente a727028de la candidata, sobre8092exposiciones por
+política. Es una variación comprobada de supervisión, sin resultado molecular.
+El perfil finito completó10mediciones,8controlesCPU/GPU y2retomas exactas;
+160,344648s de pared,302,913246sCPU y2231820288bytes deRAMpico. Sus máximosGPU
+fueron6086449152allocated/8048869376reserved; las unidades quedaron cerradas.
+
+Auditor nuevo732 releyó código, crudos y síntesis733 completos, sin hallazgos
+materiales abiertos. Contador11→12/20, una integración para todas las rondas.
+Se conserva el límite del cgroup auto-recolectado en preparación y la corrección
+del comprobador externo de cierre, sin repetir el experimento. Sigue aprender
+desde el inicial común y volver a generación/cobertura; no otro perfil por rutina.
+Fuentes, checkpoints y cinco ajenos intactos. [Resultado162](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/733_CASMI162_INTRAGROUP_PREFLIGHT_RESULTS.md).
+
+## Reanudación CASMI y mensaje recursivo 049 integrado — 2026-10-17
+
+Mariano reanudó el trabajo y habilitó la GPU local hasta nuevo aviso. Se recuperó
+el cierre161 sin repetir generación ni lectura: la próxima intervención se
+rebasará sobre la candidata728 de exposición docente a prefijos internos.
+La disponibilidad observada de la RTX3090 fue4MiB y ningún proceso de cómputo;
+se volverá a verificar ocupación y ownership antes de cada carga pertinente.
+
+Mensaje recursivo 049 integrado: releídas OrcaAgent, sección de delegación y
+protocolo completo de auditorías de MandingaInitWorkspace. La instancia principal
+conserva diseño, implementación y corrección; auditor nuevo con contexto pertinente
+sin heredar conversación en cada hito sustantivo. Contador único CASMI11/20
+conservado; no se cuenta la relectura ni se envía ACK al inbox. No se amplían
+reservas, GPU remota ni autoridad de promoción científica.
+
+## Relevo controlado del coordinador completado — 2026-10-16 UTC
+
+Por autorización explícita de Mariano se transfirió la continuidad a un hilo
+nuevo en el mismo contexto Phideus. El sucesor verificó identidad, permisos,
+modelo y fuentes; entregó READY y recibió la liberación durable del antecesor.
+Tras ver su respuesta final y confirmar que estaba inactivo, cerró únicamente
+la terminal anterior y comprobó su ausencia en el inventario de Orca. El ledger
+quedó en `completed` y el historial se conservó.
+
+La operación no reanudó investigación ni cómputo experimental: CASMI161 sigue
+completo, el contador conserva11/20 y permanece la pausa total CPU/GPU, sin nuevo
+goal. Evidencia privada: recibos de relevo y cierre bajo
+`.agent-work/thread-renewal/01a0ea1a-dd10-72b2-8913-2671ce5d6573/`.
+
+## Mensaje recursivo 048 integrado — 2026-10-16 UTC
+
+Se leyó el aviso048, la referencia actualizada del hook de renovación y el
+informe administrativo de reparación. El contador ahora reconoce el formato
+`compacted`, conserva el formato anterior y evita duplicados por identificador.
+En este hilo se verificó el ledger versión2 con113 compactaciones y fase
+`deferred`; el aviso del hook llegó efectivamente al comenzar este turno.
+La corrección del contador no significa que se haya efectuado el relevo.
+
+Se conserva la pausa total de Phideus/CASMI, incluida CPU experimental y GPU:
+no se abre sucesor ni se cierra este hilo por el aviso. El contador de auditorías
+permanece11/20. Fuente: mensaje048 de `/mnt/m2-1TB/MENSAJES_RECURSIVOS.md`;
+evidencia administrativa en
+`editorial-altermundi/Biblioteca/Agent_thread_renewal/contador-20261016/RESULTADO.md`.
+
 ## CASMI161: evaluación CPU terminada; cierre y pausa — 2026-10-16 UTC
 
 Mariano autorizó terminar solamente las evaluaciones. Se reutilizó la generación

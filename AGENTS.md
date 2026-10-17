@@ -1,3 +1,14 @@
+## Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-17
+
+Mariano indica «continua, tenes el gpu disponible hasta nuevo aviso». Reanuda
+el trabajo Phideus/CASMI después del cierre161 y habilita GPU local para los
+experimentos pertinentes, sin permisos por corrida. Recuperar el ledger y
+rebasar el siguiente plan sobre fuentes actuales; no regenerar161 ni repetir
+su evaluación. Verificar ocupación/ownership antes de cargar, preservar
+checkpoints y parada recuperable; no intervenir procesos ajenos. No habilita
+GPU remota, nuevas reservas ni promoción científica. Se conserva el contador
+ciclo2 11/20 y auditorías independientes AstraMedium en hitos pertinentes.
+
 ## Phideus/CASMI: terminar únicamente las evaluaciones — 2026-10-16 UTC
 
 Mariano indica «terminá solamente con las evaluaciones». Autoriza completar
