@@ -8,8 +8,8 @@ Se conservaron crudos y costes y se cerró la unidad; la corrección recibió
 pruebas y revisión independiente antes del segundo corte7a737ad. Los relojes
 y cuotas descuentan lo ya gastado, sin reiniciar presupuesto. Preparación2
 completa23,796s y perfil2 admitido42,875s: control y dos retomas exactos. Presupuesto
-medido aprobado; la colección candidata está en generaciónCPU. Sigue admisión
-exterior antes de lectura139. No hay nueva
+medido aprobado; la colección candidata completó2880intentos en2810,027s. Unidad cerrada y
+admisión exterior guardada; lectorCPU en curso, con semántica nueva antes de139. No hay nueva
 identificación molecular. Auditor736 en curso, contador13/20; GPUlocal habilitada.
 [Contrato y evidencia164](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/737_CASMI164_CONTRACT_AND_PROFILE_RESULTS.md).
 
