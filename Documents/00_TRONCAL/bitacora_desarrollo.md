@@ -1,3 +1,18 @@
+## CASMI164: contrato admitido y corrección del cierre del perfil — 2026-10-17
+
+El nuevo host conserva el generador160 y admite el endpointwithin-group163 con
+identidad propia. La preparación autenticó el control histórico161 sin repetir
+su colección ni evaluación. Su perfil inicial completó nueve celdas en hijos,
+pero el padre se censuró al confundir el evento de limpieza con cancelación.
+Se conservaron crudos y costes y se cerró la unidad; la corrección recibió
+pruebas y revisión independiente antes del segundo corte7a737ad. Los relojes
+y cuotas descuentan lo ya gastado, sin reiniciar presupuesto. Preparación2
+completa23,796s y perfil2 admitido42,875s: control y dos retomas exactos. Presupuesto
+medido aprobado; la colección candidata está en generaciónCPU. Sigue admisión
+exterior antes de lectura139. No hay nueva
+identificación molecular. Auditor736 en curso, contador13/20; GPUlocal habilitada.
+[Contrato y evidencia164](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/737_CASMI164_CONTRACT_AND_PROFILE_RESULTS.md).
+
 ## CASMI163: aprendizaje y control contemporáneo cerrados — 2026-10-17
 
 Las dos políticas completaron128actualizaciones y8092exposiciones desde el
