@@ -135,20 +135,23 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI164: contrato admitido y corrección del cierre del perfil — 2026-10-17
+## CASMI164: más validez sin recuperación molecular — 2026-10-17
 
-El nuevo host conserva el generador160 y admite el endpointwithin-group163 con
-identidad propia. La preparación autenticó el control histórico161 sin repetir
-su colección ni evaluación. Su perfil inicial completó nueve celdas en hijos,
-pero el padre se censuró al confundir el evento de limpieza con cancelación.
-Se conservaron crudos y costes y se cerró la unidad; la corrección recibió
-pruebas y revisión independiente antes del segundo corte7a737ad. Los relojes
-y cuotas descuentan lo ya gastado, sin reiniciar presupuesto. Preparación2
-completa23,796s y perfil2 admitido42,875s: control y dos retomas exactos. Presupuesto
-medido aprobado; la colección candidata completó2880intentos en2810,027s. Unidad cerrada y
-admisión exterior guardada; lectorCPU en curso, con semántica nueva antes de139. No hay nueva
-identificación molecular. Auditor736 en curso, contador13/20; GPUlocal habilitada.
-[Contrato y evidencia164](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/737_CASMI164_CONTRACT_AND_PROFILE_RESULTS.md).
+El endpoint con prefijos docentes internos completó2880intentos y la lectura
+posterior a admisión semántica de la colección nueva. Cobertura química/elegible
+ytop1/5/25 de0/16enA/B, sin desconocidos. B pasó de101a165slots válidos y de101a163
+candidatas finales; esa mayor validez no incorporó la identidad objetivo. El
+control161 se importó literalmente, sin regenerarlo ni repetir su evaluación.
+
+Generación2810,027s ylector1015,358s, unidades propias cerradas y ausencias
+verificadas;156fuentes/147históricas/cincoajenos conservados. El primer perfil
+censurado y el segundo completo permanecen con su gasto acumulado, dentro de
+los relojes y cuotas originales. Auditor736 de resultado/prosa/horizonte
+integrado una vez:14/20, sin hallazgos materiales abiertos. Sigue diseñar72rutas
+docentesFULL con refresco160 porpar y ambos endpoints163, para comparar la
+continuación correcta sin errores propios. No son probabilidad de identidad ni
+causalidad espectral, ni se prolonga training porCE. GPUlocal habilitada hasta aviso.
+[Resultado164](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/738_CASMI164_INTRAGROUP_MOLECULAR_RESULTS.md).
 
 ## CASMI163 cerrado: endpoints aprendidos y control histórico exacto — 2026-10-17
 
