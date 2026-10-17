@@ -1,3 +1,21 @@
+## CASMI163: aprendizaje y control contemporáneo cerrados — 2026-10-17
+
+Las dos políticas completaron128actualizaciones y8092exposiciones desde el
+mismo inicial;129checkpoints por condición y cinco selecciones con crudos. El
+control coincidió exactamente con CE156 en modelo/optimizer/RNG. La candidata
+redujoCE de enlaces pero aumentó no-enlaces yCEtotal de selección:0,267179 frente
+a0,265076. Es evidencia de ajuste, sin nueva identificación molecular;161 no se
+regeneró ni reevaluó. Sigue el contrato164 con generador160 y cobertura/top25,
+verificando antes la reutilización del control histórico.
+
+62pruebasCPU y revisión independiente734 de plan/código/resultado/prosa íntegra
+sin hallazgos materiales abiertos. R1/B1/R2 corregidos antesGPU; integración única
+12→13/20. Consumidor238,777883s, CPU408,910481s yRAMpico5513891840bytes. Unidad
+propia cerrada yGPUvacía;96fuentes163/136históricas/cincoajenos intactos. Primer
+comprobador confundió descriptores de handles, corregido sólo en lectura exterior,
+sin repetir entrenamiento ni forward. Código8976dc0; fuentes y recibos en
+[resultado163](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/735_CASMI163_INTRAGROUP_LEARNING_RESULTS.md).
+
 ## CASMI162: preparación docente y perfilGPU cerrados — 2026-10-17
 
 La exposición a posiciones internas quedó implementada y auditada conservando

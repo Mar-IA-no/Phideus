@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-10-16
+updated: 2026-10-17
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -134,6 +134,26 @@ source_paths:
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
+
+## CASMI163 cerrado: endpoints aprendidos y control histórico exacto — 2026-10-17
+
+Las dos políticas docentes completaron128updates y8092exposiciones desde el
+mismo inicial148/151 con CE original. Cada una conserva129checkpoints y cinco
+selecciones fijas. El control coincide exactamente con CE156 en81tensores,
+configuración, optimizer yRNG. La candidata tiene CE total de selección0,267179
+frente a0,265076 del control: menorCE de enlaces y mayor de no-enlaces. Es un
+diagnóstico, sin generación ni recuperación molecular nueva;161 conserva0/16.
+
+62testsCPU y auditor734 de implementación/crudos/prosa/horizonte integrados una
+vez: ciclo2,13/20. Consumidor238,777883s; fuentes y cinco ajenos intactos, unidad
+cerrada/not-found yGPUvacía. Sigue contrato molecular164 con generador160 y
+cobertura/top25, comprobando identidad contractual antes de reutilizar161;
+no más épocas porCE ni repetición161 por rutina. GPUlocal habilitada hasta nuevo
+aviso; remota/reservas cerradas. [Resultado163](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/735_CASMI163_INTRAGROUP_LEARNING_RESULTS.md).
+
+Los cortes de pausa siguientes son históricos; la reanudación explícita17/10
+los supera sólo para el trabajo local autorizado, sin alterar su evidencia.
+
 
 ## CASMI161: evaluación completa y pausa general — 2026-10-16 UTC
 
