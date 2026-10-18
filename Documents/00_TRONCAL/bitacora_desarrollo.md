@@ -9556,3 +9556,38 @@ Group-boundary terminó sus2.880intentos físicos, con dos resultados desconocid
 ### 2026-10-18 UTC — CASMI168: primera cobertura admitida y segundo modelo activo
 
 La adaptación terminó correctamente y conservó la procedencia del padre fallido:2.880intentos ejecutados,2.878observados y2desconocidos, sin repetirlos ni abrir respuestas. La unidad original quedó cerrada y su ausencia verificada. Within-group163 arrancó bajo8CPU/8GiB/swap0 y43.200s; ambos workers conservan intentos reales, con verificación y tiempos de modelo. El controlador corregido sigue como único ejecutor de las transiciones. Sigue completar esta segunda colección y la lectura semántica conjunta, auditoría final e interpretación; objetivo completo activo y contador17/20. Corrección/continuidad previa guardadas y subidas en ambos repositorios, wiki válida22páginas/91fuentes.
+
+
+### 2026-10-18 UTC — CASMI169: contraste acotado y perfil cerrado
+
+La revisión de fuentes encontró que159 ya había comparado retroceso y reinicios
+moleculares, y que139 carece de pares de consultas con fórmulas candidatas
+compartidas. El diseño169 estudia por eso la interacción entre rotar intensidades
+propias y revisar el recorrido, sin presentarla como causalidad química general.
+Conserva ambas163,197startsFULL/12celdas y cobertura molecular como resultado
+principal; no cambia el kernel dinámico168 ni repite sus colecciones.
+
+Plan/código revisados por una instancia nueva AstraMedium;56pruebas pertinentes
+pasan. El perfil adicional36 terminó en339,799s, CPU121,065s y356MiB pico, con
+ocho desenlaces conocidos sin cierre y28desconocidos por10s. Sus trazas se
+admitieron sin nuevos forwards, scoring ni lectura de identidades. La unidad y
+su cgroup exacto quedaron ausentes;206fuentes conservan las197anteriores.
+Falta revisar el presupuesto para no confundir cortes de ejecución con desenlaces
+moleculares. Main2.364/lector/auditoría/entrega siguen pendientes; contador18/20
+sin sumar prechecks. GPUlocal disponible, backendCPUFP32 conservado para este
+contraste. No hay nuevos entrenamientos, promoción ni reanudación de reservas.
+
+
+### 2026-10-18 UTC — CASMI169: ejecución principal iniciada
+
+La revisión del perfil fijó90s por intento y126000s por worker.35h es un techo
+finito, no una predicción de duración. Dos unidades propias verificadas ejecutan
+1128/1236intentos conCPUFP32,4threads,8GiB RAM y10GiB de disco por worker.
+La revisión detectó margen insuficiente en el lector candidato7200s: una enmienda
+aditiva lo lleva a14400s, conservando206fuentes y el protocolo, con nueve pruebas
+adicionales. No se repite el perfil ni se amplían datos, entrenamiento o GPU.
+
+Siguen los resultados principales, su admisión sin nuevos forwards, acceso único
+a respuestas139 y auditoría final de cifras, prosa íntegra y horizonte. Cortes
+por plazo o disco conservarán prefijos y outcomes desconocidos; no se reintentarán
+por inercia. Contador18/20, sin promoción científica. LaGPUlocal sigue habilitada.

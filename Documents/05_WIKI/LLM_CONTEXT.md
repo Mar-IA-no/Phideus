@@ -135,6 +135,32 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI169: comparación molecular en ejecución — 2026-10-18 UTC
+
+La prueba siguiente contrasta la interacción entre intensidades espectrales y
+revisión del recorrido, con ambos endpoints163 congelados. El panel139 no permite
+intercambios entre consultas emparejados por fórmula; se fijó una rotación de las
+intensidades propias, conservando masas y contexto. Es una intervención operacional
+posiblemente fuera de distribución, no una prueba general de información química.
+Se conservan197fórmulas: un startFULL por fórmula, dos condiciones y tres políticas,
+2.364intentos principales previstos;13consultas con intervención efectiva, dos
+controles de un pico y una lista vacía dentro del denominador16.
+
+El perfil adicional de36intentos terminó en339,799s, con121,065sCPU y372.957.184B
+pico. Las36trazas quedaron admitidas sin forwards ni evaluación de identidades:
+ocho desenlaces conocidos sin cierre y28desconocidos por el plazo10s. La unidad
+está cerrada y su cgroup ausente. Son datos de viabilidad, no un resultado molecular
+principal; los perfiles no se agregan al main como réplicas independientes.
+
+56pruebas pertinentes pasan;206fuentes congeladas conservan las197anteriores.
+El presupuesto principal fue aprobado:90s por intento/126000s por worker,
+techo exterior35h, no ETA. Dos workers activos ejecutan1128/1236intentos con
+10GiB cada uno; lector14400s por una enmienda aditiva con nueve pruebas más,
+sin cambiar206fuentes ni repetir el perfil. Siguen main/evaluación/cierre169.
+Contador18/20 sin incremento. GPUlocal habilitada; este contraste mantiene CPUFP32
+para reutilizar el runtime autenticado y no introduce otra arquitectura por inercia.
+No hay todavía identificación169; la ejecución no equivale a un resultado.
+
 ## CASMI168: comparación molecular completa y auditada — 2026-10-18 UTC
 
 Las dos colecciones163 completaron5.760intentos físicos y el lector admitió sus
