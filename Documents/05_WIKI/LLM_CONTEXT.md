@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-10-17
+updated: 2026-10-18
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -134,6 +134,36 @@ source_paths:
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
+
+## CASMI166: prioridad de pares bajo prefijos correctos — 2026-10-18 UTC
+
+El diagnóstico sobre72 rutas/21400 matrices preservadas165 separó elegir el par
+entre los todavía ocultos de asignarle categoría. AUROC inicial0,551423→0,557605;
+Top1 inicial0,125 en ambos frente a referencia uniforme0,095406. En prefijos
+mixtos la AUROC fue0,727621→0,726706 y el exceso Top1 sobre prevalencia
+0,222079→0,208059. Dentro del grupo no mejoró la prioridad relativa media,
+aunque asignó mayor probabilidad de enlace en los pasos docentes positivos.
+
+La señal crece tras decisiones correctas de referencia: no acredita una ruta
+constructiva con errores propios, causalidad espectral ni generalización.
+Nueve encodings, ocho identidades expuestas, cuatro órdenes y dos endpoints;
+jerarquía estricta y soporte pareado completo. Porpolítica10327prefijos mixtos,
+372sin positivos y uno con todos positivos, conservados porseparado.
+No modelos, nuevos forwards o reevaluaciones161/164/165;164 permanece0/16.
+
+Perfil2:1,764s, continuación70:9,942s, lector72:9,583s. El fallo inicial de
+admisión se preservó y descontó del mismo presupuesto;69tests pasan. Cuatro
+unidades cerradas/ausencia verificada,172fuentes y cinco archivos ajenos intactos.
+Auditoría741 validó cifras, prosa, recursos y horizonte; integrada una sola vez:
+ciclo2:16/20, sin hallazgos materiales abiertos.
+
+Sigue un ensayo constructivo concreto: elegir dinámicamente el par mediante
+presencia y después su categoría, frente al orden de pares actual, manteniendo
+ambos endpoints163. Necesita plan, auditoría nueva y estados construidos reales;
+los arrays cacheados no simulan ese contrafactual. No más épocas porCE ni otra
+cadena de proxies. GPUlocal habilitada hasta aviso; remota y reservas cerradas.
+
+[Resultado166](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/742_CASMI166_HIDDEN_PAIR_RANKING_RESULTS.md).
 
 ## CASMI165: mejora docente pequeña, identificación todavía pendiente — 2026-10-17
 
