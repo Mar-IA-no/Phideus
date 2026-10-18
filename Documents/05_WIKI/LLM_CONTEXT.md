@@ -135,6 +135,23 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI167: selección dinámica del par, preparación activa — 2026-10-18 UTC
+
+Tras el cierre166, se implementó un controlador aditivo que prioriza el par
+oculto por presencia antes de aplicar las mismas categorías/química160.
+Ambos checkpoints163 siguen congelados; no hay entrenamiento ni identificación
+nueva.64pruebas sintéticas independientes pasan, incluidas retoma, desempate
+por shuffle inicial, RNG160 y regresión numérica deoffset común grande.
+743 revisó plan/kernel/tests sin hallazgos materiales abiertos en ese alcance.
+
+Siguen host, captura de matrices completas, lector y operador antes del freeze
+y perfil real prefijado de16intentos sobre tres starts ya admitidos. No se han
+cargado modelos ni ejecutado el perfil167. Su cierre permitirá presupuestar
+el contraste molecular siguiente; no constituye esa comparación. Contador16/20
+sin incremento. GPUlocal habilitada hasta aviso; perfil inicialCPU porcoste
+previo de construcción/replay/IO, sin CUDA innecesaria ni GPUremota/reservas.
+[Plan167](../../../Phideus-CASMI/docs/CASMI167_DYNAMIC_PAIR_PREFLIGHT_PLAN.md).
+
 ## CASMI166: prioridad de pares bajo prefijos correctos — 2026-10-18 UTC
 
 El diagnóstico sobre72 rutas/21400 matrices preservadas165 separó elegir el par
