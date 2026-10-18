@@ -135,31 +135,35 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI168: dos agendas ejecutadas; lectura conjunta en curso — 2026-10-18 UTC
+## CASMI168: comparación molecular completa y auditada — 2026-10-18 UTC
 
-Los dos endpoints163 congelados completaron sus agendas:2.880intentos físicos por
-colección,5.760en total. Los metadatos del productor registran2.878resultados
-observados y2desconocidos en group-boundary, y2.879observados y1desconocido en
-within-group. Las tres censuras conservan el límite60s y permanecen desconocidas;
-estas cifras de ejecución todavía esperan la admisión semántica del lector.
-El denominador permanece16, incluida la consulta con lista de fórmulas vacía.
+Las dos colecciones163 completaron5.760intentos físicos y el lector admitió sus
+trazas antes de abrir únicamente las respuestas139 autorizadas. Las listas reales
+mantienen cobertura química/elegible y top1/5/25 en0/16A/B, conRR25cero, igual que
+los controles fijos161/164 importados sin reevaluación. Hubo398propuestas físicas
+válidas:164group-boundary y234within-group, pero ninguna identidad correcta entre
+las generadas. Cambiar sólo el ranking no recuperaría una respuesta ausente.
 
-Ambas unidades generadoras están cerradas y su ausencia de procesos/cgroups fue
-verificada. El primer cierre conserva el fallo de admisión original y su
-procedencia; el segundo terminó con código0 y cobertura física completa.
-Las188fuentes originales siguen intactas; la segunda generación acreditó las197
-fuentes congeladas antes y después. El lector conjunto inició a10:09UTC con ese
-mismo freeze,8CPU/8GiB/swap0 y28.800s internos, más120s de watchdog. Autentica ambas
-colecciones y sus trazas antes de abrir únicamente las respuestas139 admitidas.
+Se conservan5.757resultados observados y3desconocidos por60s. Las listas efectivas
+son evaluables en16consultas, incluida la lista de fórmulas vacía; el contrafactual
+sin censura permanece incompleto enA/Bgroup-boundary yBwithin-group, con límites
+conservadores[0;1/16] porcada media normalizada. Awithin-group está completamente
+observada. Son límites de valores posibles, no intervalos de confianza o prueba
+causal; los desconocidos no se convierten en inválidos ni resultados cero.
 
-El controlador finito conserva ownership exclusivo de las transiciones. Ante
-pausa se detiene y verifica primero el controlador y después las unidades propias.
-Los controles161/164 continúan importados de sus evaluaciones ya cerradas;
-138pruebas pertinentes y33escenarios del controlador conservan vigencia.
-Las métricas de identificación, la auditoría745 de cifras/prosa/horizonte y la
-entrega final siguen pendientes: objetivo completo activo, contador17/20.
-GPUlocal habilitada; backendCPUFP32 conservado para la comparación.
+El lector duró3.987,981s sin modelos/forwards. Generadores, lector y controlador
+quedaron cerrados, sin unidades/cgroups propios activos.197fuentes actuales,
+188originales, pesos y cinco archivos ajenos preservados;138pruebas pertinentes
+y33escenarios del controlador conservan vigencia. El recálculo numérico independiente
+coincide con filas/máscaras/intervalos.745 validó cifras, prosa íntegra y
+horizonte, sin hallazgos materiales pendientes; integrada una vez, contador18/20.
+GPUlocal habilitada; comparaciónCPUFP32, sin promoción o GO/NO-GO científico.
 
+
+La siguiente pregunta separa propuesta/condicionamiento espectral de pérdidas por
+el recorrido irreversible. El resultado no abre otra campaña de ranking ni
+justifica prolongar entrenamiento por inercia; la intervención siguiente requiere
+diseño y controles pertinentes sobre estos datos autorizados.
 
 ## CASMI168: integración verificada; comparación molecular pendiente — 2026-10-18 UTC
 

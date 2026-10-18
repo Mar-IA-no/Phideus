@@ -1,3 +1,33 @@
+## CASMI168: comparación molecular completa y auditada — 2026-10-18 UTC
+
+Las dos colecciones163 completaron5.760intentos físicos y el lector admitió sus
+trazas antes de abrir únicamente las respuestas139 autorizadas. Las listas reales
+mantienen cobertura química/elegible y top1/5/25 en0/16A/B, conRR25cero, igual que
+los controles fijos161/164 importados sin reevaluación. Hubo398propuestas físicas
+válidas:164group-boundary y234within-group, pero ninguna identidad correcta entre
+las generadas. Cambiar sólo el ranking no recuperaría una respuesta ausente.
+
+Se conservan5.757resultados observados y3desconocidos por60s. Las listas efectivas
+son evaluables en16consultas, incluida la lista de fórmulas vacía; el contrafactual
+sin censura permanece incompleto enA/Bgroup-boundary yBwithin-group, con límites
+conservadores[0;1/16] porcada media normalizada. Awithin-group está completamente
+observada. Son límites de valores posibles, no intervalos de confianza o prueba
+causal; los desconocidos no se convierten en inválidos ni resultados cero.
+
+El lector duró3.987,981s sin modelos/forwards. Generadores, lector y controlador
+quedaron cerrados, sin unidades/cgroups propios activos.197fuentes actuales,
+188originales, pesos y cinco archivos ajenos preservados;138pruebas pertinentes
+y33escenarios del controlador conservan vigencia. El recálculo numérico independiente
+coincide con filas/máscaras/intervalos.745 validó cifras, prosa íntegra y
+horizonte, sin hallazgos materiales pendientes; integrada una vez, contador18/20.
+GPUlocal habilitada; comparaciónCPUFP32, sin promoción o GO/NO-GO científico.
+
+
+La siguiente pregunta separa propuesta/condicionamiento espectral de pérdidas por
+el recorrido irreversible. El resultado no abre otra campaña de ranking ni
+justifica prolongar entrenamiento por inercia; la intervención siguiente requiere
+diseño y controles pertinentes sobre estos datos autorizados.
+
 ## CASMI168: dos agendas ejecutadas; lectura conjunta en curso — 2026-10-18 UTC
 
 Los dos endpoints163 congelados completaron sus agendas:2.880intentos físicos por
