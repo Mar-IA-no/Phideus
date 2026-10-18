@@ -1,3 +1,17 @@
+## CASMI168: primera colección molecular en marcha — 2026-10-18 UTC
+
+La revisión745 aprobó la enmienda de recursos y el pase a las dos colecciones.
+Comenzó la primera con el endpoint group-boundary163: ambos workers ejecutan
+callbacks reales y conservan sus primeros intentos. El límite es43.200s,
+8CPU/8GiB/swap0 y60s porintento; la colección no se considera completa por arrancar.
+Después siguen within-group y lectura conjunta, siempre dentro de este mismo goal.
+
+Las dos colecciones deben sellarse y cerrar sus unidades antes de abrir sólo las
+respuestas139 ya admitidas. Controles161/164 importados, sin reevaluarlos ni
+regenerarlos; fuente188 congelada. No hay aún resultados moleculares168, promoción
+científica ni incremento de auditoría:17/20. GPUlocal habilitada; CPUFP32 conserva
+el backend del contraste. [Plan168](../../../Phideus-CASMI/docs/CASMI168_DYNAMIC_PAIR_MOLECULAR_PLAN.md).
+
 ## CASMI168: integración verificada; comparación molecular pendiente — 2026-10-18 UTC
 
 La comparación completa conserva dos modelos163 congelados y5.760intentos nuevos,
