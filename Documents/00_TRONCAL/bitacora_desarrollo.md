@@ -9486,3 +9486,13 @@ La primera colección sigue activa y conserva sus fuentes. Una consulta ejecutó
 ### 2026-10-18 UTC — CASMI168: extensión aprobada y transiciones recuperadas
 
 La revisión745 aprobó la extensión que distingue ejecutar la agenda completa de observar todos sus resultados.138pruebas pertinentes y26escenarios del controlador pasan;197fuentes congeladas conservan las188originales. El nuevo controlador finito está activo y adoptó la primera colección: sólo continuará si acredita2.880intentos, sin reintentar censuras ni recuperar faltantes automáticamente. Los dos resultados vencidos permanecen desconocidos. Siguen pendientes la segunda colección y la lectura conjunta; goal completo activo, contador17/20. Ante una pausa se detiene primero el controlador y luego se verifican todas las unidades propias.
+
+
+### 2026-10-18 UTC — CASMI168: primera agenda ejecutada y fallo operativo conservado
+
+Group-boundary terminó sus2.880intentos físicos, con dos resultados desconocidos por60s. El padre terminó con el error previsto de admisión completa; todavía no se realizó la admisión semántica. El controlador posterior agotó512MiB antes de crear la unión de metadatos: sus bytes/fallo se conservaron y su ausencia quedó verificada. El coordinador recuperó las transiciones; segundo modelo y lector no arrancaron. La corrección revisada limita el cambio a1GiB del controlador, conserva los mismos8MiB de disco descontando gastos previos y pasa33escenarios. Las otras196fuentes siguen iguales. Falta aprobación operativa final antes de efectos; objetivo5.760/lector/auditoría/entrega continúa activo, contador17/20.
+
+
+### 2026-10-18 UTC — CASMI168: controlador corregido activo
+
+745 aprobó el corte exacto, la corrección a1GiB y33escenarios; comprobación real de importación/metadatos exit0, pico528.588.800bytes y unidad cerrada. Sólo cambió una palabra del plan de recursos;196fuentes restantes y188originales idénticas. El nuevo controlador finito se inició y verificó con ownership exclusivo de las transiciones: admitir la primera agenda completa y continuar segundo modelo/lector. Conserva los dos desconocidos, gastos previos y mismos8MiB de disco, sin repetir ciencia ni reponer presupuestos. Ante pausa detener/verificar primero controlador, después todas las unidades científicas propias. Objetivo completo activo, contador17/20, sin cierre científico.

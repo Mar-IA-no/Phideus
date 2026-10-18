@@ -135,28 +135,28 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI168: primera colección molecular en marcha — 2026-10-18 UTC
+## CASMI168: primera agenda ejecutada; continuación activa — 2026-10-18 UTC
 
-La revisión745 aprobó la enmienda de recursos y el pase a las dos colecciones.
-Comenzó la primera con el endpoint group-boundary163: ambos workers ejecutan
-callbacks reales y conservan sus primeros intentos. El límite es43.200s,
-8CPU/8GiB/swap0 y60s porintento; la colección no se considera completa por arrancar.
-Después siguen within-group y lectura conjunta, siempre dentro de este mismo goal.
-Una consulta agotó192intentos con dos resultados censurados por60s, vencidos antes
-de la verificación del productor. Se retiró el controlador anterior y se comprobó
-su ausencia. La extensión aditiva separa cobertura de ejecución, resultados
-observados y cierre real de procesos, conservando las188fuentes originales.
-745 aprobó el corte197,138pruebas y26escenarios del nuevo controlador finito.
-Este ya está activo y adoptó la corrida original: sólo acreditados los2.880intentos
-podrá preservarla/cerrarla y pasar a within-group y lectura conjunta. No repite
-censuras ni recupera faltantes por sí solo. Ante pausa, detener primero este
-controlador y verificar después todas las unidades científicas propias.
+La colección group-boundary terminó sus2.880intentos físicos:1.536en el primer
+shard y1.344en el segundo. Dos resultados siguen desconocidos por el límite60s;
+la cobertura de ejecución no equivale a observación completa ni a admisión
+semántica. Las188fuentes originales y todos los artefactos están conservados.
+El padre terminó con error porque su gate exigía observaciones completas.
 
-Las dos colecciones deben sellarse y cerrar sus unidades antes de abrir sólo las
-respuestas139 ya admitidas. Controles161/164 importados, sin reevaluarlos ni
-regenerarlos; fuente188 congelada. No hay aún resultados moleculares168, promoción
-científica ni incremento de auditoría:17/20. GPUlocal habilitada; CPUFP32 conserva
-el backend del contraste. [Plan168](../../../Phideus-CASMI/docs/CASMI168_DYNAMIC_PAIR_MOLECULAR_PLAN.md).
+El controlador posterior agotó sus512MiB al importar el adaptador de metadatos,
+antes de crear la unión o retirar la unidad original. Se conservó el fallo y se
+verificó su ausencia.745 aprobó la corrección a1GiB tras33pruebas y una comprobación
+real de importación/metadatos, cuyo pico de memoria fue528.588.800bytes. El nuevo
+controlador finito está activo y tiene ownership exclusivo de las transiciones:
+admisión completa de los2.880intentos, luego segundo modelo y lectura conjunta.
+No repite intentos ni amplía presupuestos científicos. Ante pausa se detiene y
+verifica primero ese controlador, luego todas las unidades científicas propias.
+
+El objetivo conserva ambos endpoints163 y5.760intentos, sellos/cierres y lector
+propio antes de abrir sólo las respuestas139 admitidas. Controles161/164 importados
+sin regeneración ni reevaluación.138pruebas de la extensión científica siguen
+vigentes: sus196fuentes restantes no cambiaron. Sin resultados moleculares168 ni
+promoción; contador17/20. GPUlocal habilitada, backendCPUFP32 para comparabilidad.
 
 ## CASMI168: integración verificada; comparación molecular pendiente — 2026-10-18 UTC
 
