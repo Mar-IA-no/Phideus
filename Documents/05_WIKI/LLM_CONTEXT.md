@@ -135,6 +135,32 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI168: integración verificada; comparación molecular pendiente — 2026-10-18 UTC
+
+La comparación completa conserva dos modelos163 congelados y5.760intentos nuevos,
+con el orden fijo161/164 como controles importados por hashes/metadatos, sin repetir
+sus evaluaciones. El nuevo códec guarda los cuatro valores de todos los pares
+superiores todavía ocultos y permite reconstruir selección, química y RNG.
+
+La integración real de seis intentos terminó en41,209486s:2.447callbacks, dos
+retomas exactas y seis fallos químicos conocidos, sin cierres niHcompleto.
+Los48.598.174B de streams quedaron preservados; unidad/cgroup cerrados y ausencia
+verificada. El auditor745 reconstruyó las seis trazas sin nuevos forwards.
+No hay todavía colecciones moleculares168 ni nuevas identificaciones.
+
+El coste concurrente eleva la proyección conservadora a42.300,075s. Una enmienda
+exclusivamente operativa fija43.200s de generación porendpoint y watchdog43.320s;
+conserva60s porintento, lector14.400s porendpoint, CPUFP32, modelos, agenda,
+semillas, química y48GiB totales/reserva32GiB libres. El freeze inicial y la
+integración se conservan; equivalencia de fuentes y gate adicional bajo revisión
+independiente antes de las colecciones. Las proyecciones no garantizan terminar.
+
+188fuentes actuales/177históricas y cinco archivos ajenos preservados. Pruebas
+pertinentes de contrato, códec, productor/lector y gates pasan; última revisión de
+límites:92pruebas.745 sigue abierta, contador17/20 sin incremento. La GPU local
+continúa habilitada; este contraste conserva CPU para comparar con los controles.
+Sin GPU remota, nuevas reservas, entrenamiento o promoción científica.
+
 ## CASMI167: controlador probado; comparación molecular pendiente — 2026-10-18 UTC
 
 La selección dinámica del par por presencia se ejecutó con estados propios,
