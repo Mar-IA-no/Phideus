@@ -9496,3 +9496,8 @@ Group-boundary terminó sus2.880intentos físicos, con dos resultados desconocid
 ### 2026-10-18 UTC — CASMI168: controlador corregido activo
 
 745 aprobó el corte exacto, la corrección a1GiB y33escenarios; comprobación real de importación/metadatos exit0, pico528.588.800bytes y unidad cerrada. Sólo cambió una palabra del plan de recursos;196fuentes restantes y188originales idénticas. El nuevo controlador finito se inició y verificó con ownership exclusivo de las transiciones: admitir la primera agenda completa y continuar segundo modelo/lector. Conserva los dos desconocidos, gastos previos y mismos8MiB de disco, sin repetir ciencia ni reponer presupuestos. Ante pausa detener/verificar primero controlador, después todas las unidades científicas propias. Objetivo completo activo, contador17/20, sin cierre científico.
+
+
+### 2026-10-18 UTC — CASMI168: primera cobertura admitida y segundo modelo activo
+
+La adaptación terminó correctamente y conservó la procedencia del padre fallido:2.880intentos ejecutados,2.878observados y2desconocidos, sin repetirlos ni abrir respuestas. La unidad original quedó cerrada y su ausencia verificada. Within-group163 arrancó bajo8CPU/8GiB/swap0 y43.200s; ambos workers conservan intentos reales, con verificación y tiempos de modelo. El controlador corregido sigue como único ejecutor de las transiciones. Sigue completar esta segunda colección y la lectura semántica conjunta, auditoría final e interpretación; objetivo completo activo y contador17/20. Corrección/continuidad previa guardadas y subidas en ambos repositorios, wiki válida22páginas/91fuentes.

@@ -135,7 +135,7 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI168: primera agenda ejecutada; continuación activa — 2026-10-18 UTC
+## CASMI168: primera agenda ejecutada; segunda colección en marcha — 2026-10-18 UTC
 
 La colección group-boundary terminó sus2.880intentos físicos:1.536en el primer
 shard y1.344en el segundo. Dos resultados siguen desconocidos por el límite60s;
@@ -147,8 +147,10 @@ El controlador posterior agotó sus512MiB al importar el adaptador de metadatos,
 antes de crear la unión o retirar la unidad original. Se conservó el fallo y se
 verificó su ausencia.745 aprobó la corrección a1GiB tras33pruebas y una comprobación
 real de importación/metadatos, cuyo pico de memoria fue528.588.800bytes. El nuevo
-controlador finito está activo y tiene ownership exclusivo de las transiciones:
-admisión completa de los2.880intentos, luego segundo modelo y lectura conjunta.
+controlador finito está activo y tiene ownership exclusivo de las transiciones.
+La admisión de metadatos confirmó2.880intentos,2.878observados y2desconocidos;
+la unidad original ya está cerrada con su fallo/procedencia conservados. Comenzó
+within-group163 y guarda intentos reales; después sigue la lectura semántica conjunta.
 No repite intentos ni amplía presupuestos científicos. Ante pausa se detiene y
 verifica primero ese controlador, luego todas las unidades científicas propias.
 
