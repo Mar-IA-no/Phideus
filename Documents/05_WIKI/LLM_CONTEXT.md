@@ -142,6 +142,10 @@ Comenzó la primera con el endpoint group-boundary163: ambos workers ejecutan
 callbacks reales y conservan sus primeros intentos. El límite es43.200s,
 8CPU/8GiB/swap0 y60s porintento; la colección no se considera completa por arrancar.
 Después siguen within-group y lectura conjunta, siempre dentro de este mismo goal.
+El controlador finito, revisado por745 y verificado en ejecución, asume esas
+transiciones y se detiene ante fallos o ambigüedad, sin reintentos. El coordinador
+conserva la revisión de resultados y el cierre completo; para pausar debe detener
+primero el controlador y después comprobar las tres unidades científicas propias.
 
 Las dos colecciones deben sellarse y cerrar sus unidades antes de abrir sólo las
 respuestas139 ya admitidas. Controles161/164 importados, sin reevaluarlos ni
