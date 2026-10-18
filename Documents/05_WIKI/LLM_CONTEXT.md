@@ -135,30 +135,31 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI168: primera agenda ejecutada; segunda colección en marcha — 2026-10-18 UTC
+## CASMI168: dos agendas ejecutadas; lectura conjunta en curso — 2026-10-18 UTC
 
-La colección group-boundary terminó sus2.880intentos físicos:1.536en el primer
-shard y1.344en el segundo. Dos resultados siguen desconocidos por el límite60s;
-la cobertura de ejecución no equivale a observación completa ni a admisión
-semántica. Las188fuentes originales y todos los artefactos están conservados.
-El padre terminó con error porque su gate exigía observaciones completas.
+Los dos endpoints163 congelados completaron sus agendas:2.880intentos físicos por
+colección,5.760en total. Los metadatos del productor registran2.878resultados
+observados y2desconocidos en group-boundary, y2.879observados y1desconocido en
+within-group. Las tres censuras conservan el límite60s y permanecen desconocidas;
+estas cifras de ejecución todavía esperan la admisión semántica del lector.
+El denominador permanece16, incluida la consulta con lista de fórmulas vacía.
 
-El controlador posterior agotó sus512MiB al importar el adaptador de metadatos,
-antes de crear la unión o retirar la unidad original. Se conservó el fallo y se
-verificó su ausencia.745 aprobó la corrección a1GiB tras33pruebas y una comprobación
-real de importación/metadatos, cuyo pico de memoria fue528.588.800bytes. El nuevo
-controlador finito está activo y tiene ownership exclusivo de las transiciones.
-La admisión de metadatos confirmó2.880intentos,2.878observados y2desconocidos;
-la unidad original ya está cerrada con su fallo/procedencia conservados. Comenzó
-within-group163 y guarda intentos reales; después sigue la lectura semántica conjunta.
-No repite intentos ni amplía presupuestos científicos. Ante pausa se detiene y
-verifica primero ese controlador, luego todas las unidades científicas propias.
+Ambas unidades generadoras están cerradas y su ausencia de procesos/cgroups fue
+verificada. El primer cierre conserva el fallo de admisión original y su
+procedencia; el segundo terminó con código0 y cobertura física completa.
+Las188fuentes originales siguen intactas; la segunda generación acreditó las197
+fuentes congeladas antes y después. El lector conjunto inició a10:09UTC con ese
+mismo freeze,8CPU/8GiB/swap0 y28.800s internos, más120s de watchdog. Autentica ambas
+colecciones y sus trazas antes de abrir únicamente las respuestas139 admitidas.
 
-El objetivo conserva ambos endpoints163 y5.760intentos, sellos/cierres y lector
-propio antes de abrir sólo las respuestas139 admitidas. Controles161/164 importados
-sin regeneración ni reevaluación.138pruebas de la extensión científica siguen
-vigentes: sus196fuentes restantes no cambiaron. Sin resultados moleculares168 ni
-promoción; contador17/20. GPUlocal habilitada, backendCPUFP32 para comparabilidad.
+El controlador finito conserva ownership exclusivo de las transiciones. Ante
+pausa se detiene y verifica primero el controlador y después las unidades propias.
+Los controles161/164 continúan importados de sus evaluaciones ya cerradas;
+138pruebas pertinentes y33escenarios del controlador conservan vigencia.
+Las métricas de identificación, la auditoría745 de cifras/prosa/horizonte y la
+entrega final siguen pendientes: objetivo completo activo, contador17/20.
+GPUlocal habilitada; backendCPUFP32 conservado para la comparación.
+
 
 ## CASMI168: integración verificada; comparación molecular pendiente — 2026-10-18 UTC
 

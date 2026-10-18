@@ -1,3 +1,28 @@
+## CASMI168: dos agendas ejecutadas; lectura conjunta en curso — 2026-10-18 UTC
+
+Los dos endpoints163 congelados completaron sus agendas:2.880intentos físicos por
+colección,5.760en total. Los metadatos del productor registran2.878resultados
+observados y2desconocidos en group-boundary, y2.879observados y1desconocido en
+within-group. Las tres censuras conservan el límite60s y permanecen desconocidas;
+estas cifras de ejecución todavía esperan la admisión semántica del lector.
+El denominador permanece16, incluida la consulta con lista de fórmulas vacía.
+
+Ambas unidades generadoras están cerradas y su ausencia de procesos/cgroups fue
+verificada. El primer cierre conserva el fallo de admisión original y su
+procedencia; el segundo terminó con código0 y cobertura física completa.
+Las188fuentes originales siguen intactas; la segunda generación acreditó las197
+fuentes congeladas antes y después. El lector conjunto inició a10:09UTC con ese
+mismo freeze,8CPU/8GiB/swap0 y28.800s internos, más120s de watchdog. Autentica ambas
+colecciones y sus trazas antes de abrir únicamente las respuestas139 admitidas.
+
+El controlador finito conserva ownership exclusivo de las transiciones. Ante
+pausa se detiene y verifica primero el controlador y después las unidades propias.
+Los controles161/164 continúan importados de sus evaluaciones ya cerradas;
+138pruebas pertinentes y33escenarios del controlador conservan vigencia.
+Las métricas de identificación, la auditoría745 de cifras/prosa/horizonte y la
+entrega final siguen pendientes: objetivo completo activo, contador17/20.
+GPUlocal habilitada; backendCPUFP32 conservado para la comparación.
+
 ## CASMI168: primera colección molecular en marcha — 2026-10-18 UTC
 
 La revisión745 aprobó la enmienda de recursos y el pase a las dos colecciones.
