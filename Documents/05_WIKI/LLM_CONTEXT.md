@@ -161,6 +161,16 @@ Contador18/20 sin incremento. GPUlocal habilitada; este contraste mantiene CPUFP
 para reutilizar el runtime autenticado y no introduce otra arquitectura por inercia.
 No hay todavía identificación169; la ejecución no equivale a un resultado.
 
+Una derivación del código POST, contrastada independientemente con fuentes y
+prosa completa, precisa cómo llega el espectro al modelo: hasta64promedios de
+activaciones aprendidas por checkpoint determinan su resumen. La corrección
+espectral local comparte dirección y varía su amplitud por par; tiene rango
+ideal como máximo uno. Esto no mide el rango numérico ni el de los logits,
+ni demuestra suficiencia o insuficiencia química. Con GELU no puede asumirse
+invariancia general ante rotar intensidades. El contraste y el contador18/20
+siguen iguales; los resultados moleculares169 están pendientes.
+[Derivación y límites](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/casmi169_conditioning_algebra_20261018/ANALISIS.md) · [Lectura cruzada](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/casmi169_conditioning_algebra_20261018/REVISION_ASTRA.md).
+
 ## CASMI168: comparación molecular completa y auditada — 2026-10-18 UTC
 
 Las dos colecciones163 completaron5.760intentos físicos y el lector admitió sus

@@ -9591,3 +9591,18 @@ Siguen los resultados principales, su admisión sin nuevos forwards, acceso úni
 a respuestas139 y auditoría final de cifras, prosa íntegra y horizonte. Cortes
 por plazo o disco conservarán prefijos y outcomes desconocidos; no se reintentarán
 por inercia. Contador18/20, sin promoción científica. LaGPUlocal sigue habilitada.
+
+### 2026-10-18 UTC — CASMI169: mediación espectral precisada desde el código
+
+Mientras continúa la generación, la lectura del código congelado permitió
+explicitar una propiedad del canal POST: el resumen espectral depende de hasta
+64promedios de activaciones aprendidas por checkpoint y el residual local usa
+una dirección común con amplitud por par. Una instancia independiente leyó la
+derivación completa y sus fuentes, sin encontrar errores materiales. La conclusión
+es algebraica e ideal; no mide rango numérico, capacidad química o rango de logits.
+La no linealidad del encoder impide asumir que rotar intensidades sea invisible.
+
+Esta precisión ayudará a distinguir respuesta del modelo, recorrido e identidad
+al interpretar169. No modifica pesos, corridas, presupuesto ni contador18/20 y
+no adelanta su resultado molecular.
+[Derivación y alcance](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/casmi169_conditioning_algebra_20261018/ANALISIS.md) · [Lectura cruzada](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/casmi169_conditioning_algebra_20261018/REVISION_ASTRA.md).
