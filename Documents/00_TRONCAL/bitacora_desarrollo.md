@@ -9476,3 +9476,13 @@ límite conjunto es34200s y8GiB RAM; CPU800%,sin CUDA, sin nuevos entrenamientos
 ni acceso a respuestas. El lanzamiento no completa159: siguen las colecciones,
 sellos, lectura de cobertura/top25 y auditoría. Último resultado molecular0/16,
 contador8/20. Evidencia de presupuesto, ejecución y límites en perfil716 deCASMI.
+
+
+### 2026-10-18 UTC — CASMI168: cobertura y censura separadas
+
+La primera colección sigue activa y conserva sus fuentes. Una consulta ejecutó sus192intentos con dos resultados desconocidos por el límite60s, vencido antes de verificarlos; los recibos tardíos conservan esa censura.745 confirmó que la admisión actual exige observaciones completas y puede cancelar indebidamente al otro shard. Se retiró el controlador, cancelación y ausencia verificadas, y el coordinador recuperó las transiciones. Se prepara una enmienda aditiva para conservar cobertura, incertidumbre y gastos sin repetir intentos; siguen pendientes ambas colecciones completas y lectura conjunta. Contador17/20, sin nuevos resultados ni promoción.
+
+
+### 2026-10-18 UTC — CASMI168: extensión aprobada y transiciones recuperadas
+
+La revisión745 aprobó la extensión que distingue ejecutar la agenda completa de observar todos sus resultados.138pruebas pertinentes y26escenarios del controlador pasan;197fuentes congeladas conservan las188originales. El nuevo controlador finito está activo y adoptó la primera colección: sólo continuará si acredita2.880intentos, sin reintentar censuras ni recuperar faltantes automáticamente. Los dos resultados vencidos permanecen desconocidos. Siguen pendientes la segunda colección y la lectura conjunta; goal completo activo, contador17/20. Ante una pausa se detiene primero el controlador y luego se verifican todas las unidades propias.
