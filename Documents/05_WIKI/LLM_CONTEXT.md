@@ -135,22 +135,32 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI167: selección dinámica del par, preparación activa — 2026-10-18 UTC
+## CASMI167: controlador probado; comparación molecular pendiente — 2026-10-18 UTC
 
-Tras el cierre166, se implementó un controlador aditivo que prioriza el par
-oculto por presencia antes de aplicar las mismas categorías/química160.
-Ambos checkpoints163 siguen congelados; no hay entrenamiento ni identificación
-nueva.64pruebas sintéticas independientes pasan, incluidas retoma, desempate
-por shuffle inicial, RNG160 y regresión numérica deoffset común grande.
-743 revisó plan/kernel/tests sin hallazgos materiales abiertos en ese alcance.
+La selección dinámica del par por presencia se ejecutó con estados propios,
+ambos endpoints163 congelados y las mismas categorías/química160.16intentos
+terminaron en no_admissible_category antes de completarH;5.207callbacks con
+matrices completas y5.191pares confirmados. Son fallos químicos observados,
+sin censuras/desconocidos, no una mejora molecular;164 conserva0/16.
 
-Siguen host, captura de matrices completas, lector y operador antes del freeze
-y perfil real prefijado de16intentos sobre tres starts ya admitidos. No se han
-cargado modelos ni ejecutado el perfil167. Su cierre permitirá presupuestar
-el contraste molecular siguiente; no constituye esa comparación. Contador16/20
-sin incremento. GPUlocal habilitada hasta aviso; perfil inicialCPU porcoste
-previo de construcción/replay/IO, sin CUDA innecesaria ni GPUremota/reservas.
-[Plan167](../../../Phideus-CASMI/docs/CASMI167_DYNAMIC_PAIR_PREFLIGHT_PLAN.md).
+Perfil94,417s ylector29,063s sin forwards, con cuatro retomas exactamente
+iguales a sus rutas no interrumpidas.122pruebas sintéticas independientes
+pasaron. Dos unidades cerradas/not-found y cgroups ausentes;177fuentes,
+172históricas, cinco archivos ajenos y checkpoints163 conservados.
+Auditoría743 validó resultados, prosa, presupuesto corregido, recursos y horizonte;
+integrada una sola vez, ciclo2:17/20, sin hallazgos materiales abiertos.
+
+Sigue el contraste molecular dinámico frente al orden fijo con ambos pesos,
+roster16/A+B y reuso histórico sólo tras identidad contractual. Presupuesto
+propuesto y condicionado a host revisado:5.760slots nuevos, dos shards por
+endpoint, topes36.000/14.400s generación/lector. El perfil no observó cierres
+exitosos niHcompleto: las proyecciones no son garantías. Para conservar evidencia
+sin duplicar scores enJSON se propone schema propio de cuatro logitsfloat64
+porcada par superior aún oculto; necesita lector/pruebas e integración antes
+colección. No se relabela comoFULL167 ni se borra su crudo.48GiB propuestos,
+reserva32GiB libres. GPUlocal habilitada hasta aviso; sin remota/reservas,
+retraining, promoción o GO/NO-GO científico.
+[Resultado167](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/744_CASMI167_DYNAMIC_PAIR_PREFLIGHT_RESULTS.md).
 
 ## CASMI166: prioridad de pares bajo prefijos correctos — 2026-10-18 UTC
 
