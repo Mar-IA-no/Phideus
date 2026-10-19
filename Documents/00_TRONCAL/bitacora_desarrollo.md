@@ -9619,3 +9619,23 @@ en systemd como en su cgroup de arranque. Las trazas permanecen guardadas.
 El segundo productor continúa; la admisión conjunta y la lectura de identidades
 esperan su cierre. Este avance cierra un recurso, no la comparación molecular169
 ni su auditoría final. Contador18/20 sin incremento y permisos sin cambios.
+
+
+### 2026-10-19 UTC — CASMI169: generación completa y lector propio iniciado
+
+El segundo productor completó sus1.236intentos en78.268,178s, con21.294,764sCPU
+y1.289.547.776B pico según systemd. Conservó fuentes y RNG, sin error o acceso a
+respuestas. Se cerró su unidad exacta una sola vez y se comprobó ausencia tanto
+en systemd como en su cgroup de arranque. El primer cierre se reutilizó.
+
+Quedaron guardados los2.364intentos principales: los metadatos del productor
+separan1.334desenlaces conocidos y1.030desconocidos;188cierres nativos no son aún
+admisión semántica o identidades correctas. El nuevo lector169 está activo con
+el reloj revisado14400s y recursos propios. Verifica trazas, estados y bindings,
+sella las puntuaciones y después accede únicamente a las respuestas139 ya
+expuestas, sin volver a ejecutar modelos ni repetir evaluaciones anteriores.
+
+Se corrigió además el cotejo del observador privado para usar los hashes
+esperados de las tresfuentes aditivas; las209fuentes coinciden. No cambió el
+experimento. Siguen métricas, lectura íntegra independiente de cifras y prosa,
+horizonte y cierre; contador18/20 sin incremento. GPUlocal sigue habilitada.
