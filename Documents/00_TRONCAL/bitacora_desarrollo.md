@@ -9913,3 +9913,25 @@ conversación heredada y su metadata efectiva confirmó `gpt-6.1-sol`/`high`,
 con permisos completos y approval never. Recibo privado recuperable en
 W174/control/sol-auditor-runtime-1.json. La colección continúa sin cambios en
 sus284fuentes y sin apertura de verdad; contador ciclo3:3/20.
+
+
+## CASMI174: GPU suspendida; corte conservado y continuidad CPU — 2026-10-19 UTC
+
+Mariano pidió dejar la GPU y continuar sólo CPU. El productor se interrumpió
+recuperablemente: 6.784 intentos completos, uno desconocido y 3.065 sin iniciar,
+sobre la agenda fija de 9.850. Los pesos anteriores y posteriores coinciden.
+El servicio propio quedó cerrado una vez, con doble ausencia de unidad/PID/cgroup
+y ausencia del proceso en NVIDIA comprobada a las20:59:59UTC. No hay relanzamiento.
+
+La verificación exterior CPU terminó exit0 en57,985877s:284fuentes,7.657entradas
+y27.146outputs autenticados,400.414.771B de outputs. El sampler conserva20EOS C
+/18EOS S; todavía no son moléculas válidas ni identidades recuperadas. Phase
+`bf80bed462786f6fa1ef3d8bd2cfc703886d1625f124653a566571bff96bced4`;
+verification`fe881b1df94775a8796692bd2f16c5e7fd386281014537bad68d450c9f9cc3b3`.
+
+Sigue preparar y revisar admisión numérica CPU reutilizable de3.392parescompletos,
+sin tocar el prefijo interrumpido, abrir verdad o generar nuevas trayectorias.
+Plan: `CASMI174_INTERRUPTED_CPU_PLAN.md`. El lector9850 y sus scripts de éxito
+completo quedan preparados, sin ejecutar contra este corte. La colección restante
+necesita nueva habilitación GPU;174 sigue incompleto y contador ciclo3:3/20.
+Nuevas delegaciones Sol6.1High por orden expresa, incluida auditoría independiente.

@@ -725,6 +725,12 @@ Resultado: Phideus-CASMI/docs/RESULTS_CASMI150_ALIGNMENT_OBJECTIVE.md.
 
 
 
+> CASMI174(19/10): Mariano suspendió GPU y autorizó continuar sóloCPU. Corte
+> preservado6.784complete/1unknown/3.065notstarted; servicio/cgroup/PID propio
+> ausentes y GPU liberada, bytes verificados. Se prepara admisión numérica de
+> trazas completas sin forwards ni verdad. Colección y lectura molecular siguen
+> incompletas;3/20, nuevas delegacionesSol6.1High. Ver estado troncal y ledgerCASMI.
+
 # Contexto integral de Phideus para LLMs
 
 ## Corte2026-10-15 CASMI149 cerrado

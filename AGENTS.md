@@ -509,3 +509,16 @@ coordinador, incluidas auditorías, usa `gpt-6.1-sol`, esfuerzo `high`, con
 independencia y contexto mínimo cuando corresponda. Sustituye selecciones
 anteriores incompatibles para nuevas delegaciones; no cambia el runtime de
 agentes ya iniciados ni modelos experimentales. Verificar la selección efectiva.
+
+
+## Phideus/CASMI: GPU suspendida; continuidad sólo CPU — 2026-10-19
+
+Mariano indica: «Necesito que dejes de usar la GPU por ahora, seguí solamente
+con cosas que sean de CPU». Revoca la habilitación GPU local del17/10 para
+Phideus/CASMI: no iniciar CUDA, inferencia/training GPU, relanzadores ni GPU
+remota como sustitución hasta nueva habilitación explícita. Detener únicamente
+trabajo GPU propio de forma recuperable, preservando intentos, trazas, fuentes
+y checkpoints; no intervenir procesos ajenos. Continuar sólo CPU que avance
+materialmente el objetivo. Ante dependencia material de GPU, informar y pausar
+el goal/cadena; no sustituir por CPU larga ni actividad periférica. La colección
+174 interrumpida no se regenera ni se declara completa por esta orden.

@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI174: GPU suspendida, continuidad CPU — 2026-10-19 UTC**: por orden de Mariano se interrumpió la colección en6.784intentos completos, uno desconocido y3.065sin iniciar. ProcesoGPU propio y servicio/cgroup cerrados, ausencia verificada; checkpoints conservados.284fuentes y todos los bytes del corte verificados enCPU. Sigue admisión numérica reutilizable de las trazas completas; sin abrir respuestas ni lectura molecular final.174incompleto, ciclo3:3/20; GPU local/remota suspendida hasta nuevo permiso. Nuevas delegaciones Sol6.1High.
+>
 > **CASMI174: colección GPU activa — 2026-10-19 UTC**: se están generando9.850intentos desde los dos brazos entrenados, con trazas completas y presupuesto revisado.284fuentes congeladas; unidad/cgroup y GPU propios comprobados. El cierreEOS se evaluará después de sellar la colección y liberarGPU. LectorCPU preparado y auditándose; sin resultado molecular174. Contador3/20.
 >
 > **CASMI174: calibración consolidada — 2026-10-19 UTC**: las cuatro muestras pendientes terminaron sin cierre molecular; quedan cinco desenlaces conocidos y un prefijo desconocido conservado. CodecFP32 corregido,119pruebas pertinentes y cierre verificados. Se prepara la colección principal de9.850intentos con presupuesto finito; todavía no se lanzó ni se evaluó identidad. Contador3/20.
