@@ -2925,3 +2925,29 @@ de representación no equivale a garantizar una CDF matemática monótona. Se
 preparan solamente las cuatro posicionesFIT nunca iniciadas, con el presupuesto
 original y revisión antes deCUDA. Generación principal y lectura molecular174
 siguen pendientes; fuentes265/271 intactas y contador ciclo3:3/20.
+
+
+### CASMI174 — calibración consolidada y colección preparada
+
+Las cuatro posicionesFIT no iniciadas completaron52/62/142/74acciones en
+0.418587/0.295649/0.639159/0.342466s; todas terminaron sin acciones admisibles.
+C0previo conserva24acciones/no_actions y S0continúa desconocido con11acciones.
+Se registran cinco desenlaces conocidos del sampler y uno desconocido, no cinco
+moléculas válidas. La correcciónV2 guarda todos los FP32 y diagnósticos sin cambiar
+kernel, pesos, uniformes o valores. La versión previa y sus artefactos siguen
+intactos; ninguna muestra repetida.58tests integrados pasan y61del host principal,
+proyector y compatibilidad del lectorCPU pasan adicionalmente.
+
+Continuación4.112794s de servicio; gasto acumulado125.968518s dentro de840,
+con85.582530/5.004526/35.381462s por admisión/trabajo/cierre.278fuentes y todos
+outputs verificados, cierre exacto una vez y doble ausenciaPID/unidad/cgroup.
+Phasec4c5c92b7558919424a75ee309180d8d393ec3bd212aa5825b3d6f8c177d5ca5;
+cierred9816f676be120533366d2507a2fdd507838ab9b2ca1c7d60fb74b56338ec75b.
+
+Sigue la colección principal9850, todavía sin lanzar: freeze284
+f7cf61c78275ca5b4aa5ad0f0e7d23be42b0cdd8aa87ee91c01d1cffcea45a8f.
+Presupuesto14400s generación/180admisión/120cierre,14700total, sin ETA garantizada
+por las rutas largas no observadas y la censuraFIT. Envolvente física69.34GB,
+con32GiB libres incluidos; margen efectivo4.70GB al preparar. La lecturaCPU se
+presupuesta tras cerrarGPU con la colección real y no abre verdad antes de sellos.
+No hay recuperación molecular174 ni promoción; contador ciclo3:3/20.
