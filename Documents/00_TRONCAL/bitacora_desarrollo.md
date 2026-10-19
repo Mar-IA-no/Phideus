@@ -9786,3 +9786,26 @@ antes de convertir o crear hijos: comparación de tuplas y listas serializadas.
 Se conserva el intento y se corrige con prueba128 de ida/vueltaJSON; retoma en
 unidad/output nuevos con descuento del tiempo ya consumido, pendiente de revisión.
 No hay corpus completo o nuevo entrenamiento.173 sigue activo; ciclo3:2/20.
+
+
+### 2026-10-19 UTC — CASMI173: corpus y caché completos y auditados
+
+Se materializaron 20.212 grafos y se conservaron 7.448 exclusiones heredadas, sin
+rechazos nuevos o indeterminados. Las 128 conversiones previas se reutilizaron.
+El reloj CPU acumulado de 334,992286 s incluye los 28,113395 s del fallo de admisión,
+corregido sin repetir química ni renovar presupuesto. Las máscaras ocupan 22,38 MB
+y las secuencias tienen entre 16 y 290 tokens. La caché conserva las entradas
+reales y el cálculo del modelo en pruebas sintéticas; la preparación de los
+B32 medidos fue entre 10,057 y 11,442 veces menor. El perfil GPU de 48,952638 s
+produjo tres updates y seis checkpoints, sin generación principal. El probe
+S22/identidad de tres casos fit duró 27,470782 s; no mide recuperación nueva.
+
+756 acepta implementación, cifras, prosa íntegra y horizonte; se integra una
+vez, ciclo 3: 2→3. Se corrigió la explicación de min_cuts≥1 sin cambiar el código
+experimental. Quedan 109 pruebas pertinentes vigentes. Las cuatro unidades
+propias están cerradas y su ausencia verificada; Orca conserva sólo la terminal
+coordinadora protegida. Se preservan 227 fuentes, pesos, cinco archivos ajenos
+y transcripts. El piloto 174 mantiene entrenamiento y lectura molecular aunque
+CE no mejore: antes debe resolver trazas y disco total, pues los 37,2 GB
+condicionales de checkpoints no acreditan que todo el trabajo quepa.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/757_CASMI173_CORPUS_RESULTS.md).

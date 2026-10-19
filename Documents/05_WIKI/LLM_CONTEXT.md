@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-10-18
+updated: 2026-10-19
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -135,16 +135,24 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI173: corpus y caché en implementación — 2026-10-19 UTC
+## CASMI173: corpus y alimentación completos — 2026-10-19 UTC
 
-La caché conserva el cálculo del modelo en pruebas sintéticas y evita interpretar
-la gramática por lote. El corpus completo aún no está materializado: la admisión
-inicial detectó una diferencia de tipos entre tuplas yJSON, antes de conversiones.
-La corrección conserva el intento y descuenta su tiempo al retomar, con revisión
-independiente. Se reutilizan128conversiones172; no se entrenó el piloto principal
-ni se abrió otra evaluación molecular. Contador ciclo3:2/20/GPUlocal autorizada.
+El corpus conserva20.212secuencias(18.262fit/1.950selección) y7.448exclusiones
+heredadas, sin nuevosrechazos oindeterminados. Se reutilizaron128conversiones;
+el fallo de admisión se conservó y corrigió con descuento de su tiempo. RelojCPU
+acumulado334,992286s, incluyendo28,113395s anteriores. Las máscaras cacheadas
+preservan el cálculo: preparación10,057–11,442veces menor en los mismosB32,
+sin extrapolar esa mejora a entrenamiento entero. PerfilGPU48,952638s;probeS22
+yidentidad3fit27,470782s. No se evaluó recuperación molecular nueva.
 
-[Plan173](../../../Phideus-CASMI/docs/CASMI173_SEQUENCE_CORPUS_PLAN.md).
+756 valida implementación, cifras, prosa íntegra yhorizonte; integrada una vez
+a ciclo3:3/20. UnidadesCPU/probe/GPU cerradas yausentes, GPUlibre al comprobar,
+fuentes/pesos/cincoajenosconservados. El siguiente piloto mantiene2000prior y
+cuatroépocasC/S, con lectura molecular aunqueNLLnomejore. Debe concretar primero
+trazas recuperables/discototal ycostes de rutas entrenadas: los37,2GBcondicionales
+decheckpoints no pruebanque todoquepa. GPUlocalautorizada; sinpromoción científica.
+
+[Resultado757](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/757_CASMI173_CORPUS_RESULTS.md) · [Auditoría756](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/756_CASMI173_CORPUS_AUDIT_ASTRA.md).
 
 ## CASMI172: preflight completo y auditado — 2026-10-19 UTC
 
