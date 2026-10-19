@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI174: diagnóstico FP32 conservado — 2026-10-19 UTC**: un único paso reprodujo una CDF un ULP por encima de1. Crudos guardados, pesos intactos y diagnóstico cerrado en2,273315s. Se prepara corrección del registro y sólo las cuatro muestrasFIT no iniciadas; S0 sigue desconocido. Generación/lectura molecular pendientes y contador3/20.
+>
 > **CASMI174: entrenamiento completo y calibración incompleta — 2026-10-19 UTC**: se conservaron2515checkpoints, con verificación y cierre propios. La calibración detuvo el registro por una probabilidad rechazada: una muestra completa, un prefijo desconocido y cuatro posiciones no iniciadas. Se diagnostica un único paso desde ese prefijo, preservando el presupuesto y los intentos. No hay resultado molecular174 ni promoción; contador ciclo3:3/20.
 >
 > **CASMI174 en entrenamiento GPU — 2026-10-19 UTC**: el prior y los dos brazos del piloto171 se entrenan con checkpoints por update, tras medir persistencia y revisar el presupuesto total. El auditor aceptó254fuentes y el comando exacto; arranque real verificado, GPUlocal libre antes de cargar. Se reutiliza el corpus173. Después siguen calibraciónFIT, generación y comparación molecular; no se declara recuperación por terminar el aprendizaje. Contador ciclo3:3/20, sin promoción científica.

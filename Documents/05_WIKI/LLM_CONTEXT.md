@@ -2909,3 +2909,19 @@ margen≈6,4×coste; pérdidaauxmenor no demuestra reconstrucción.438recompone1
 constructivo y experimento finito antes deotrotraining; no reabrirλ ni repetir
 ROOT/ATTACH/CLOSE18–32como novedad. Mayorsoporte no pruebausoMS/MS.452preservado,
 reserva cerrada, fórmulaoracle, desarrolloexpuesto y unainicialización, no promoción.
+
+
+### CASMI174 — actualización del diagnóstico de registro
+
+El diagnóstico de un solo paso reprodujo el rechazo del registrador: siete
+entradas de la CDF valen1.0000001192092896 y existe un descenso de un ULP;
+probabilidades finitas en[0,1]. Se conservaron vectoresFP32/RNG crudos antes del
+guard, sin modificar sampler ni pesos. Servicio2.273315s, phase5033763e03bd42902fe8b23301ba81de92de5e6364a9a087eca525cb0918d6f4,
+cierre externo y doble ausencia verificados. El gasto acumulado es121.855724s.
+
+Este testigo no recupera el evento original perdido: S0 continúa desconocido.
+La corrección aditiva registra redondeo acotado sin recortar valores; tolerancia
+de representación no equivale a garantizar una CDF matemática monótona. Se
+preparan solamente las cuatro posicionesFIT nunca iniciadas, con el presupuesto
+original y revisión antes deCUDA. Generación principal y lectura molecular174
+siguen pendientes; fuentes265/271 intactas y contador ciclo3:3/20.
