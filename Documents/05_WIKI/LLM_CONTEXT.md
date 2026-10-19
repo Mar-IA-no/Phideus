@@ -135,6 +135,28 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI172: preflight completo y auditado — 2026-10-19 UTC
+
+El constructor composicional está implementado.128/128fit conservaron fórmula,
+órdenes e identidad en34,908669sCPU, sin exclusiones/desconocidos. La calibración
+GPU duró32,633129s y sus tres retomas reprodujeron exactamente el siguienteupdate.
+Las seis muestrasfit de calibración agotaron acciones; no se evaluó recuperación
+molecular ni se ejecutó entrenamiento principal.
+
+El perfilB32 midió preparación0,512–0,537s frente aupdateGPU0,029–0,036s. El coste
+actual está dominado por reconstruir máscaras; sigue173: censo completo y máscaras
+reutilizables autenticadas, reaprovechando las128conversiones. El presupuesto
+principal sigue pendiente de soporte/coste completo, rutas entrenadas yS22;
+no se fabrica una ETA desde seis muestras cortas ni se prolonga trabajo porCE.
+
+754 aceptó implementación, cifras, PROSAÍNTEGRA755 y horizonte. Integración única
+ciclo3:1→2/20;199pruebasCPU y10del kernel/hostGPU vigentes.227fuentes, checkpoints
+y cinco archivos ajenos conservados. Ambas unidades cerradas con ausencia exacta
+verificada yGPU sin procesos de cómputo al comprobar. GPUlocal autorizada hasta
+aviso; no remota, nuevas reservas o promoción científica.
+
+[Resultado755](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/755_CASMI172_SEQUENCE_PREFLIGHT_RESULTS.md) · [Auditoría754](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/754_CASMI172_PREFLIGHT_AUDIT_ASTRA.md) · [Siguiente173](../../../Phideus-CASMI/docs/CASMI173_SEQUENCE_CORPUS_PLAN.md).
+
 ## CASMI172: perfil de conversión128 completado — 2026-10-19 UTC
 
 La gramática composicional, el consumidor autenticado y la red nueva están

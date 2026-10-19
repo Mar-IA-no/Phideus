@@ -9751,3 +9751,26 @@ verificada dos veces. No se ejecutaron modelos oGPU. Es soporte de representaci�
 sin recuperación libre ni censo completo. Siguen kernel/hostGPU aditivos y revisión
 antes de calibración fit-only, con8pruebasCPU nuevas aprobadas.172 sigue activo y
 contador1/20; no se integra otra auditoría por rondas preparatorias.
+
+
+### 2026-10-19 UTC — CASMI172: calibraciónGPU y revisión final completas
+
+La GPUlocal ejecutó el perfil finito, previamente revisado, en32,633129s. Tres
+retomas reprodujeron exactamente parámetros/estadísticas del siguienteupdate;
+se preservaron12checkpoints y los endpointsu4 de muestreo. Seis muestrasfit
+agotaron acciones, sin desconocidos, con34decisiones reconstruibles porCDF/RNG.
+No son resultados de recuperación ni sustituyen el piloto completo.
+
+La preparaciónB32 tarda0,512–0,537s, frente aupdateGPU0,029–0,036s ycheckpoint
+~0,020s. La mejora pertinente es guardar máscaras una sola vez, junto al censo
+secuencial completo;173 conserva las128conversiones172 y no repite su química.
+El presupuesto principal tiene límites materiales aún sin medir: soporte/caché,
+rutas largas entrenadas yscoringS22. No se fabrica una ETA de9850intentos.
+
+754, auditor independiente del mismo172, verificó implementación, números,
+PROSAÍNTEGRA755 y horizonte; sin hallazgos materiales pendientes. Se integra una
+sola vez1→2/ciclo3, sin sumar preparatoriosCPU/GPU ni repetirDivina751.199testsCPU
+más10nuevos deGPUhost/kernel vigentes;227fuentes, checkpoints ycincoajenos intactos.
+GPUunit1edd2f21 cerradaUNAveztrasExec0/PID0,2notfound/listempty/startupCGabsent;
+CPU767eaef1 ya cerrada y conservada. PIDGPUpropioausente/appsnonealcomprobar.
+Sigue implementación/revisión173, luego entrenamiento y lectura molecular171.
