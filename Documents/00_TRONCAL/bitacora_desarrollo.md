@@ -9708,3 +9708,29 @@ intervención sobre el prefijo parcial de la selección espectral de padres ya
 ensayada, o un prior neuronal de otra familia, conservando referencia y controles.
 PRE/POST ya llegó a128updates en152: no corresponde presentarlo como un trabajo
 faltante. La alternativa171 no se implementó ni se promovió dentro170.
+
+
+### 2026-10-19 UTC — CASMI171: de diagnóstico a diseño constructivo
+
+El rebase de dos autores separó una energía sobre prefijos parciales de los
+scores de padres completos ya ensayados, y encontró que SMILES, prior y masa
+condicionada también tienen antecedentes. Se elige una revisión concreta del
+generador secuencial: fórmula completa, inventario elemental y EOS compatible.
+La energía de prefijos queda preservada como alternativa con degeneraciones;
+no se mezclan ambas para evitar perder el contraste.
+
+El plan171 deriva strings de grafos133 autenticados, conservando split y roles,
+en lugar de atribuir autoridad a exportaciones antiguas. Compara descendientes
+fórmula/contexto y completo desde un mismo prior;2000updates y cuatro épocas
+fijas después de perfil/presupuesto. El cierre experimental futuro vuelve a
+pools sellados, cobertura e identidad/top25 del panel139, aunque CE no mejore.
+Todavía no hay corpus secuencial materializado, modelo o resultado molecular171.
+
+752, auditor nuevo AstraMedium con contexto limpio y separado de autores, leyó
+el plan entero y aceptó implementabilidad y horizonte. Sus precisiones sobre
+Kekulé, disco total de checkpoints y ranking con scores pendientes se concretan
+en753. Integración única ciclo3:0→1/20; no se repite Divina751. Fuentes212, tres
+checkpoints y cinco archivos ajenos cotejados y conservados. El trabajo171 fue
+sólo documental, sin CUDA ni ejecución experimental. Sigue consumidor/gramática,
+pruebas sintéticas y perfil fit-only acotado antes del contraste finito. GPUlocal
+permanece habilitada hasta aviso; no remota, reservas nuevas o promoción.

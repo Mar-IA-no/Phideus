@@ -135,6 +135,29 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI171: diseño composicional revisado — 2026-10-19 UTC
+
+Se eligió un prior secuencial con fórmula completa, inventario elemental y cierre
+compatible. SMILES, pretraining y masa ya se probaron: la novedad del contrato es
+estrecha. La alternativa de compatibilidad de prefijos queda preservada, con su
+degeneración temprana y prueba discriminante. No se añade al mismo contraste.
+
+El diseño deriva secuencias de grafos133 ya autenticados y conserva particiones
+por componentes. Control fórmula/contexto y modelo completo se entrenarán desde
+el mismo prior, sin picos en el control durante aprendizaje. Su capacidad no está
+acreditada todavía. Perfil y presupuesto principal precederán2000updates de prior,
+cuatro épocas por descendiente y retorno obligatorio al panel139 con cobertura,
+identidad/top25, pools sellados y censuras; no se ampliará entrenamiento porCE.
+
+Auditor nuevo752 aceptó implementabilidad y horizonte del diseño íntegro, sin
+bloqueantes. Integración única ciclo3:0→1/20; fuentes212, trescheckpoints y cinco
+archivos ajenos intactos.171 no ejecutó datos, química, modelos ni GPU.170 FULL
+sigue cerrado; no se repitió161/169. Siguiente172: implementar consumidor/gramática,
+probar con sintéticos y perfilar fit-only antes del piloto principal. GPUlocal
+sigue autorizada, sin extensión remota o promoción científica.
+
+[Plan171](../../../Phideus-CASMI/docs/CASMI171_COMPOSITIONAL_SEQUENCE_DESIGN.md) · [Decisión753](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/753_CASMI171_CONSTRUCTIVE_DESIGN_DECISION.md) · [Auditoría752](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/752_CASMI171_DESIGN_AUDIT_ASTRA.md).
+
 ## CASMI170: primera decisión completa y auditada — 2026-10-19 UTC
 
 Se autenticaron 2.364 prefijos169 sin repetir química, modelos o evaluación de
