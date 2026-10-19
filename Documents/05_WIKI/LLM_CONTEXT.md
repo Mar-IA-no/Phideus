@@ -135,6 +135,23 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI174: entrenamiento completo; calibración incompleta — 2026-10-19 UTC
+
+El entrenamiento terminó en1465,370832s de servicio y conserva2515checkpoints
+comprimidos(29,85GB), con7562outputs y fuentes verificados. Se completaron2000
+updates del prior y256porbrazo. Su unidad está cerrada y ausente; la lectura
+molecular sigue pendiente y esta fase no acredita recuperación.
+
+La calibraciónFIT se detuvo porValueError:invalid probabilities en el registro.
+C0 produjo24acciones yno_actions; S0 conserva11acciones y resultado desconocido;
+cuatro muestras no empezaron.119,582409s de servicio quedan descontados del
+presupuesto original840. El vector rechazado no se preservó: redondeo es una
+hipótesis, todavía sin confirmación. Se prepara un forward diagnóstico único
+desde el prefijo guardado, con datosraw antes del guard, sin repetir intentos.
+La unidad fallida se cerró y su estadofailed se retiró una vez con ausencia
+verificada.265fuentes, pesos y recibos conservados; contador ciclo3:3/20.
+GPUlocal autorizada, sin promoción científica ni extensión de entrenamiento.
+
 ## CASMI174: entrenamiento GPU en curso — 2026-10-19 UTC
 
 El piloto composicional171 está entrenando:2000updates del prior y cuatroépocas

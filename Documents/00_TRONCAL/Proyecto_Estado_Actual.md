@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI174: entrenamiento completo y calibración incompleta — 2026-10-19 UTC**: se conservaron2515checkpoints, con verificación y cierre propios. La calibración detuvo el registro por una probabilidad rechazada: una muestra completa, un prefijo desconocido y cuatro posiciones no iniciadas. Se diagnostica un único paso desde ese prefijo, preservando el presupuesto y los intentos. No hay resultado molecular174 ni promoción; contador ciclo3:3/20.
+>
 > **CASMI174 en entrenamiento GPU — 2026-10-19 UTC**: el prior y los dos brazos del piloto171 se entrenan con checkpoints por update, tras medir persistencia y revisar el presupuesto total. El auditor aceptó254fuentes y el comando exacto; arranque real verificado, GPUlocal libre antes de cargar. Se reutiliza el corpus173. Después siguen calibraciónFIT, generación y comparación molecular; no se declara recuperación por terminar el aprendizaje. Contador ciclo3:3/20, sin promoción científica.
 >
 > **CASMI173 completo y auditado — 2026-10-19 UTC**: se materializaron 20.212 secuencias y se conservaron 7.448 exclusiones heredadas, sin rechazos nuevos ni indeterminados. Las 128 conversiones previas se reutilizaron. El reloj CPU acumulado fue de 334,992286 s, incluido el fallo de admisión corregido sin repetir química ni renovar presupuesto. La caché conserva las entradas y reduce la preparación entre 10,057 y 11,442 veces en los lotes B32 medidos; esa mejora no se extrapola al entrenamiento entero. El perfil GPU duró 48,952638 s y el probe de tres casos fit, 27,470782 s. No hay entrenamiento principal ni recuperación molecular nueva.
