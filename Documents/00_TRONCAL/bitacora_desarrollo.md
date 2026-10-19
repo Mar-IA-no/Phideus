@@ -9774,3 +9774,15 @@ más10nuevos deGPUhost/kernel vigentes;227fuentes, checkpoints ycincoajenos inta
 GPUunit1edd2f21 cerradaUNAveztrasExec0/PID0,2notfound/listempty/startupCGabsent;
 CPU767eaef1 ya cerrada y conservada. PIDGPUpropioausente/appsnonealcomprobar.
 Sigue implementación/revisión173, luego entrenamiento y lectura molecular171.
+
+
+### 2026-10-19 UTC — CASMI173: implementación de corpus/cache
+
+Se implementaron máscaras bitpack y tensorizador que conserva entradas, logits,
+pérdida, gradientes y parámetros actualizados exactos frente a172 en sintéticos.
+La unión de roles del prior se ajustó a171;S22 conserva su filtro previo de iones.
+Las107pruebasCPU integradas pasaron. La admisión inicial terminó a28,113395s,
+antes de convertir o crear hijos: comparación de tuplas y listas serializadas.
+Se conserva el intento y se corrige con prueba128 de ida/vueltaJSON; retoma en
+unidad/output nuevos con descuento del tiempo ya consumido, pendiente de revisión.
+No hay corpus completo o nuevo entrenamiento.173 sigue activo; ciclo3:2/20.

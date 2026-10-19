@@ -135,6 +135,17 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI173: corpus y caché en implementación — 2026-10-19 UTC
+
+La caché conserva el cálculo del modelo en pruebas sintéticas y evita interpretar
+la gramática por lote. El corpus completo aún no está materializado: la admisión
+inicial detectó una diferencia de tipos entre tuplas yJSON, antes de conversiones.
+La corrección conserva el intento y descuenta su tiempo al retomar, con revisión
+independiente. Se reutilizan128conversiones172; no se entrenó el piloto principal
+ni se abrió otra evaluación molecular. Contador ciclo3:2/20/GPUlocal autorizada.
+
+[Plan173](../../../Phideus-CASMI/docs/CASMI173_SEQUENCE_CORPUS_PLAN.md).
+
 ## CASMI172: preflight completo y auditado — 2026-10-19 UTC
 
 El constructor composicional está implementado.128/128fit conservaron fórmula,

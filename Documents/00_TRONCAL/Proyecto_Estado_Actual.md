@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI173 en preparación — 2026-10-19 UTC**: caché de máscaras implementada y equivalencia sintética comprobada. El primer intento de admisión se detuvo antes de conversiones por comparar tuplas internas con listas del JSON previo; corrección y retoma con tiempo acumulado pasan por revisión independiente. No se repiten las128conversiones172 ni se declara corpus completo. Sigue piloto composicional y lectura molecular; contador ciclo3:2/20.
+>
 > **CASMI172: preflight completo y auditado — 2026-10-19 UTC**:128fit conservaron representación en34,908669s; perfilGPU32,633129s y tres retomas exactas. Seis muestrasfit agotadas no son evaluación molecular. Preparación de máscaras0,512–0,537s domina updateGPU0,029–0,036s; sigue173censo completo/cache con reutilización de128conversiones.754 acepta implementación, cifras, prosa íntegra y horizonte; integración única ciclo3:2/20.199+10pruebas pertinentes,227fuentes y cincoajenos conservados, ambas unidades cerradas/GPUlibre al comprobar. Presupuesto principal/entrenamiento/recuperación todavía pendientes. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/755_CASMI172_SEQUENCE_PREFLIGHT_RESULTS.md).
 >
 > **CASMI172: perfilCPU128 terminado — 2026-10-19 UTC**: gramática/lector/red implementados;199pruebas sintéticas pasan. Dos fallos de admisión/indeterminación fueron corregidos antes de datos y revisados.128/128fit conservaron fórmula, órdenes e identidad en34,908669s; sin exclusiones/desconocidos. UnidadCPU cerrada y cgroup ausente,222pines conservados. Sigue revisión de calibraciónGPU fit-only; todavía no entrenamiento principal, censo completo o nueva recuperación.172 activo/ciclo3:1/20/GPUlocal autorizada.
