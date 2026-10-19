@@ -9639,3 +9639,41 @@ Se corrigió además el cotejo del observador privado para usar los hashes
 esperados de las tresfuentes aditivas; las209fuentes coinciden. No cambió el
 experimento. Siguen métricas, lectura íntegra independiente de cifras y prosa,
 horizonte y cierre; contador18/20 sin incremento. GPUlocal sigue habilitada.
+
+
+### 2026-10-19 UTC — CASMI169: lector completo y cerrado; revisión final abierta
+
+El lector admitió2.364intentos, selló puntuaciones y después abrió respuestas139.
+Terminó en12799,137099791318s,CPU12789,061833s/pico1086021632B,sin modelos/forwards.
+Quedó cerrado tras salidaExec0/PID0, connot-found/listadovacío/cgroup exacto ausente.
+
+Hay1.334conocidos,188cierres válidos admitidos y1.030desconocidos por plazo.
+Otros doscierres válidos tardíos permanecenunknown/noelegibles. Las doceceldas
+mantienen cobertura/top1/5/25 en0/16,RR25cero; abandono en13activas estácompleto
+con seis métricas0ycotas[0;0].550parejasactivascompletas difieren deestado
+numérico, sin cambiar la secuencia de pares/categorías.71no-op completos son
+idénticos. La interacción sigue subidentificada por ceros/censura/OOD y no se
+promueve una causa exclusiva o techo científico. Se guardó informe748 completo.
+
+La revisión independiente preliminar coincide con1344comparaciones de agregados,
+máscaras,cotas/contrastes e inventario. Sigue lectura íntegra final del748 y docs,
+revisión dehorizonte/recursos, integración18→19UNAvez y entrega/proof32criterios.
+Contador18/20 sinincremento. Candidata delectorCPUparalelo registrada,sinimplementar;
+propuesta siguiente: diferencias de logits/probabilidades/márgenes en estados
+comunes conservados169, sin reforward o nuevas moléculas. No se ejecutó otrohito.
+
+
+### 2026-10-19 UTC — CASMI169: auditoría final integrada una sola vez
+
+La auditoría747 aceptó implementación, cifras, prosa íntegra, horizonte y recursos,
+sin hallazgos materiales pendientes. Se integró una única vez18→19/20; no se
+contaron sus revisiones previas ni el diagnóstico operativo como hitos distintos.
+La evidencia molecular sigue0/16en las doce celdas, con1.030desconocidos tratados
+explícitamente y abandono completamente observado en13activas. El cotejo de
+identidades procede del lector autenticado; la auditoría redujo cuentas,
+máscaras/cotas/contrastes sin volver a abrir respuestas o ejecutar modelos.
+
+Se actualizó el estado canónico y se conserva la versión científica íntegra
+revisada. Siguen los recibos finales de entrega, recursos y los32requisitos antes
+del cierre formal. La propuesta posterior se acota a estados comunes, acciones
+admisibles y márgenes respecto del uniforme guardado; aún no fue ejecutada.

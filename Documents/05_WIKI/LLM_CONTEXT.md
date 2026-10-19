@@ -135,51 +135,45 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI169: generación cerrada y evaluación en curso — 2026-10-19 UTC
+## CASMI169: comparación molecular completa y auditada — 2026-10-19 UTC
 
-La prueba siguiente contrasta la interacción entre intensidades espectrales y
-revisión del recorrido, con ambos endpoints163 congelados. El panel139 no permite
-intercambios entre consultas emparejados por fórmula; se fijó una rotación de las
-intensidades propias, conservando masas y contexto. Es una intervención operacional
-posiblemente fuera de distribución, no una prueba general de información química.
-Se conservan197fórmulas: un startFULL por fórmula, dos condiciones y tres políticas,
-2.364intentos principales previstos;13consultas con intervención efectiva, dos
-controles de un pico y una lista vacía dentro del denominador16.
+La comparación completó2.364intentos físicos con dos endpoints163 congelados,
+intensidades propias/rotadas y abandono/retroceso/reinicio nativos159. Las doce
+celdas mantienen cobertura química/elegible y top1/5/25 en0/16,RR25cero. Sobre
+las13consultas activas las mismas métricas son0/13; abandono está completamente
+observado allí,166starts porcelda, con cotas[0;0]. No es un techo científico.
 
-El perfil adicional de36intentos terminó en339,799s, con121,065sCPU y372.957.184B
-pico. Las36trazas quedaron admitidas sin forwards ni evaluación de identidades:
-ocho desenlaces conocidos sin cierre y28desconocidos por el plazo10s. La unidad
-está cerrada y su cgroup ausente. Son datos de viabilidad, no un resultado molecular
-principal; los perfiles no se agregan al main como réplicas independientes.
+Se admitieron188cierres válidos y1.334desenlaces conocidos;1.030siguen desconocidos.
+Otros dos cierres nativos válidos llegaron fuera del plazo y permanecen unknown,
+no elegibles. Los límites internos conocidos se separan:759fallos químicos,
+235límites de política y152de recursos. La caché de puntuaciones contiene71claves
+consulta/estructura, todas con soporte exitoso; ninguna es la identidad buscada.
 
-56pruebas pertinentes pasan;206fuentes congeladas conservan las197anteriores.
-El presupuesto principal fue aprobado:90s por intento/126000s por worker,
-techo exterior35h, no ETA. La asignación sigue siendo1128/1236intentos con
-10GiB por worker; ambos terminaron y quedaron cerrados.
-Lector14400s por una enmienda aditiva con nueve pruebas más,
-sin cambiar206fuentes ni repetir el perfil. El lector está activo; siguen evaluación/cierre169.
-Contador18/20 sin incremento. GPUlocal habilitada; este contraste mantiene CPUFP32
-para reutilizar el runtime autenticado y no introduce otra arquitectura por inercia.
-No hay todavía identificación169; la ejecución no equivale a un resultado.
+En550parejas activas con ambas ejecuciones conocidas difiere el estado numérico
+comparado, pero no la secuencia registrada de pares/categorías. Los71no-op
+comparables mantienen también igualdad del estado. Cambiar logits/probabilidades
+no acredita una ruta distinta ni información químicamente útil. La selección de
+casos completos está condicionada por censura y no representa todo el panel.
+La interacción conserva cotas amplias: group-boundary[−10/16;11/16] y
+within-group[−11/16;12/16]; activas[−8/13;9/13] y[−9/13;9/13]. Son límites de
+valores posibles, no intervalos de confianza o prueba de efecto nulo.
 
-Los dos productores completaron2.364intentos físicos y conservaron fuentes y
-RNG. Tardaron73.059,976s y78.268,178s; systemd registró17.796,456sCPU y
-21.294,764sCPU, con picos1.226.280.960B y1.289.547.776B respectivamente. Las
-dos unidades y sus cgroups exactos están ausentes. Los metadatos separan1.334
-desenlaces conocidos y1.030desconocidos;188cierres nativos no acreditan todavía
-identidades ni admisión semántica. El nuevo lector verifica trazas y sella las
-puntuaciones antes de abrir respuestas139, sin ejecutar los modelos.
-Contador18/20 hasta su auditoría final; todavía no hay resultado molecular169.
+El nuevo lector admitió las trazas y selló puntuaciones antes de abrir únicamente
+respuestas139; terminó en12.799,137s,CPU12.789,062s/pico1.086.021.632B, sin modelos
+ni forwards. Perfil, ambos generadores y lector están cerrados, con unidades y
+cgroups exactos ausentes.206fuentes originales/tresaditivas, checkpoints y cinco
+archivos ajenos conservados.56tests core y9aditivos vigentes. GPUlocal habilitada;
+este contraste conservóCPUFP32. El lector serial motivó una candidata de mejora
+CPU, documentada y sin implementar; no se reinició su trabajo acumulado.
 
-Una derivación del código POST, contrastada independientemente con fuentes y
-prosa completa, precisa cómo llega el espectro al modelo: hasta64promedios de
-activaciones aprendidas por checkpoint determinan su resumen. La corrección
-espectral local comparte dirección y varía su amplitud por par; tiene rango
-ideal como máximo uno. Esto no mide el rango numérico ni el de los logits,
-ni demuestra suficiencia o insuficiencia química. Con GELU no puede asumirse
-invariancia general ante rotar intensidades. El contraste y el contador18/20
-siguen iguales; los resultados moleculares169 están pendientes.
-[Derivación y límites](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/casmi169_conditioning_algebra_20261018/ANALISIS.md) · [Lectura cruzada](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/casmi169_conditioning_algebra_20261018/REVISION_ASTRA.md).
+747 validó cifras, implementación, prosa íntegra, horizonte y recursos, sin
+hallazgos materiales pendientes. Integración única: contador19/20.
+El resultado no discrimina concluyentemente condicionamiento frente a recorrido.
+Sigue propuesto contrastar magnitud de logits/probabilidades y márgenes en estados
+comunes de los journals169, sin reforward ni nuevas moléculas; necesita su propio
+diseño posterior y rebase de157/165/166, no está ejecutado dentro de este cierre.
+
+[Resultado169](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/748_CASMI169_SPECTRAL_ROUTE_INTERACTION_RESULTS.md) · [Auditoría747](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/747_CASMI169_SPECTRAL_ROUTE_INTERACTION_AUDIT_ASTRA.md) · [Plan169](../../../Phideus-CASMI/docs/CASMI169_SPECTRAL_ROUTE_INTERACTION_PLAN.md).
 
 ## CASMI168: comparación molecular completa y auditada — 2026-10-18 UTC
 
