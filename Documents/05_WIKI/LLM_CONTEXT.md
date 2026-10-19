@@ -135,7 +135,7 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI169: comparación molecular en ejecución — 2026-10-18 UTC
+## CASMI169: comparación molecular en ejecución — 2026-10-19 UTC
 
 La prueba siguiente contrasta la interacción entre intensidades espectrales y
 revisión del recorrido, con ambos endpoints163 congelados. El panel139 no permite
@@ -154,12 +154,19 @@ principal; los perfiles no se agregan al main como réplicas independientes.
 
 56pruebas pertinentes pasan;206fuentes congeladas conservan las197anteriores.
 El presupuesto principal fue aprobado:90s por intento/126000s por worker,
-techo exterior35h, no ETA. Dos workers activos ejecutan1128/1236intentos con
-10GiB cada uno; lector14400s por una enmienda aditiva con nueve pruebas más,
+techo exterior35h, no ETA. La asignación sigue siendo1128/1236intentos con
+10GiB por worker; el primero terminó y fue cerrado, el segundo sigue activo.
+Lector14400s por una enmienda aditiva con nueve pruebas más,
 sin cambiar206fuentes ni repetir el perfil. Siguen main/evaluación/cierre169.
 Contador18/20 sin incremento. GPUlocal habilitada; este contraste mantiene CPUFP32
 para reutilizar el runtime autenticado y no introduce otra arquitectura por inercia.
 No hay todavía identificación169; la ejecución no equivale a un resultado.
+
+El primer productor completó1.128intentos en73.059,976s, con17.796,456sCPU y
+1.226.280.960B pico registrados por systemd. Sus502desconocidos por plazo se
+conservan; las trazas esperan admisión semántica y evaluación de identidades.
+Fuentes y RNG intactos, unidad y cgroup exactos ausentes. El lector espera el
+cierre del segundo productor; contador18/20 sin incremento.
 
 Una derivación del código POST, contrastada independientemente con fuentes y
 prosa completa, precisa cómo llega el espectro al modelo: hasta64promedios de

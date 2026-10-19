@@ -9606,3 +9606,16 @@ Esta precisión ayudará a distinguir respuesta del modelo, recorrido e identida
 al interpretar169. No modifica pesos, corridas, presupuesto ni contador18/20 y
 no adelanta su resultado molecular.
 [Derivación y alcance](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/casmi169_conditioning_algebra_20261018/ANALISIS.md) · [Lectura cruzada](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/casmi169_conditioning_algebra_20261018/REVISION_ASTRA.md).
+
+### 2026-10-19 UTC — CASMI169: primer productor principal cerrado
+
+El primer generador completó sus1.128intentos en73.059,976s, con17.796,456sCPU
+y1.226.280.960B pico registrados por systemd. Conservó las206fuentes y el RNG;
+las tresfuentes aditivas también siguen intactas. Sus502desconocidos por plazo
+se conservan sin convertirlos en fallos químicos o ceros. La unidad exacta había
+terminado correctamente: se cerró una sola vez y se verificó la ausencia tanto
+en systemd como en su cgroup de arranque. Las trazas permanecen guardadas.
+
+El segundo productor continúa; la admisión conjunta y la lectura de identidades
+esperan su cierre. Este avance cierra un recurso, no la comparación molecular169
+ni su auditoría final. Contador18/20 sin incremento y permisos sin cambios.
