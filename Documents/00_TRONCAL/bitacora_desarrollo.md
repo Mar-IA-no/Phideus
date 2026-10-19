@@ -9935,3 +9935,25 @@ Plan: `CASMI174_INTERRUPTED_CPU_PLAN.md`. El lector9850 y sus scripts de éxito
 completo quedan preparados, sin ejecutar contra este corte. La colección restante
 necesita nueva habilitación GPU;174 sigue incompleto y contador ciclo3:3/20.
 Nuevas delegaciones Sol6.1High por orden expresa, incluida auditoría independiente.
+
+
+### CASMI174 — admisión CPU detenida antes de los pares
+
+El primer hostCPU quedó cerrado tras fallar en una comprobación de metadatos:
+comparaba el catálogo consumido por TRAIN(306entradas) con las fuentes de código
+del generador(284). El catálogo consumido es la unión de corpus173(68) y
+persistencia(246); las fuentes ejecutables de TRAIN están en su freeze254.
+La revisión independiente confirmó el error y la falta de ese caso en fixtures.
+No se emitió ningún par de lectura numérica, ni química, score o verdad.
+
+La unidadCPU1 se cerró una vez y su ausencia se comprobó dos veces. Se verificaron
+sus296fuentes; MemoryPeak89.427.968B y wall3,735309s. La continuación conserva
+3,7008741128850877s de admisión,0,03443488711491227s de cierre y0trabajo;
+no repite cálculo de pares ni renueva presupuesto. Recibo de cierre
+`9f9cae689255e9c73ff1fe96d236a19bcf4100413dce8ce277d30f88d7bdd93e`.
+
+Se prepara una corrección aditiva con catálogos separados y vínculo exacto de
+su unión, pruebas sintéticas de regresión y unidad/output nuevos con gasto
+acumulado.296fuentes originales y284del generador permanecen intactas. GPU
+continúa suspendida,174 incompleto y ciclo3:3/20. Plan específico:
+`CASMI174_PREFIX_ADMISSION_RECOVERY.md`; todavía no hay continuación lanzada.
