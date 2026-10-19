@@ -135,6 +135,23 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI174: entrenamiento GPU en curso — 2026-10-19 UTC
+
+El piloto composicional171 está entrenando:2000updates del prior y cuatroépocas
+por brazo C/S desde sus mismos pesos, con optimizadores nuevos. El corpus173 se
+reutiliza; no se repiten conversiones ni perfiles anteriores. La persistencia
+174 conservó bytes exactos y midió8.572399s de servicioCPU. El nuevo presupuesto
+reserva checkpoints, trazas y32GiB libres; los guards conservan el último estado
+durable y gasto si aparece un corte real.
+
+El auditor174 aceptó las254fuentes y launcher exactos antes de CUDA. Arranque
+verificado19:01:37UTC, Invocation18820555a69140d5887af26de0525aab,8GiB/swap0/4CPU,
+allocator18GiB, sin procesosGPU ajenos.24tests integrados host/aprendizaje pasan.
+El entrenamiento no completa174: después siguen calibraciónFIT de rutas entrenadas,
+generación y lectura molecular, aunque no mejore la pérdida. No hay identidad
+nueva de desarrollo evaluada. Contador ciclo3 permanece3/20 hasta auditoría final.
+GPUlocal autorizada, sin remota, nuevas reservas o promoción científica.
+
 ## CASMI173: corpus y alimentación completos — 2026-10-19 UTC
 
 El corpus conserva20.212secuencias(18.262fit/1.950selección) y7.448exclusiones
