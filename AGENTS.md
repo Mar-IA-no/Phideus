@@ -499,3 +499,13 @@ Mariano autoriza fijar goals propios cuando el trabajo o cómputo sostenido lo
 requiera y ayude a mantener continuidad; deja esa decisión al agente. No abrir
 goals sólo para mantenerse activo. Esta precisión rige la cadena autónoma:
 entregables finitos y útiles, sin actividad artificial ni ampliación de recursos.
+
+
+## Nuevos subagentes GPT-6.1 Sol High — 2026-10-19
+
+Mariano indica: «Por favor de ahora en más, los subagentes que spawnees hacelos
+con GPT 6.1 Sol High». Desde esta orden, toda nueva instancia delegada por este
+coordinador, incluidas auditorías, usa `gpt-6.1-sol`, esfuerzo `high`, con
+independencia y contexto mínimo cuando corresponda. Sustituye selecciones
+anteriores incompatibles para nuevas delegaciones; no cambia el runtime de
+agentes ya iniciados ni modelos experimentales. Verificar la selección efectiva.

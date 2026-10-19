@@ -9902,3 +9902,14 @@ phase/cierre; no repetir ni reactivar productor por inercia. CheckpointsTRAIN,
 falloFIT/microprobe y continuación permanecen conservados/cerrados una vez.
 LectorCPU futuro preparado:40tests métricas/core pasan12.28s, revisión independiente
 en curso; sin datos reales/GT/lectura molecular nueva. Contador ciclo3:3/20.
+
+
+### 2026-10-19 — selección de nuevas delegaciones
+
+Mariano fijó GPT-6.1 Sol High para los nuevos subagentes, incluidas auditorías.
+La instrucción quedó persistida en memoria global y ambos AGENTS; las instancias
+previas conservan su runtime. El nuevo auditor independiente174 se lanzó sin
+conversación heredada y su metadata efectiva confirmó `gpt-6.1-sol`/`high`,
+con permisos completos y approval never. Recibo privado recuperable en
+W174/control/sol-auditor-runtime-1.json. La colección continúa sin cambios en
+sus284fuentes y sin apertura de verdad; contador ciclo3:3/20.
