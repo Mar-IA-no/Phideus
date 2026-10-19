@@ -9957,3 +9957,58 @@ su unión, pruebas sintéticas de regresión y unidad/output nuevos con gasto
 acumulado.296fuentes originales y284del generador permanecen intactas. GPU
 continúa suspendida,174 incompleto y ciclo3:3/20. Plan específico:
 `CASMI174_PREFIX_ADMISSION_RECOVERY.md`; todavía no hay continuación lanzada.
+
+
+### CASMI174 — admisión numérica CPU en ejecución (2026-10-19 21:23UTC)
+
+La continuación CPU2 inició una única vez, tras corregir y revisar la separación
+entre fuentes ejecutables y metadatos consumidos. Conserva el gasto del primer
+intento (3,735309s) y sus artefactos; no se repite ningún par anterior. El freeze
+300 mantiene intactas las296fuentes anteriores y añade cuatro archivos; las19
+pruebas nuevas y la revisión independiente aceptaron el comando concreto.
+
+La unidad `casmi174-prefix-admission-2.service`, PID2615482 e invocation
+`001dd36ba10a4fc593a9c7f5436a2d69`, procesa los3392pares completos ya guardados.
+Se verificaron CUDA vacía, RAM12GiB/swap0, CPU800%, watchdog14296s y ausencia
+del productorGPU. El arranque no certifica la admisión: faltan phase/finalización,
+verificación exterior y cierre. No hay química, scores, respuestas ni forwards;
+174 sigue incompleto, GPU local/remota suspendida y contador ciclo3:3/20.
+
+Fuentes: `CASMI174_PREFIX_ADMISSION_RECOVERY.md`, informe
+`../Biblioteca/Geometria_Problema_Inverso/agent_reports/casmi174_sol_prefix_recovery_prelaunch_acceptance_20261019.md`
+y recibos privados de arranque2. La caché futura todavía no está integrada en el
+lector completo. La generación restante necesita nueva autorización GPU.
+
+
+### CASMI174 — prefijo CPU admitido y cerrado; GPU suspendida (2026-10-19 UTC)
+
+Los 3.392 pares completos conservados quedaron admitidos numéricamente, sin pares
+unknown. Son 6.784 intentos completos de la colección interrumpida: el intento
+adicional desconocido y las 3.065 posiciones sin iniciar permanecen así. No se
+repitió generación ni se abrieron respuestas, química o scores; tampoco se
+hicieron forwards. La admisión de trazas no acredita recuperación molecular.
+
+El servicio CPU 2 salió con exit0 y se cerró una vez, con doble ausencia de unidad,
+PID y cgroup. El wall exterior fue 133,464439 s; sumado al primer fallo de metadatos
+conservado, 137,199748 s, sin reiniciar presupuestos. Se autenticaron 300 fuentes,
+27.165 entradas y 23.748 outputs; pico de memoria 428.945.408 B. La verificación exterior
+adicional consumió 12,980471 s y salió exit0. El único checkpoint histórico incluido
+en fuentes se hasheó por path/pin exactos; no se deserializaron checkpoints.
+
+Los 3.392 compactos quedan conservados para reutilización, todavía sin integrar en
+el lector completo. GPU local/remota sigue suspendida; completar la generación
+requiere nueva habilitación. 174 sigue incompleto y contador ciclo 3: 3/20; este
+corte no se convierte en evaluación final. Resultado: Phideus-CASMI/docs/CASMI174_PREFIX_ADMISSION_RESULTS.md.
+
+
+### Revisión integrada del corte CPU174 — 2026-10-19 UTC
+
+La auditoría independiente Sol 6.1 High aceptó recibos, cierre, prosa completa
+y horizonte sin hallazgos materiales pendientes. No identifica otro paso CPU
+necesario dentro de este corte antes de completar la generación. Se conserva
+la caché para integrar con la autoridad definitiva del lector; la cadena
+experimental se detiene ante la dependencia GPU y CASMI174 sigue incompleto.
+El contador ciclo 3 permanece en 3/20; no es la auditoría final del piloto.
+Informe crudo: `casmi174_sol_prefix_cpu_final_cut_audit_20261019.md`.
+No retomar por el texto histórico de GPU autorizada del objetivo formal: la
+orden vigente de Mariano suspende GPU local/remota hasta nueva habilitación.

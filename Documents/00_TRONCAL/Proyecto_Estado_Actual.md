@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI174: prefijo CPU admitido y cerrado — 2026-10-19 UTC**:3.392 pares de trazas completas admitidos,0 pares desconocidos; generación conservada6784complete/1unknown/3.065 sin iniciar. UnidadCPU cerrada y doble ausencia comprobada, wall acumulado137,199748 s. Sin forwards, química o respuestas; caché todavía no integrada en lector completo. GPU local/remota suspendida; completar generación requiere nueva autorización.174 incompleto, ciclo 3: 3/20. [Resultado CPU](../../../Phideus-CASMI/docs/CASMI174_PREFIX_ADMISSION_RESULTS.md).
+>
 > **CASMI174: GPU suspendida, continuidad CPU — 2026-10-19 UTC**: por orden de Mariano se interrumpió la colección en6.784intentos completos, uno desconocido y3.065sin iniciar. ProcesoGPU propio y servicio/cgroup cerrados, ausencia verificada; checkpoints conservados.284fuentes y todos los bytes del corte verificados enCPU. Sigue admisión numérica reutilizable de las trazas completas; sin abrir respuestas ni lectura molecular final.174incompleto, ciclo3:3/20; GPU local/remota suspendida hasta nuevo permiso. Nuevas delegaciones Sol6.1High.
 >
 > **CASMI174: colección GPU activa — 2026-10-19 UTC**: se están generando9.850intentos desde los dos brazos entrenados, con trazas completas y presupuesto revisado.284fuentes congeladas; unidad/cgroup y GPU propios comprobados. El cierreEOS se evaluará después de sellar la colección y liberarGPU. LectorCPU preparado y auditándose; sin resultado molecular174. Contador3/20.
