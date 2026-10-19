@@ -2951,3 +2951,18 @@ por las rutas largas no observadas y la censuraFIT. Envolvente física69.34GB,
 con32GiB libres incluidos; margen efectivo4.70GB al preparar. La lecturaCPU se
 presupuesta tras cerrarGPU con la colección real y no abre verdad antes de sellos.
 No hay recuperación molecular174 ni promoción; contador ciclo3:3/20.
+
+
+### CASMI174 — colección principal GPU activa
+
+Arranque propio2026-10-19, PID2434514/Invocation9e186a4b09b34626944578734e61c344,
+unidadcasmi174-sequence-generation-1.service. Auditor aceptó freeze284
+f7cf61c78275ca5b4aa5ad0f0e7d23be42b0cdd8aa87ee91c01d1cffcea45a8f y comando exacto.
+Límites14700total/14400generación/180admisión/120cierre, watchdog14790/stop30,
+8GiB/swap0/4CPU/allocator18GiB. Runtime/cgroup/ocupación propios verificados;
+admisión terminó y CUDA produjo195registros al corte,194no_actions/1EOS.
+EOS todavía no es identidad química ni recuperación. No editar284fuentes hasta
+phase/cierre; no repetir ni reactivar productor por inercia. CheckpointsTRAIN,
+falloFIT/microprobe y continuación permanecen conservados/cerrados una vez.
+LectorCPU futuro preparado:40tests métricas/core pasan12.28s, revisión independiente
+en curso; sin datos reales/GT/lectura molecular nueva. Contador ciclo3:3/20.

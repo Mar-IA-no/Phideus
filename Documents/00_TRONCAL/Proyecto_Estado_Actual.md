@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI174: colección GPU activa — 2026-10-19 UTC**: se están generando9.850intentos desde los dos brazos entrenados, con trazas completas y presupuesto revisado.284fuentes congeladas; unidad/cgroup y GPU propios comprobados. El cierreEOS se evaluará después de sellar la colección y liberarGPU. LectorCPU preparado y auditándose; sin resultado molecular174. Contador3/20.
+>
 > **CASMI174: calibración consolidada — 2026-10-19 UTC**: las cuatro muestras pendientes terminaron sin cierre molecular; quedan cinco desenlaces conocidos y un prefijo desconocido conservado. CodecFP32 corregido,119pruebas pertinentes y cierre verificados. Se prepara la colección principal de9.850intentos con presupuesto finito; todavía no se lanzó ni se evaluó identidad. Contador3/20.
 >
 > **CASMI174: diagnóstico FP32 conservado — 2026-10-19 UTC**: un único paso reprodujo una CDF un ULP por encima de1. Crudos guardados, pesos intactos y diagnóstico cerrado en2,273315s. Se prepara corrección del registro y sólo las cuatro muestrasFIT no iniciadas; S0 sigue desconocido. Generación/lectura molecular pendientes y contador3/20.
