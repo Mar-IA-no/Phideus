@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI172: perfilCPU128 terminado — 2026-10-19 UTC**: gramática/lector/red implementados;199pruebas sintéticas pasan. Dos fallos de admisión/indeterminación fueron corregidos antes de datos y revisados.128/128fit conservaron fórmula, órdenes e identidad en34,908669s; sin exclusiones/desconocidos. UnidadCPU cerrada y cgroup ausente,222pines conservados. Sigue revisión de calibraciónGPU fit-only; todavía no entrenamiento principal, censo completo o nueva recuperación.172 activo/ciclo3:1/20/GPUlocal autorizada.
+>
 > **CASMI171: diseño composicional revisado — 2026-10-19 UTC**: se elige prior secuencial con fórmula completa, inventario elemental y cierre compatible, sin presentar SMILES o masa como nuevos. Secuencias futuras derivadas de grafos133 autenticados; control fórmula/contexto entrenado sin productos y modelo completo comparables, retorno obligatorio a cobertura/identidad.752 acepta diseño íntegro e implementabilidad/horizonte; integración única ciclo3:1/20. No hay entrenamiento, generación, evaluación o usoGPU171. Sigue consumidor/gramática y perfil fit-only antes del piloto; GPUlocal habilitada, sin promoción. [Diseño](../../../Phideus-CASMI/docs/CASMI171_COMPOSITIONAL_SEQUENCE_DESIGN.md).
 >
 > **CASMI170: primera decisión leída — 2026-10-19 UTC**:197 parejas porendpoint,166 activas y31 controles. La perturbación cambia probabilidades, pero ningún uniforme guardado cambia la primera categoría; D medio con igual peso a13 consultas es9,115923e−7/8,079791e−7. La lectura de21,899549s terminó y su unidad está cerrada. 749 aceptó cifras, implementación, prosa y horizonte; integración única19→20 y Auditoría Divina751 completas, ciclo3:0/20. No se repitió generación o evaluación molecular.

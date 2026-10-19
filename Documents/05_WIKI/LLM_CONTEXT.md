@@ -135,6 +135,28 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI172: perfil de conversión128 completado — 2026-10-19 UTC
+
+La gramática composicional, el consumidor autenticado y la red nueva están
+implementados con199pruebas sintéticasCPU pertinentes. La auditoría preparatoria
+corrigió antes de datos la identidad indeterminada clasificada como exclusión y
+la mezcla de registros entre lectores139/147, conservando sus cierres estrictos.
+
+El perfil real procesó128fit por tamaño, con extremos incluidos:128convertidas,
+sin exclusiones ni desconocidos. Cada string conservó fórmula, órdenes hasta
+isomorfismo e identidad terminada. Duró34,908669s; CPUcgroup48,95095s y pico
+7.230.709.760B dentro de8GiB/swap0/4CPU. Unidad propia cerrada; dos inventarios y
+cgroup de arranque ausentes. Los222pines permanecen intactos. Es soporte de
+representación en128training, todavía no censo completo o reconstrucción libre.
+
+Se prepara calibraciónGPU fit-only de updates/restore y muestreo con límites
+propios revisables, antes del presupuesto principal. Ocho pruebas sintéticas del
+kernel/host nuevos pasan; su revisión independiente previa aGPU está pendiente.
+No se iniciaron2000updates, cuatro épocas o evaluación139.172 sigue activo,
+contador ciclo3:1/20;754 final no integrada. GPUlocal autorizada hasta aviso.
+
+[Plan172](../../../Phideus-CASMI/docs/CASMI172_SEQUENCE_PREFLIGHT_PLAN.md) · [Presupuesto de perfilGPU](../../../Phideus-CASMI/docs/CASMI172_GPU_PROFILE_BUDGET.md).
+
 ## CASMI171: diseño composicional revisado — 2026-10-19 UTC
 
 Se eligió un prior secuencial con fórmula completa, inventario elemental y cierre

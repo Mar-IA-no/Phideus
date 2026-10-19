@@ -9734,3 +9734,20 @@ checkpoints y cinco archivos ajenos cotejados y conservados. El trabajo171 fue
 sólo documental, sin CUDA ni ejecución experimental. Sigue consumidor/gramática,
 pruebas sintéticas y perfil fit-only acotado antes del contraste finito. GPUlocal
 permanece habilitada hasta aviso; no remota, reservas nuevas o promoción.
+
+
+### 2026-10-19 UTC — CASMI172: implementación y primer perfil real
+
+Se implementaron gramática elemental con H explícito/anillos, red causal y
+consumidor133→strings.199pruebasCPU pertinentes pasan. El auditor independiente
+preparatorio detectó antes de datos dos errores materiales: identidad indeterminada
+se convertía en exclusión y los registros de lectores139/147 contaminaban su
+clausura exacta. Ambos se corrigieron con pruebas; freeze2 y launcher aceptados.
+
+El perfil de128fit por tamaño terminó en34,908669s:128convertidas, sin exclusiones
+o desconocidos, con fórmula/órdenes-isomorfismo/identidad conservadas. CPU48,95095s,
+pico7230709760B,8GiB/swap0/4CPU; unit767eaef1 cerrada por handleexacto y ausencia
+verificada dos veces. No se ejecutaron modelos oGPU. Es soporte de representación,
+sin recuperación libre ni censo completo. Siguen kernel/hostGPU aditivos y revisión
+antes de calibración fit-only, con8pruebasCPU nuevas aprobadas.172 sigue activo y
+contador1/20; no se integra otra auditoría por rondas preparatorias.
