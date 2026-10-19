@@ -135,6 +135,33 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI170: primera decisión completa y auditada — 2026-10-19 UTC
+
+Se autenticaron 2.364 prefijos169 sin repetir química, modelos o evaluación de
+identidades. El principal contiene197 parejas own/rotated porendpoint163:
+166 fórmulas activas en13 consultas y31 controles sin perturbación. Todas las
+primeras acciones están presentes; la consulta de lista vacía conserva ausencia
+de distribución, sin cero imputado. Las políticas restantes son copias de control.
+
+En ambos endpoints cambia el contraste entre clases y la distribución filtrada
+en las166 fórmulas activas. D, desacuerdo bajo uniforme continuo compartido,
+media con igual peso a consultas, es9,115923e−7 group y8,079791e−7 within. Los
+uniformes guardados no cruzan ninguna frontera:0/166 primeras categorías cambian.
+Los controles dan cero exacto. Esto explica sólo la primera elección bajo esta
+perturbación; no toda la trayectoria ni una causa exclusiva del cero molecular.
+
+La lectura terminó en21,899549s, sin GPU; unidad cerrada y ausencia verificada.
+22 pruebas pertinentes pasan. El recálculo independiente coincide en32.688
+comparaciones;749 aceptó implementación, cifras, prosa íntegra y horizonte.
+Integración única19→20 y Auditoría Divina751 completas; ciclo3:0/20. No hay otra
+corrida en marcha.
+Se cierra aquí el diagnóstico inicial y se exige un contraste material posterior
+que separe alcance de la perturbación y capacidad del canal condicionado.
+751 orienta171 a una intervención sobre el prefijo parcial o un prior neuronal
+de otra familia, tras rebasar los mecanismos ya ensayados; no está implementada.
+
+[Resultado170](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/750_CASMI170_DECISION_COUPLING_RESULTS.md).
+
 ## CASMI169: comparación molecular completa y auditada — 2026-10-19 UTC
 
 La comparación completó2.364intentos físicos con dos endpoints163 congelados,
