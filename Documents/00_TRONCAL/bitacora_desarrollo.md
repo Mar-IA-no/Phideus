@@ -1,3 +1,24 @@
+## CASMI178: contraste de objetivos FIT diseñado — 2026-10-20 UTC
+
+La siguiente prueba queda especificada como comparación de dos objetivos con
+controles informacionales: dos trayectorias de secuencia174 archivadas y dos
+ramas nuevas propuestas desde su prior común, condicionadas a un gate de
+inicialización, datos, software y calendario. Mantiene2.023FIT/8.092exposiciones
+por rama; focaliza la pérdida en166clases/366eventos con balance de clase y
+label, sin tratar los30pares176como réplicas. La proyección futura admite los
+productos de todos los2.023FITpara conservar sus forwards originales; selección
+permanece opaca. Pesos racionales, soportes2/3/5, donantes completos, equivalencias
+S por conjunto de picos, unknowns y métricas legales quedan predeclarados.
+
+Son propuestas512updates reales y128sintéticos,644snapshots y lecturas0/128/256;
+ninguno se ejecutó en178. El diseño no atribuye causalmente176a la masa0,292%
+ni prueba identificación o generalización. Implementación y efectos requieren
+su propio plan revisado y autoridad; la cesión GPU local no prolonga174.
+Revisión independiente aceptada e integrada una sola vez7→8,ciclo3:8/20;
+sin hallazgos materiales pendientes. No acredita implementación o entrenamiento.
+No modelos, checkpointload, forwards, optimizer, entrenamiento, química oGPU.
+[Diseño](../../../Phideus-CASMI/docs/CASMI178_PAIRED_BRANCH_DESIGN.md).
+
 ## CASMI177: presión de supervisión medida en CPU — 2026-10-20 UTC
 
 El contraste de las entradas causales en2.023FITpermitió medir una diferencia
