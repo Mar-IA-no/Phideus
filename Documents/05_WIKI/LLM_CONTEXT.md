@@ -135,6 +135,26 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI177: equivalencias de entrada y presión del objetivo — 2026-10-20 UTC
+
+El objetivo docente distribuye su peso sobre decisiones que no son igualmente
+discriminantes. En2.023FIT/138.860targets, mantener fórmula, contextoFP32y toda
+la historia causal del prefijo deja166clases con targets distintos:366posiciones
+y0,292013%del peso de la agenda real. La entropía retrospectiva es
+0,002115683380nats, pero137.121de137.952clases sólo aparecen una vez: una tabla
+arbitraria puede memorizar casi todo ese soporte. Esto separa conflicto empírico,
+presión del objetivo y capacidad neuronal sin identificar causalmente176ni
+demostrar que los productos basten para resolver los conflictos.
+
+Los30pares176pertenecen a esas clases conflictivas; sus membresías se reducen
+a53eventos/25clases, no30réplicas independientes. La siguiente intervención
+propuesta equilibra ambas ramas en un contrasteFITfinito antes de otra colección.
+177no realizó entrenamiento/forwards/química/GPU. CálculoCPU18,7024s y exterior
+14,399133s verificados; unidad cerrada y crudos preservados. Auditoría final
+acepta cifras, prosa íntegra y horizonte; integración única6→7,ciclo3:7/20.
+La entrega y el cierre formal conservan recibos propios posteriores.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI177_SUPERVISION_AMBIGUITY_RESULTS.md).
+
 ## CASMI176: preferencia FIT medida y auditada — 2026-10-20 UTC
 
 El ensayo congelado sobre 30 pares FIT (51 claves, 21 fórmulas) distingue

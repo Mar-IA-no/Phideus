@@ -1,3 +1,24 @@
+## CASMI177: presión de supervisión medida en CPU — 2026-10-20 UTC
+
+El contraste de las entradas causales en2.023FITpermitió medir una diferencia
+entre contar moléculas y pesar sus decisiones en el objetivo.366de138.860targets
+pertenecen a166clases con fórmula/contexto/prefijo iguales y respuestas distintas;
+son323moléculas, pero pesan0,292013%según el calendario real. Una tabla arbitraria
+sin productos conserva entropía0,002115683380nats; la abundancia de clases vistas
+una sola vez impide confundir esa cota retrospectiva con capacidad neuronal,
+generalización o solución del problema inverso.
+
+Los30pares176caen en ese conflicto, con53eventos/25clasesdistintos. Esto orienta
+un siguiente contrasteFITque equilibre explícitamente las ramas, sin atribuir
+causalmente el resultado176a la ponderación ni afirmar que productos basten.
+El único runCPUduró18,7024s; exterior independiente14,399133sPASS, cierre una vez
+y doble ausencia. Fuentes408,2.515snapshots,cinco archivos ajenos y terminal610
+conservados; sin modelos, entrenamiento, química oGPU. La lectura independiente
+acepta cifras, prosa íntegra y horizonte; integración única6→7,ciclo3:7/20.
+El encabezado del ledger conservaba4y se reconcilió con los cierres175/176ya
+integrados, sin volver a contarlos. EntregaGit/formalgoalpor recibos posteriores.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI177_SUPERVISION_AMBIGUITY_RESULTS.md).
+
 ## CASMI176: preferencia FIT medida y auditada — 2026-10-20 UTC
 
 El ensayo congelado sobre 30 pares FIT (51 claves, 21 fórmulas) distingue
