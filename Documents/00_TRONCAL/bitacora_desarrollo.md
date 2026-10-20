@@ -1,21 +1,29 @@
-## CASMI175: lectura molecular CPU activa por lotes — 2026-10-20 UTC
+## CASMI175: contraste molecular cerrado y auditado — 2026-10-20 UTC
 
-La colección nueva quedó verificada y cerrada:9.850registros conocidos,
-1.997cierresEOS,3.794finales locales vacíos y4.059imposibilidades de continuación.
-EOS todavía no acredita validez química o recuperación. Fuentes y pesos intactos.
+Con los endpoints174 y semillas conservados, el filtro de imposibilidad elevó los
+cierres conocidos de58 a1.997, todos químicamente válidos.1.988 obtuvieron identidad
+completa; nueve siguen desconocidos porMaxTransformsReached. No apareció ninguna
+identidad objetivo entre las conocidas. Top1/5/25 yRR25 de las listas efectivas son
+cero enC/S y en16/13/3consultas; las cotas del pool completo son[0,3/16] por brazo,
+con diferenciaS−C[−3/16,3/16]. Los105scores únicos desconocidos conservan identidades
+conocidas y no ensanchan esas cotas. Se mantuvo la consulta sin fórmulas.
 
-El lector materializado fue bloqueado antes de jobs por su reservaRAM43,41GB.
-La adaptación aditiva conserva todos los crudos por lotes de ocho, sin modificar
-operaciones científicas ni sus límites.85pruebas sintéticas pasaron y la revisión
-independiente aceptó378fuentes, presupuesto y comando concretos: reservaRAM
-7.263.373.696B ydisco12.065.530.790B, ambas dentro de12GiB; CPU8/swap0.
+La lectura por lotes conservó todos los crudos y terminó en505,276441s de servicio,
+con pico final2.624.061.440B bajo12GiB; se preservó el gate previo de memoria fallido.
+El verificador exterior reconstruyó pools/métricas sin repetir nativo; las cuatro
+unidades175 están cerradas y la terminal coordinadora se conserva. Fuentes378,
+320históricas,2.515snapshots y cinco archivos ajenos quedaron preservados.
 
-Arranque único del lector verificado: unidadpropia activa, PID490542, invocación
-b5600b2c2453432982011f8a65c2bdd2. Está admitiendo trazas175 antes dequímica;
-después siguen ambos sellos,S22 y acceso139 autorizado antes demétricas16/13/3.
-Todavía no hay resultado molecular175. GPUlibre al cierreGEN, autorizaciónlocal
-vigente; no nuevo entrenamiento. Contadorciclo3:4/20 y goal175incompleto.
-[Plan de lectura por lotes](../../../Phideus-CASMI/docs/CASMI175_SPOOLED_READOUT_PLAN.md).
+La auditoría independiente acepta implementación,cifras,prosa íntegra y horizonte;
+se integra UNA vez4→5,ciclo3:5/20. El resultado mejora viabilidad sin demostrar
+recuperación ni ventaja espectral. Sigue diseñar un contrasteFIT de preferencia
+compatible bajo productos emparejados/intercambiados/anulados y pesos fijos, con
+control positivo; no prolongar entrenamiento o reparar scores como fin principal.
+Las nueve identidades inciertas siguen como deuda material con grafos reutilizables.
+No hay GO/promoción científica; GPUlocal autorizada hasta aviso, sin procesos
+experimentales propios activos. La entregaGit y el cierre formal se verifican
+tras este corte auditado.
+[Resultado completo](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_CONSTRUCTIVE_MOLECULAR_RESULTS.md).
 
 ## CASMI168: comparación molecular completa y auditada — 2026-10-18 UTC
 
