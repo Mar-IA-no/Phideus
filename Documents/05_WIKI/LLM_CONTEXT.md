@@ -725,13 +725,11 @@ Resultado: Phideus-CASMI/docs/RESULTS_CASMI150_ALIGNMENT_OBJECTIVE.md.
 
 
 
-> CASMI174(19/10): Mariano suspendió GPU y autorizó continuar sóloCPU. Corte
-> preservado6.784complete/1unknown/3.065notstarted; servicio/cgroup/PID propio
-> ausentes y GPU liberada. Los 3.392 pares completos quedaron admitidos enCPU,
-> sin desconocidos nuevos, forwards, química o verdad; caché aún sin integrar
-> en lector completo. Wall acumulado137,199748 s y unidad CPU cerrada. Colección/lectura
-> molecular incompletas;3/20, GPU suspendida y siguiente generación bloqueada
-> hasta nueva autorización. Ver resultadoCPU 174 y ledger CASMI.
+> CASMI174 (20/10): Mariano reanudó el trabajo y habilitó GPU local hasta aviso.
+> Continúan sólo 3.065 posiciones no iniciadas; se preservan 6.784 completas,
+> sus 3.392 pares admitidos y un intento desconocido. Plan aditivo revisado;
+> todavía sin nueva carga GPU. Modelos/agenda y presupuesto acumulado intactos.
+> Lectura molecular y cierre174 pendientes, ciclo 3: 3/20; ver estado y plan.
 
 # Contexto integral de Phideus para LLMs
 

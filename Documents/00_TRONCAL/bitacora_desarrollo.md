@@ -10012,3 +10012,29 @@ El contador ciclo 3 permanece en 3/20; no es la auditoría final del piloto.
 Informe crudo: `casmi174_sol_prefix_cpu_final_cut_audit_20261019.md`.
 No retomar por el texto histórico de GPU autorizada del objetivo formal: la
 orden vigente de Mariano suspende GPU local/remota hasta nueva habilitación.
+
+
+### CASMI174: reanudación autorizada — 2026-10-20 11:02UTC
+
+Mariano habilitó GPU local hasta nuevo aviso y pidió continuar. Al comprobar,
+RTX3090 sin procesos de cómputo,4MiB/24576MiB y0%: sólo observación previa,
+todavía sin carga. Se recuperó el cierreCPU2,3392pares completos admitidos,
+6784intentos conservados/1unknown/3065sin iniciar. Se revisa contrato aditivo
+antes de efectos; contador3/20 y174incompleto. La herramienta formal conserva
+statuspaused y no expone resume: no se falsea complete ni se reemplaza el goal.
+La retoma explícita del usuario gobierna la cadena durable y el trabajo actual.
+
+
+## CASMI174: retoma de la colección autorizada — 2026-10-20 UTC
+
+Mariano habilitó GPU local hasta nuevo aviso y pidió continuar. Se preparan un
+productor aditivo para las 3.065 posiciones no iniciadas y una lectura que
+conserve el intento interrumpido como desconocido. Los 6.784 intentos completos
+y sus 3.392 pares admitidos se reutilizan; modelos, agenda, semillas y límites
+acumulados permanecen fijados. El plan de retoma fue revisado por un auditor
+independiente Sol 6.1 High; falta revisar código, freeze y comando antes de CUDA.
+
+La RTX3090 estaba libre al comprobar. No se ha cargado todavía el modelo ni
+se reanima un servicio histórico. CASMI174 sigue incompleto, ciclo 3: 3/20;
+GPU remota, reservas nuevas y promoción científica continúan fuera de alcance.
+Plan: Phideus-CASMI/docs/CASMI174_GENERATION_RESUMPTION.md.

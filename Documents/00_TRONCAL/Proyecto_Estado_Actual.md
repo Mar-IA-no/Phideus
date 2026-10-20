@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI174 reanudado; GPU local habilitada — 2026-10-20 UTC**: se prepara continuación aditiva de las 3.065 posiciones sin iniciar, conservando 6.784 canónicos y un intento desconocido. GPU libre al comprobar; todavía sin carga. Plan de retoma revisado, implementación y launcher pendientes de revisión. No se repite entrenamiento ni admisión CPU conservada.174 sigue incompleto y ciclo 3: 3/20. [Plan](../../../Phideus-CASMI/docs/CASMI174_GENERATION_RESUMPTION.md).
+>
 > **CASMI174: prefijo CPU admitido y cerrado — 2026-10-19 UTC**:3.392 pares de trazas completas admitidos,0 pares desconocidos; generación conservada6784complete/1unknown/3.065 sin iniciar. UnidadCPU cerrada y doble ausencia comprobada, wall acumulado137,199748 s. Sin forwards, química o respuestas; caché todavía no integrada en lector completo. GPU local/remota suspendida; completar generación requiere nueva autorización.174 incompleto, ciclo 3: 3/20. [Resultado CPU](../../../Phideus-CASMI/docs/CASMI174_PREFIX_ADMISSION_RESULTS.md).
 >
 > **CASMI174: GPU suspendida, continuidad CPU — 2026-10-19 UTC**: por orden de Mariano se interrumpió la colección en6.784intentos completos, uno desconocido y3.065sin iniciar. ProcesoGPU propio y servicio/cgroup cerrados, ausencia verificada; checkpoints conservados.284fuentes y todos los bytes del corte verificados enCPU. Sigue admisión numérica reutilizable de las trazas completas; sin abrir respuestas ni lectura molecular final.174incompleto, ciclo3:3/20; GPU local/remota suspendida hasta nuevo permiso. Nuevas delegaciones Sol6.1High.

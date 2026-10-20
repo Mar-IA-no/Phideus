@@ -522,3 +522,17 @@ y checkpoints; no intervenir procesos ajenos. Continuar sólo CPU que avance
 materialmente el objetivo. Ante dependencia material de GPU, informar y pausar
 el goal/cadena; no sustituir por CPU larga ni actividad periférica. La colección
 174 interrumpida no se regenera ni se declara completa por esta orden.
+
+
+## Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-20
+
+Mariano indica «tenes gpu hasta nuevo aviso, continua». Levanta la suspensión
+GPU del19/10 y reanuda CASMI174 desde su corte conservado, sin permisos por
+corrida. La cesión directa mantiene PMP sin proveedoresGPU hasta nueva orden.
+Verificar ocupación y ownership antes de cargar; no intervenir procesos ajenos.
+Conservar los6784intentos completos, el intento6784interrumpido y las3065
+posiciones aún sin iniciar; diseñar y revisar continuación aditiva sin reiniciar
+presupuestos ni regenerar canónicos. Reutilizar admisiónCPU3392 y sus compactos.
+No habilita GPU remota, reservas nuevas, entrenamiento extra o promoción
+científica. Contador ciclo3:3/20; toda delegación nueva Sol6.1High, incluidas
+auditorías, según orden19/10. No repetir161 ni auditorías cerradas.
