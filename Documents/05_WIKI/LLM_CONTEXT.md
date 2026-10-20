@@ -3068,3 +3068,18 @@ los32casos y ocho máscaras sin repetir la fase. Unidad automáticamente descarg
 doble ausencia comprobada. Siguen sampler175 y calibraciónFIT GPU con ambos endpoints
 conservados, antes de la comparación molecular;175 incompleto, ciclo3:4/20.
 [SoporteCPU](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_CPU_SUPPORT_RESULTS.md).
+
+## CASMI175: calibración GPU cerrada; comparación molecular en preparación — 2026-10-20 UTC
+
+Se verificaron seis propuestasFIT nuevas con los endpointsC/S256 conservados:
+377acciones, dos finales con imposibilidad certificada y cuatro sin acciones
+locales, sinEOS. Wall6,075802s; trazas crudas,346fuentes y fingerprints intactos.
+La auditoría independiente acepta números, prosa y cierre; unidad propia cerrada
+con doble ausencia yGPUlibre al comprobar. Es una prefase de seis casos, sin
+conclusión general sobre recuperación molecular.
+
+Sigue el contraste molecular de9.850posiciones sobre las16consultas/197fórmulas
+originales, mismos pesos y semillas, namespace175 nuevo. Se preparan productor,
+admisiónstreaming y lecturaCPU química/S22 con sellos previos a139. Generación
+molecular todavía no iniciada; GPUlocal autorizada,175incompleto y contador4/20.
+[ResultadoGPUFIT](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_GPU_FIT_RESULTS.md).
