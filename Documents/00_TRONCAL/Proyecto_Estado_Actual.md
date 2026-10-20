@@ -10,6 +10,10 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI175: soporteFIT comprobado — 2026-10-20 UTC**:32secuencias/2.304transiciones sin falsos rechazos; ocho máscaras retiran221acciones con prueba y conservan548unknown. FaseCPU0,670748s, verificada/cerrada; sigue calibraciónGPU con ambos endpoints antes de medir efecto molecular.175incompleto, ciclo3:4/20. [SoporteCPU](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_CPU_SUPPORT_RESULTS.md).
+>
+> **CASMI175 en preparación — 2026-10-20 UTC**: filtro de imposibilidad con abstenciónunknown,71 pruebas sintéticas pertinentes pasadas; faseCPU32FIT/ocho máscaras congelada en revisión previa a datos. Sin generación175 ni nuevo resultado molecular. GPUlocal habilitada, mismos endpoints y320 fuentes174 preservadas; ciclo3:4/20. [Plan175](../../../Phideus-CASMI/docs/CASMI175_CONSTRUCTIVE_CONTINUATION_PLAN.md).
+>
 > **CASMI174 cerrado y auditado — 2026-10-20 UTC**:9849 completos/1 desconocido,25 candidatos químicosC y33S, ninguna identidad objetivo conocida; listas puntuadas top1/5/25 yRR25cero en16 consultas. C conserva cota[0,1/16],S[0,0]; cinco scores unknown separados. Generación/lector cerrados;758 acepta cifras/prosa/horizonte, integración única ciclo3:4/20. Sigue contraste propuesto de viabilidad con testigoEOS, sin atribuir causa única a9791no_actions ni ampliar training. [Resultado759](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/759_CASMI174_COMPOSITIONAL_RESULTS.md).
 >
 > **CASMI174: lectura molecular completa — 2026-10-20 UTC**:9849 completos/1 desconocido conservado,25 candidatos químicosC y33S, ninguna identidad objetivo conocida recuperada; listas puntuadas top1/5/25 yRR25cero en16 consultas. C conserva cota[0,1/16],S[0,0]; cinco scores unknown separados. Generación y lector verificados/cerrados, GPUlibre. Auditoría final758 en integración; ciclo3:3/20 hasta su aceptación. [Resultado759](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/759_CASMI174_COMPOSITIONAL_RESULTS.md).

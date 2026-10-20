@@ -3037,3 +3037,34 @@ imposibilidad demostrada yunknown antes de otra comparación molecular. El caso
 sintéticoC2H6 no atribuye una causa única a9791 desenlaces sin acciones.175 aún
 no ejecutado, sin GO/promoción científica.
 [Resultado759](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/759_CASMI174_COMPOSITIONAL_RESULTS.md).
+
+
+## CASMI175: filtro de continuación en preparación — 2026-10-20 UTC
+
+Se abrió el contraste de viabilidad con los mismos endpointsC/S256, sin entrenamiento
+adicional. El filtro sólo descarta hijos con prueba de imposibilidad; unknown
+conserva soporte. Plan, reglas y contratoFIT revisados por una instancia nueva
+Sol6.1High. Pasaron71 pruebas sintéticas pertinentes, incluida composición real
+del extractor con el consumidor y cierres ante deadline/disco.
+
+La faseCPU32FIT/ocho máscaras está congelada y en revisión exterior antes de
+leer datos reales. Todavía no hay resultado de soporteFIT ni generación175.
+Después corresponden calibraciónGPU y contraste molecular, sin atribuir las9791
+rutas sin acciones de174 al testigo sintético.174 permanece cerrado y preservado;
+ciclo3:4/20, sin sumar prefases. GPUlocal autorizada hasta nuevo aviso.
+[Plan175](../../../Phideus-CASMI/docs/CASMI175_CONSTRUCTIVE_CONTINUATION_PLAN.md).
+
+## CASMI175: soporte FIT comprobado; calibración GPU pendiente — 2026-10-20 UTC
+
+Las32 secuenciasFIT fijadas completaronEOS y2.304transiciones docentes sin falsos
+rechazos:2.240abstencionesunknown y64testigos inmediatos. En ocho máscaras,
+769acciones locales se separaron en221rechazos certificados y548unknown conservados.
+La fase duró0,670748s según intervalo conservador del manager; no usóGPU/química.
+Unknown lógico no es caso perdido:32/32 terminaron y las330fuentes quedaron intactas.
+
+La primera verificación perdió metadata efímera al descargarse la unidad; su fallo
+se conserva. Una recuperación revisada desde journal/arranque pinados verificó
+los32casos y ocho máscaras sin repetir la fase. Unidad automáticamente descargada,
+doble ausencia comprobada. Siguen sampler175 y calibraciónFIT GPU con ambos endpoints
+conservados, antes de la comparación molecular;175 incompleto, ciclo3:4/20.
+[SoporteCPU](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_CPU_SUPPORT_RESULTS.md).
