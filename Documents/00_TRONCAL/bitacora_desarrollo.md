@@ -10065,3 +10065,41 @@ servicios previos sigue descontado; no se amplía entrenamiento ni presupuesto.
 La lectura aditiva CPU se prepara y audita en paralelo, sin abrir respuestas
 ni química antes del cierreGPU y sus sellos.174 sigue incompleto, ciclo3:3/20.
 Fuentes: `Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md` y `Phideus-CASMI/docs/CASMI174_COMPOSED_READOUT_PLAN.md`.
+
+
+## CASMI174: lectura molecular completa; cierre final en integración — 2026-10-20 UTC
+
+La agenda quedó agotada con9849 intentos completos y uno desconocido conservado.
+C produjo25 candidatos químicos conocidos y S33; ninguna identidad objetivo
+apareció en esos pools. Top1/5/25 yRR25 de las listas efectivamente puntuadas son
+cero en ambos brazos, con las16 consultas conservadas. El pool completo deC
+mantiene cota[0,1/16] por el intento desconocido; S[0,0], diferenciaS−C[−1/16,0].
+Los cinco scores desconocidos(2C/3S) siguen separados de la identidad conocida.
+
+Se reutilizaron3392 pares y se admitieron1533 jobs nuevos, sin regeneración o
+entrenamiento adicional. Generación/lector verificados y cerrados con doble
+ausencia; lectura59,055072s yGPUlibre al comprobar. El resultado orienta el
+siguiente contraste hacia viabilidad constructiva con testigoEOS e imposibilidad
+probada, sin atribuir causalidad a los9791 desenlaces sin acciones.175 aún no se
+ejecutó. Auditoría final758 en integración; ciclo3:3/20 hasta su aceptación.
+[Resultado759](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/759_CASMI174_COMPOSITIONAL_RESULTS.md).
+
+
+## CASMI174: piloto cerrado y auditado — 2026-10-20 UTC
+
+La agenda quedó agotada con9849 intentos completos y uno desconocido conservado.
+C produjo25 candidatos químicos conocidos y S33; ninguna identidad objetivo
+apareció en esos pools. Top1/5/25 yRR25 de las listas efectivamente puntuadas son
+cero en ambos brazos, con las16 consultas conservadas. El pool completo deC
+mantiene cota[0,1/16] por el intento desconocido; S[0,0], diferenciaS−C[−1/16,0].
+Los cinco scores desconocidos(2C/3S) siguen separados de la identidad conocida.
+
+Se reutilizaron3392 pares y se admitieron1533 jobs nuevos, sin regeneración o
+entrenamiento adicional. Generación/lector verificados y cerrados con doble
+ausencia; lectura59,055072s yGPUlibre al comprobar.758 aceptó implementación,
+cifras, prosa íntegra y horizonte; integración única3→4, ciclo3:4/20. El siguiente
+contraste propuesto175 comprobará viabilidad constructiva con testigoEOS,
+imposibilidad demostrada yunknown antes de otra comparación molecular. El caso
+sintéticoC2H6 no atribuye una causa única a9791 desenlaces sin acciones.175 aún
+no ejecutado, sin GO/promoción científica.
+[Resultado759](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/759_CASMI174_COMPOSITIONAL_RESULTS.md).

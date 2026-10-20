@@ -10,6 +10,10 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI174 cerrado y auditado — 2026-10-20 UTC**:9849 completos/1 desconocido,25 candidatos químicosC y33S, ninguna identidad objetivo conocida; listas puntuadas top1/5/25 yRR25cero en16 consultas. C conserva cota[0,1/16],S[0,0]; cinco scores unknown separados. Generación/lector cerrados;758 acepta cifras/prosa/horizonte, integración única ciclo3:4/20. Sigue contraste propuesto de viabilidad con testigoEOS, sin atribuir causa única a9791no_actions ni ampliar training. [Resultado759](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/759_CASMI174_COMPOSITIONAL_RESULTS.md).
+>
+> **CASMI174: lectura molecular completa — 2026-10-20 UTC**:9849 completos/1 desconocido conservado,25 candidatos químicosC y33S, ninguna identidad objetivo conocida recuperada; listas puntuadas top1/5/25 yRR25cero en16 consultas. C conserva cota[0,1/16],S[0,0]; cinco scores unknown separados. Generación y lector verificados/cerrados, GPUlibre. Auditoría final758 en integración; ciclo3:3/20 hasta su aceptación. [Resultado759](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/759_CASMI174_COMPOSITIONAL_RESULTS.md).
+>
 > **CASMI174: continuación3 GPU activa — 2026-10-20 UTC**: freeze306 y comando revisados; arranque propio y restauración de ambos modelos comprobados. Se están generando sólo las3065 posiciones no iniciadas, con gasto previo descontado y C6784 desconocido conservado. LectorCPU aditivo en revisión; sin recuperación molecular todavía.174 incompleto, ciclo3:3/20. [Plan3](../../../Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md).
 >
 > **CASMI174: continuación2 detenida antes de emitir candidatos — 2026-10-20 UTC**: fallo de interfaz de agenda identificado, fuentes/checkpoints conservados y unidad cerrada con doble ausencia. Sigue recuperación3 aditiva con validación previa a CUDA;6784 completos/1 desconocido/3065 sin iniciar. Gasto acumulado3497,697865s sin renovar presupuesto. GPU local autorizada;174 incompleto, ciclo3:3/20. [Plan3](../../../Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md).
