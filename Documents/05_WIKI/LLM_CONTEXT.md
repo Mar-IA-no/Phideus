@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-10-19
+updated: 2026-10-20
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -134,6 +134,26 @@ source_paths:
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
+
+## CASMI176: preferencia FIT medida y auditada — 2026-10-20 UTC
+
+El ensayo congelado sobre 30 pares FIT (51 claves, 21 fórmulas) distingue
+sensibilidad de selección estructural. S tiene 16 diferencias de rama orientadas
+y 14 contrarias, sin desconocidos; en los 30 pares favorece el mismo token con
+ambos espectros, por lo que ninguna pareja consigue ambas orientaciones propias
+correctas. C es literalmente invariante a productos emparejados/intercambiados/null.
+El par sin truncamiento adicional172 tiene D=+0,0447354, pero favorece [O] bajo
+ambas observaciones y su interacción de sufijo medio es negativa. No son 16 pares
+resueltos ni evidencia de identificación o generalización.
+
+Se completaron 480 forwards sin repetir entrenamiento; servicio 12,379956s,
+pico final RAM 913.371.136B, crudos y pesos preservados, verificación CPU y cierre
+exacto/doble ausencia. La lectura independiente acepta cifras, prosa íntegra y
+horizonte; integración única 5→6, ciclo3:6/20. Sigue diseñar un diagnóstico finito
+que separe aprendizaje de asociación y preferencias previas antes de otra colección.
+GPU local sigue autorizada, actualmente libre; sin promoción científica.
+[Resultado completo](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI176_SPECTRAL_PREFERENCE_RESULTS.md).
+
 
 ## CASMI174: entrenamiento completo; calibración incompleta — 2026-10-19 UTC
 

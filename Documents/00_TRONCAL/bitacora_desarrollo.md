@@ -1,3 +1,22 @@
+## CASMI176: preferencia FIT medida y auditada — 2026-10-20 UTC
+
+El ensayo congelado sobre 30 pares FIT (51 claves, 21 fórmulas) distingue
+sensibilidad de selección estructural. S tiene 16 diferencias de rama orientadas
+y 14 contrarias, sin desconocidos; en los 30 pares favorece el mismo token con
+ambos espectros, por lo que ninguna pareja consigue ambas orientaciones propias
+correctas. C es literalmente invariante a productos emparejados/intercambiados/null.
+El par sin truncamiento adicional172 tiene D=+0,0447354, pero favorece [O] bajo
+ambas observaciones y su interacción de sufijo medio es negativa. No son 16 pares
+resueltos ni evidencia de identificación o generalización.
+
+Se completaron 480 forwards sin repetir entrenamiento; servicio 12,379956s,
+pico final RAM 913.371.136B, crudos y pesos preservados, verificación CPU y cierre
+exacto/doble ausencia. La lectura independiente acepta cifras, prosa íntegra y
+horizonte; integración única 5→6, ciclo3:6/20. Sigue diseñar un diagnóstico finito
+que separe aprendizaje de asociación y preferencias previas antes de otra colección.
+GPU local sigue autorizada, actualmente libre; sin promoción científica.
+[Resultado completo](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI176_SPECTRAL_PREFERENCE_RESULTS.md).
+
 ## CASMI175: contraste molecular cerrado y auditado — 2026-10-20 UTC
 
 Con los endpoints174 y semillas conservados, el filtro de imposibilidad elevó los

@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI176 medido y auditado — 2026-10-20 UTC**: 30 pares FIT/480 inferencias, 16 cambios relativos orientados y14 contrarios; ninguna pareja elige ambas continuaciones propias y C permanece invariante. El espectro modifica preferencias sin resolver todavía la discriminación bilateral. Servicio12,379956s cerrado, crudos/pesos conservados, integración única ciclo3:6/20. Sigue diseño diagnóstico de aprendizaje antes de otra colección, sin promoción ni entrenamiento extra176. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI176_SPECTRAL_PREFERENCE_RESULTS.md).
+>
 > **CASMI175: contraste cerrado y auditado — 2026-10-20 UTC**:1.997cierres químicamente válidos,1.988identificados y nueveidentidades desconocidas conservadas; ningunaidentidad objetivo conocida enC/S. Top1/5/25 yRR25cero en16consultas, cotas de pool[0,3/16] porbrazo. Lector505,276441s, pico final2.624.061.440B; cuatro unidades cerradas, fuentes/checkpoints preservados. Auditoría integral aceptada e integrada una vez,ciclo3:5/20. Sigue diseño de preferencia estructural informada porMS/MS con controlesFIT y pesosfijos. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_CONSTRUCTIVE_MOLECULAR_RESULTS.md).
 >
 > **CASMI175: colecciónmolecularGPU activa — 2026-10-20 UTC**:351fuentes y argv auditados; arranque único PID234680/inv7b281a6eee054e9db249b513e21fd919 y primeras trazas canónicas comprobados.9.850posiciones nuevas, mismos endpoints/semillas; lectorCPU implementado y revisado, pendiente del presupuesto concreto y efecto tras cierreGEN.175incompleto, ciclo3:4/20. [Plan](../../../Phideus-CASMI/docs/CASMI175_MOLECULAR_PIPELINE_PLAN.md).
