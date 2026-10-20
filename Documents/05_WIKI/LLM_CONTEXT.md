@@ -3083,3 +3083,13 @@ originales, mismos pesos y semillas, namespace175 nuevo. Se preparan productor,
 admisiónstreaming y lecturaCPU química/S22 con sellos previos a139. Generación
 molecular todavía no iniciada; GPUlocal autorizada,175incompleto y contador4/20.
 [ResultadoGPUFIT](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_GPU_FIT_RESULTS.md).
+
+## CASMI175: colección molecular GPU activa — 2026-10-20 UTC
+
+La generación nueva pasó revisión independiente de351fuentes y comando exacto.
+Arranque único verificado13:41:51UTC: PID234680, invocation7b281a6eee054e9db249b513e21fd919;
+ambos endpoints restaurados y primeras trazas canónicas observadas. Se ejecuta
+la agenda9850/16consultas con el filtro de imposibilidad175, conservando174.
+La GPU es local y no se entrena. LecturaCPU de trazas/química/S22 en preparación
+paralela; no hay todavía resultado molecular175. Contador4/20 sin cambio.
+[Plan molecular](../../../Phideus-CASMI/docs/CASMI175_MOLECULAR_PIPELINE_PLAN.md).

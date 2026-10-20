@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI175: colecciónmolecularGPU activa — 2026-10-20 UTC**:351fuentes y argv auditados; arranque único PID234680/inv7b281a6eee054e9db249b513e21fd919 y primeras trazas canónicas comprobados.9.850posiciones nuevas, mismos endpoints/semillas; lectorCPU en preparación.175incompleto, ciclo3:4/20. [Plan](../../../Phideus-CASMI/docs/CASMI175_MOLECULAR_PIPELINE_PLAN.md).
+>
 > **CASMI175: calibraciónGPU cerrada — 2026-10-20 UTC**: seis propuestasFIT/377acciones sinEOS; dos imposibilidades certificadas y cuatro finales sin acciones locales. Wall6,075802s, trazas/pesos/fuentes intactos y unidad cerrada. Sigue comparación molecular sobre16consultas/197fórmulas, todavía sin iniciar;175incompleto, ciclo3:4/20. [ResultadoGPUFIT](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_GPU_FIT_RESULTS.md).
 >
 > **CASMI175: soporteFIT comprobado — 2026-10-20 UTC**:32secuencias/2.304transiciones sin falsos rechazos; ocho máscaras retiran221acciones con prueba y conservan548unknown. FaseCPU0,670748s, verificada/cerrada; sigue calibraciónGPU con ambos endpoints antes de medir efecto molecular.175incompleto, ciclo3:4/20. [SoporteCPU](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_CPU_SUPPORT_RESULTS.md).
