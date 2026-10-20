@@ -10159,3 +10159,19 @@ la agenda9850/16consultas con el filtro de imposibilidad175, conservando174.
 La GPU es local y no se entrena. LecturaCPU de trazas/química/S22 en preparación
 paralela; no hay todavía resultado molecular175. Contador4/20 sin cambio.
 [Plan molecular](../../../Phideus-CASMI/docs/CASMI175_MOLECULAR_PIPELINE_PLAN.md).
+
+## CASMI175: lector CPU implementado; efecto en espera de GEN — 2026-10-20 UTC
+
+La generación molecular sigue activa. Se completaron y revisaron admisión
+streaming175, supervisor de pares/singles, autoridad de colección cerrada,
+presupuesto condicional y núcleo/host de lectura con sellos previos a139.
+Las pruebasCPU son sintéticas; todavía no se ejecutó el lector molecular.
+La auditoría resolvió dos fallos de cierre antes de efectos y acepta los
+componentes, conservando pendiente la revisión deD/M/W y freeze/argv concretos.
+
+Tras verificar/cerrar GEN se conservará todoEOS y se instanciará la regla de
+recursos fijada: reservaD≤12GiB yM_old+1GiB≤12GiB, además de disponibilidad
+física. Un exceso se registra antes de jobs, sin eliminar casos o artefactos.
+Luego: admisión de todas las trazas→química→sello→S22→sello→139→métricas16/13/3.
+La sola generación no cierra175. Contador4/20 sin cambio, GPUlocal autorizada.
+[Contrato de ejecución](../../../Phideus-CASMI/docs/CASMI175_MOLECULAR_READOUT_EXECUTION.md).
