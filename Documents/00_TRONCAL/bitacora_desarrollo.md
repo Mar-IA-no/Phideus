@@ -1,3 +1,22 @@
+## CASMI175: lectura molecular CPU activa por lotes — 2026-10-20 UTC
+
+La colección nueva quedó verificada y cerrada:9.850registros conocidos,
+1.997cierresEOS,3.794finales locales vacíos y4.059imposibilidades de continuación.
+EOS todavía no acredita validez química o recuperación. Fuentes y pesos intactos.
+
+El lector materializado fue bloqueado antes de jobs por su reservaRAM43,41GB.
+La adaptación aditiva conserva todos los crudos por lotes de ocho, sin modificar
+operaciones científicas ni sus límites.85pruebas sintéticas pasaron y la revisión
+independiente aceptó378fuentes, presupuesto y comando concretos: reservaRAM
+7.263.373.696B ydisco12.065.530.790B, ambas dentro de12GiB; CPU8/swap0.
+
+Arranque único del lector verificado: unidadpropia activa, PID490542, invocación
+b5600b2c2453432982011f8a65c2bdd2. Está admitiendo trazas175 antes dequímica;
+después siguen ambos sellos,S22 y acceso139 autorizado antes demétricas16/13/3.
+Todavía no hay resultado molecular175. GPUlibre al cierreGEN, autorizaciónlocal
+vigente; no nuevo entrenamiento. Contadorciclo3:4/20 y goal175incompleto.
+[Plan de lectura por lotes](../../../Phideus-CASMI/docs/CASMI175_SPOOLED_READOUT_PLAN.md).
+
 ## CASMI168: comparación molecular completa y auditada — 2026-10-18 UTC
 
 Las dos colecciones163 completaron5.760intentos físicos y el lector admitió sus

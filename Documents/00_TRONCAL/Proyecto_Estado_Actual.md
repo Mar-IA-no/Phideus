@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI175: lectorCPU por lotes activo — 2026-10-20 UTC**:9.850registros verificados y1.997cierresEOS todavía sin validación química/identidad. La retención por lotes conserva todos los crudos dentro deRAM12GiB;85pruebas y378fuentes/comando revisados. Arranque único PID490542 comprobado, admisión175 en curso antes dequímica/sellos/S22/139.175incompleto y ciclo3:4/20. [Plan](../../../Phideus-CASMI/docs/CASMI175_SPOOLED_READOUT_PLAN.md).
+>
 > **CASMI175: colecciónmolecularGPU activa — 2026-10-20 UTC**:351fuentes y argv auditados; arranque único PID234680/inv7b281a6eee054e9db249b513e21fd919 y primeras trazas canónicas comprobados.9.850posiciones nuevas, mismos endpoints/semillas; lectorCPU implementado y revisado, pendiente del presupuesto concreto y efecto tras cierreGEN.175incompleto, ciclo3:4/20. [Plan](../../../Phideus-CASMI/docs/CASMI175_MOLECULAR_PIPELINE_PLAN.md).
 >
 > **CASMI175: calibraciónGPU cerrada — 2026-10-20 UTC**: seis propuestasFIT/377acciones sinEOS; dos imposibilidades certificadas y cuatro finales sin acciones locales. Wall6,075802s, trazas/pesos/fuentes intactos y unidad cerrada. Sigue comparación molecular sobre16consultas/197fórmulas, todavía sin iniciar;175incompleto, ciclo3:4/20. [ResultadoGPUFIT](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_GPU_FIT_RESULTS.md).
