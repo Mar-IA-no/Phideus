@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI174: continuación3 GPU activa — 2026-10-20 UTC**: freeze306 y comando revisados; arranque propio y restauración de ambos modelos comprobados. Se están generando sólo las3065 posiciones no iniciadas, con gasto previo descontado y C6784 desconocido conservado. LectorCPU aditivo en revisión; sin recuperación molecular todavía.174 incompleto, ciclo3:3/20. [Plan3](../../../Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md).
+>
 > **CASMI174: continuación2 detenida antes de emitir candidatos — 2026-10-20 UTC**: fallo de interfaz de agenda identificado, fuentes/checkpoints conservados y unidad cerrada con doble ausencia. Sigue recuperación3 aditiva con validación previa a CUDA;6784 completos/1 desconocido/3065 sin iniciar. Gasto acumulado3497,697865s sin renovar presupuesto. GPU local autorizada;174 incompleto, ciclo3:3/20. [Plan3](../../../Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md).
 >
 > **CASMI174 reanudado; GPU local habilitada — 2026-10-20 UTC**: se prepara continuación aditiva de las 3.065 posiciones sin iniciar, conservando 6.784 canónicos y un intento desconocido. GPU libre al comprobar; todavía sin carga. Plan de retoma revisado, implementación y launcher pendientes de revisión. No se repite entrenamiento ni admisión CPU conservada.174 sigue incompleto y ciclo 3: 3/20. [Plan](../../../Phideus-CASMI/docs/CASMI174_GENERATION_RESUMPTION.md).

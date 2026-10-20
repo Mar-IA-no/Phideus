@@ -10051,3 +10051,17 @@ Se prepara continuación3 aditiva con validación de agenda interna antes de CUD
 sin modificar303 fuentes previas. Gasto exterior acumulado3497,697865s, sin renovar
 presupuestos. GPU local autorizada y libre tras cierre2.174 sigue incompleto,
 ciclo3:3/20; lectura molecular pendiente. Plan: `Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md`.
+
+
+## CASMI174: continuación3 GPU activa — 2026-10-20 UTC
+
+La continuación3 pasó30 pruebas CPU y revisión independiente de freeze306,
+fuentes y comando exactos. Arranque único comprobado: PID4177869, invocation
+3482fc9ee40b4614873e4c95e6a55b5a. Ambos modelos se restauraron y se observaron
+intentos nuevos canónicos y384MiB de usoGPU propio. Se emiten sólo3065 posiciones
+no iniciadas;6784 anteriores y C6784 desconocido se conservan. El gasto de los
+servicios previos sigue descontado; no se amplía entrenamiento ni presupuesto.
+
+La lectura aditiva CPU se prepara y audita en paralelo, sin abrir respuestas
+ni química antes del cierreGPU y sus sellos.174 sigue incompleto, ciclo3:3/20.
+Fuentes: `Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md` y `Phideus-CASMI/docs/CASMI174_COMPOSED_READOUT_PLAN.md`.
