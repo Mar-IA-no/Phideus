@@ -10038,3 +10038,16 @@ La RTX3090 estaba libre al comprobar. No se ha cargado todavía el modelo ni
 se reanima un servicio histórico. CASMI174 sigue incompleto, ciclo 3: 3/20;
 GPU remota, reservas nuevas y promoción científica continúan fuera de alcance.
 Plan: Phideus-CASMI/docs/CASMI174_GENERATION_RESUMPTION.md.
+
+
+## CASMI174: recuperación tras fallo de metadatos — 2026-10-20 UTC
+
+La continuación2 salió con `KeyError:paired_epochs` antes de emitir candidatos,
+tras restaurar el primer modelo. Se verificaron fuentes y archivos; checkpoints
+intactos y unidad cerrada con doble ausencia. La validación de fingerprints en
+memoria no estuvo disponible. Se conservan6784 completos/1 desconocido/3065 sin iniciar.
+
+Se prepara continuación3 aditiva con validación de agenda interna antes de CUDA,
+sin modificar303 fuentes previas. Gasto exterior acumulado3497,697865s, sin renovar
+presupuestos. GPU local autorizada y libre tras cierre2.174 sigue incompleto,
+ciclo3:3/20; lectura molecular pendiente. Plan: `Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md`.

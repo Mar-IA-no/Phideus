@@ -2972,3 +2972,16 @@ phase/cierre; no repetir ni reactivar productor por inercia. CheckpointsTRAIN,
 falloFIT/microprobe y continuación permanecen conservados/cerrados una vez.
 LectorCPU futuro preparado:40tests métricas/core pasan12.28s, revisión independiente
 en curso; sin datos reales/GT/lectura molecular nueva. Contador ciclo3:3/20.
+
+
+## CASMI174: recuperación tras fallo de metadatos — 2026-10-20 UTC
+
+La continuación2 salió con `KeyError:paired_epochs` antes de emitir candidatos,
+tras restaurar el primer modelo. Se verificaron fuentes y archivos; checkpoints
+intactos y unidad cerrada con doble ausencia. La validación de fingerprints en
+memoria no estuvo disponible. Se conservan6784 completos/1 desconocido/3065 sin iniciar.
+
+Se prepara continuación3 aditiva con validación de agenda interna antes de CUDA,
+sin modificar303 fuentes previas. Gasto exterior acumulado3497,697865s, sin renovar
+presupuestos. GPU local autorizada y libre tras cierre2.174 sigue incompleto,
+ciclo3:3/20; lectura molecular pendiente. Plan: `Phideus-CASMI/docs/CASMI174_GENERATION_3_RECOVERY.md`.
