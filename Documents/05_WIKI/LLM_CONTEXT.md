@@ -135,6 +135,33 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI180: asociación FIT medida; alcance molecular pendiente — 2026-10-21 UTC
+
+El ensayo contemporáneo completó sus 640 updates y 644 snapshots, desde un
+prior común autenticado y con optimizadores nuevos. La asociación de la rama
+con productos aumentó 0,089238078 nats entre 0 y 256; sólo 6 de 166 clases
+resolvieron todos sus eventos y targets. La proyección histórica conservó
+0/30 pares con ambas decisiones propias correctas. El subconjunto de igual
+conteo no reprodujo la mejora y la NLL de secuencia completa aumentó. El positivo
+artificial mostró asociación parcial, con 0/3 clases completas. Estos resultados
+no prueban recuperación molecular, generalización ni causalidad frente a174.
+
+Se conservaron los seis crudos reales, cuatro artificiales y checkpoints; las
+432 fuentes incluyen las 408 anteriores. Las tres etapas terminaron, recibieron
+verificación exterior y sus unidades quedaron cerradas con ausencia comprobada.
+La etapa GPU duró 387,595787 s; preparación y resumen CPU, 11,890430 y 54,731617 s.
+La revisión final independiente acepta cifras, prosa íntegra y horizonte;
+integración única8→9, ciclo3:9/20, sin hallazgos materiales pendientes. El contraste histórico179 permanece
+sin ejecutar. GPU local sigue habilitada, sin trabajos propios activos.
+
+La última evaluación molecular175 mantiene top25 efectivo 0/16 por brazo,
+con nueve identidades sin resolver. El cierre oficial es 14/12/2026 a las
+20:59 de Argentina; desde21/10 quedan54 días. La infraestructura está más
+avanzada que la capacidad predictiva demostrada. Sigue rebasar la ruta hacia
+recuperación de estructuras desconocidas; no prolongar esta receta sólo por G.
+[Resultados180](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI180_ASSOCIATION_RESULTS.md).
+
+
 ## CASMI179: comparación histórica sin iniciar por su gate — 2026-10-21 UTC
 
 La preparación aditiva del contraste178quedó implementada y probada con fixtures

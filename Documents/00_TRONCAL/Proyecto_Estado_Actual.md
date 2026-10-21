@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI180 medido — 2026-10-21 UTC**: 640 updates/644 snapshots completos, verificación exterior y tres unidades cerradas. Asociación FIT S: delta0,089238078 nats; resolución completa6/166clases, proyección0/30pares, positivo0/3clases y NLL secuencial peor. No demuestra recuperación molecular;175 conserva top25 efectivo0/16porbrazo. Revisión final de cifras/prosa íntegra/horizonte aceptada, integración única8→9, ciclo3:9/20. Sigue rebasar la ruta hacia estructuras desconocidas, sin prolongar por G ni promover arquitectura. Cierre14/12/2026 20:59Argentina,54días desde21/10. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI180_ASSOCIATION_RESULTS.md).
+>
 > **CASMI179: comparación sin iniciar por gate histórico — 2026-10-21 UTC**: preparaciónCPUaditiva, sin training/GPU ni resultados de asociación.174no conserva autoridad de versiones del runtime para el gate178; no se afirma diferencia de versiones, sino igualdad no acreditada. Se conserva el corte y se prepara otra pregunta contemporánea bajo plan propio. GPU habilitada, contador8/20sin incremento. [Corte](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI179_RUNTIME_GATE_RESULTS.md).
 >
 > **CASMI178: diseño de asociación FIT — 2026-10-20 UTC**: dos controles174archivados y dos ramas focalizadas propuestas, sujetas a gate de inicial/datos/calendario. Todas las166clases/366decisiones, misma agenda2023FIT; pesos/métricas/unknowns y presupuesto finito fijados. Sin entrenamiento, modelos oGPU178; revisión independiente aceptada e integrada una vez7→8,ciclo3:8/20. El trabajo posterior requiere su propia autoridad de efectos. [Diseño](../../../Phideus-CASMI/docs/CASMI178_PAIRED_BRANCH_DESIGN.md).
