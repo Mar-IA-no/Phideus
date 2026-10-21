@@ -1,3 +1,22 @@
+## CASMI179: comparación histórica sin iniciar por su gate — 2026-10-21 UTC
+
+La preparación aditiva del contraste178quedó implementada y probada con fixtures
+CPU, pero la comparación de objetivos no se ejecutó:174no conserva autoridad
+contemporánea de versionesTorch/CUDA/cuDNN/driver. No acreditamos que su runtime
+fuera distinto; falta comprobar que fuera el mismo. El gate previo conserva su
+corte, sin cargar checkpoints, admitir espectros reales, ejecutar positivo64 o
+entrenar ramas. Las versiones registradas en176no prueban continuidad hacia atrás.
+
+Se conservan admisión/pesos/donantes/equivalencias, loss/padding/AdamW0vsNone y
+staging verificable; sus pruebas de software no acreditan capacidad o aprendizaje.
+El informe distingue preparación y experimento pendiente, sin DeltaG ni promoción.
+La candidata siguiente plantea C/S contemporáneos desde prior autenticado para
+medir aprendizaje desde0, con174como antecedente descriptivo; requiere plan y
+revisión propios. GPU local sigue habilitada; este corte no la usó. Contador8/20
+sin incremento por revisión del gate/preparación. Auditoría de código/prosa/horizonte acepta la preparación y el corte; sin hallazgos
+materiales pendientes.81testsCPUintegradosPASSen1,72s.
+[Corte](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI179_RUNTIME_GATE_RESULTS.md).
+
 ## CASMI178: contraste de objetivos FIT diseñado — 2026-10-20 UTC
 
 La siguiente prueba queda especificada como comparación de dos objetivos con
