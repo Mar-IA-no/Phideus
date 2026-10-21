@@ -135,6 +135,23 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI182: baseline molecular medido — 2026-10-21 UTC
+
+El primer bloque competitivo produjo un recuperador neuronal ejecutable:
+DreaMS obtiene0,930837MRR25 frente0,942781del ancla sobre228consultas con
+referencia conocida,226alcanzables. Diferencia−0,011943;3mejoras,217empates,
+8empeoramientos, ningúnUNKNOWN. No supera al ancla ni estima el concurso:
+la población está expuesta y el solapamiento de pretraining es desconocido.
+
+ParidadCPU exacta en7casos, luego59368embeddings y158468scores completos,
+sellados antes de respuestas. La corrida tomó114,501s; no se reentrenó el
+generador. Auditor nuevo confirmó implementación, cifras, prosa completa y horizonte;
+integración única10→11, ciclo3:11/20. GPU y cinco unidades propias liberadas/verificadas.
+Sigue cobertura/ranking estructural y entrega: bancoCOCONUT/ChEBI sólo candidata
+documental, ninguna cobertura afirmada. No se abre otra ronda porG/NLL.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI182_NEURAL_RETRIEVAL_RESULTS.md).
+
+
 ## CASMI181: plan competitivo auditado y ruta rectificada — 2026-10-21 UTC
 
 Mariano reorienta el programa hacia resultados competentes en el concurso.
