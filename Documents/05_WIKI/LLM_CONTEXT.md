@@ -135,6 +135,23 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI183: fuente estructural admitida para preparación — 2026-10-21 UTC
+
+COCONUT2024 quedó autenticado y censado sin targets:695133filas/63colecciones;
+14358filas de procedenciaChEBINPs con ID y SMILES. Auditor nuevo reprodujo todos
+los conteos/proyección byte por byte y aceptó la admisión local de esos campos,
+con atribución y límites explícitos. No es aún un índice químico validado ni
+cobertura del concurso; sin química, training oGPU183. Cinco unidades cerradas,
+432fuentes/foreign5intactos, originales/parciales conservados. Integración única
+11→12/ciclo3:12/20, prechecks no suman.
+
+Contrato de cabeza/entrega archivado: encoderDreaMS congelado, nuevo consumidor
+FITy fingerprint común, controles marginal/masa y CSVreal separado del fixture.
+Sigue preparación química y presupuesto desde perfil/aprendizajeFITcon validación
+interna por componente, sin optimizar213o228ni volver aG/NLL.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI183_STRUCTURAL_BANK_RESULTS.md).
+
+
 ## CASMI182: baseline molecular medido — 2026-10-21 UTC
 
 El primer bloque competitivo produjo un recuperador neuronal ejecutable:
