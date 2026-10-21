@@ -135,6 +135,19 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI184 activo — preparación para ranking molecular sin referencia
+
+El protocolo y sus componentes pasaron revisión independiente. FIT2023 quedó
+preparado con401ejemplos de validación en370componentes y1622de ajuste inicial.
+El perfil químico acotado produjo244estructuras válidas y12identidades desconocidas
+en256SMILES únicos, en1,945s con4workers. No representa cobertura del banco entero.
+Se preservaron el fallo inicial por IDs oficiales ausentes, la corrección de IDs
+locales explícitos y la continuación RAW16,778s que reutilizó labels. SinGPU,
+encoder, training o labels213. Sigue preparación completa y contraste molecular
+sellado; goal184 activo, contador12/20. CSV interno no equivale a entrega Kaggle.
+Fuente: [protocolo184](../../../Phideus-CASMI/docs/CASMI184_MOLECULAR_RANKING_PROTOCOL.md).
+
+
 ## CASMI183: fuente estructural admitida para preparación — 2026-10-21 UTC
 
 COCONUT2024 quedó autenticado y censado sin targets:695133filas/63colecciones;

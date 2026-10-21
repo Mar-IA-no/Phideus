@@ -1,3 +1,25 @@
+## CASMI184 activo: preparación y perfil del contraste molecular — 2026-10-21 UTC
+
+El protocolo y los componentes del ranking sin espectros de referencia pasaron
+revisión independiente. La preparación conserva2023 pares FIT; la validación
+interna fijada antes de química contiene401ejemplos en370componentes, con1622
+para ajuste inicial. El primer transporte detectó que train histórico carece
+de IDs oficiales; la corrección auditada usa handles locales explícitos y
+reutilizó los labels ya extraídos. La continuación RAW terminó en16,778s.
+
+El perfil químico de128filas del banco y128casos FIT procesó256SMILES únicos:
+244completaron y12quedaron con identidad desconocida por enumeración incompleta.
+Duró1,945s de procesamiento con4workers,7,439sCPU acumulados; caché conservado
+para no recalcular. Estos conteos describen sólo ese prefijo, no cobertura del
+banco completo ni resultado de identificación. SinGPU, encoder, entrenamiento
+o labels213. Servicios propios terminados y ausencia verificada.
+
+Sigue preparación química completa con presupuesto medido, entrenamiento elegido
+sólo mediante validación FIT y comparación de listas/CSV sellados frente a
+marginales y masa. El CSV interno usará IDs locales; no equivale a una submission
+Kaggle lista. Goal184 permanece activo y contador12/20, sin sumar prechecks.
+[Protocolo](../../../Phideus-CASMI/docs/CASMI184_MOLECULAR_RANKING_PROTOCOL.md).
+
 ## CASMI183: fuente estructural admitida para preparación — 2026-10-21 UTC
 
 COCONUT2024 quedó autenticado y censado sin targets:695133filas/63colecciones;

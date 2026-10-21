@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI184 activo — 2026-10-21 UTC**: protocolo/componentes auditados y2023pares FIT preparados;401validación interna/1622ajuste, por componentes. Perfil químico256estructuras:244válidas y12identidades desconocidas,1,945s con4workers; sinGPU/training/labels213. Sigue preparación completa y contraste molecular, todavía sin resultado competitivo. [Protocolo](../../../Phideus-CASMI/docs/CASMI184_MOLECULAR_RANKING_PROTOCOL.md).
+>
 > **CASMI183: fuente estructural material — 2026-10-21 UTC**: COCONUT2024autenticado,695133filas;14358deprocedenciaChEBIadmitidas sólo para preparación estructural local. Auditor nuevo confirmó censo/proyección byte por byte y alcance de derechos, sin índice químico/identidades/cobertura afirmados. Sintraining/GPU, cinco unidades cerradas, integración única11→12/ciclo3:12/20. Sigue preparación común y piloto sin referencia desdeFITcon validación por componente. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI183_STRUCTURAL_BANK_RESULTS.md).
 >
 > **CASMI182 medido — 2026-10-21 UTC**: baseline neuronal DreaMS0,930837MRR25 frente ancla0,942781 en228consultas conocidas;3mejoras/217empates/8empeoramientos, sinUNKNOWN. Corrida114,501s, embeddings/scores preservados; no resultadoKaggle ni novedad estructural. Auditoría final independiente aceptada; integración única10→11, ciclo3:11/20. Sigue cobertura/ranking estructural;GPU liberada. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI182_NEURAL_RETRIEVAL_RESULTS.md).
