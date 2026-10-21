@@ -1,3 +1,25 @@
+## Phideus/CASMI: competitividad del concurso como objetivo central — 2026-10-21
+
+Mariano ordena: «de ahora en mas el objetivo central es lograr resultados
+competentes para el concurso. Usar cosas de phideus o del enfoque geometrico
+pasa a ser herramientas de la caja de herramientas para usar solo si es
+pertinente. Audita lo hecho y lo por hacer bajo este criterio. Luego diseña
+un plan con objetivos principales y secundarios bien claros. Audita el plan
+con auditoria normal y divina, y avanza por donde lo indique lo pertinente».
+
+Esta directiva sustituye la prioridad de validar transferencia de Phideus y
+la obligación geometry-first de la ruta activa: la utilidad para CASMI dirige
+representaciones, modelos, datos permitidos, métricas y esfuerzo. Conservar
+resultados negativos, alternativas e historia sin prolongar líneas por identidad
+del proyecto. Auditar retrospectiva y prospectiva; plan concreto con objetivos
+principales/secundarios, auditor independiente y Auditoría Divina explícita
+antes de avanzar al siguiente experimento. No esperar al contador20 para este
+ejercicio solicitado; registrar su carácter extraordinario sin borrar historia.
+Conserva reservas cerradas, licencias, recursos/ownership y GO/NO-GO científico;
+no implica promoción de arquitectura ni abrir datos privados por inferencia.
+GPU local vigente; nuevas delegaciones GPT6.1SolHigh, contexto limpio cuando
+corresponda. La orden incluye continuar por la ruta pertinente tras las revisiones.
+
 ## Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-17
 
 Mariano indica «continua, tenes el gpu disponible hasta nuevo aviso». Reanuda

@@ -10,6 +10,18 @@ Documentos de apoyo:
 
 ---
 
+## Uso situado en CASMI desde21/10/2026
+
+En el frente CASMI el objetivo central pasa a ser obtener resultados competentes
+para el concurso. Esta historia de descriptores conserva su valor como caja de
+herramientas; no obliga a validar transferencia, mantener geometría como centro
+o usar una familia por su procedencia. Un mecanismo se incorpora cuando mejora
+identificación, cobertura o una decisión pertinente bajo condiciones explícitas.
+El cambio de prioridad no altera la evidencia histórica ni las preguntas de
+armonía natural de los otros frentes de Phideus. El[plan de competencia181](../../../../Phideus-CASMI/docs/CASMI181_COMPETITION_PLAN.md)
+separa objetivos principales de las candidatas secundarias.
+
+
 ## Uso en el nuevo ciclo geométrico
 
 El [programa de geometría armónica computable](../../00_TRONCAL/ROADMAP_GENERAL/PROGRAMA_GEOMETRIA_ARMONICA_COMPUTABLE.md)

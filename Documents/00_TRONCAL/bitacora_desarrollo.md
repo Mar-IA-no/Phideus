@@ -1,3 +1,27 @@
+## CASMI181: plan competitivo auditado y ruta rectificada — 2026-10-21 UTC
+
+Mariano reorienta el programa hacia resultados competentes en el concurso.
+Phideus y geometría quedan como herramientas opcionales; no se espera al1/11
+ni se prolonga el generador por continuidad. La auditoría retrospectiva conserva
+el valor de datos, modelos y controles, pero identifica una brecha de rumbo:
+proxiesFIT y cierres válidos no han cambiado la última recuperación molecular.
+El puente de referencias conocidas sí tiene ranking útil; sus cifras no son
+una estimación del test ni del régimen de estructuras nuevas.
+
+El plan distingue tres objetivos principales: baseline neuronal híbrido fuerte,
+cobertura/ranking de estructuras sin referencia y entrega íntegra reproducible.
+Generación180, geometría y ajustes de cómputo son secundarios, sujetos a valor
+material. DreaMS es candidata concreta aún sin instalar/admitir; antes de usarla
+se revisarán activo, licencia, exposición, entorno y coste. Dos inventarios de
+código/datos/entrega están preservados. La auditoría normal independiente
+Sol6.1High y la Divina extraordinaria del coordinador están completas; R1 sobre
+scores y ausencia de referencias quedó corregido. Se integra un hito9→10,
+ciclo3:10/20; la Divina extraordinaria no borra el ciclo. La admisión documental
+del banco y la definición de entrega comienzan junto al baseline del encoder,
+para evitar otra cadena centrada sólo en referencias conocidas. No se ejecutó
+ningún experimento181; sigue admisión e implementación bajo el plan revisado.
+[Plan](../../../Phideus-CASMI/docs/CASMI181_COMPETITION_PLAN.md).
+
 ## CASMI180: asociación FIT medida; alcance molecular pendiente — 2026-10-21 UTC
 
 El ensayo contemporáneo completó sus 640 updates y 644 snapshots, desde un
