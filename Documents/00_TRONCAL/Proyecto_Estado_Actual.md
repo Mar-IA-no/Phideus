@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI191 fuente completa — 2026-10-22 UTC**:462.206 nuevas y469.602 totales(461.699 válidas/7.890 indeterminadas/13 rechazadas), cero pendientes/retries.42min39sCPU,pico5,39GB,scope cerrado; saldo4.557,57s. Auditoría independiente integrada20/20 y Divina ordinaria completa; ciclo4:0/20. Sigue censo de canónicos antes de estabilidad/exportación/cobertura; no es banco listo. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI191_FULL_SOURCE_RESULTS.md).
+>
 > **CASMI190 diagnóstico completo — 2026-10-22 UTC**:4.096 tareas en24,00s CPU de supervisor;4.027 representaciones válidas(3.915 en dominio),68unknown y un rechazo.462.206 fuentes pendientes, saldo7.116,81s; scope cerrado y53 fuentes intactas. Auditoría final integrada una vez,19/20. Sigue fuente completa bajo plan finito, sin más perfiles; no acredita banco/cobertura. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI190_PREPARATION_COST_RESULTS.md).
 >
 > **CASMI189 inventario/perfil completos — 2026-10-22 UTC**:3.172 antecedentes exactos y466.430 nuevos sobre469.602 textos; perfil128 válido conservado,466.302 restantes. Inventario54,32s y perfil4,87s sóloCPU; dos scopes cerrados,51 fuentes intactas. Auditoría final integrada una vez, contador18/20. Presupuesto de preparación completa aún no acreditado; sigue diseño aditivo antes de efectos. No mide cobertura. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI189_STRUCTURAL_CACHE_PROFILE_RESULTS.md).

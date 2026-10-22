@@ -135,6 +135,27 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI191: fuente completa y revisión de rumbo — 2026-10-22 UTC
+
+La corrida procesó462.206 textos nuevos y conserva resultados para las469.602
+fuentes:461.699 representaciones válidas,7.890 indeterminadas y13 rechazadas.
+Cero pendientes/retries;128+4.096 resultados anteriores reutilizados y cotejados
+independientemente por hashes/offsets. Esto completa fuente, no banco ni cobertura.
+
+Supervisor42min39s, sóloCPU, pico5,39GB y scope cerrado. El presupuesto común
+conserva4.557,57s; los derivados comunes rondan6,25GB. Auditoría final integrada
+una vez19→20 y Auditoría Divina ordinaria realizada por el coordinador; ciclo4:0/20.
+Se conservan historia y ejercicio extraordinario181.
+
+Sigue censar canónicos desde todo el cache184–191, sin nueva química ni targets,
+para fijar checks realmente nuevos, bytes y saldo antes de estabilidad/exportación.
+Después corresponde medir cobertura/ranking y cerrar el recorrido de entrega;
+no abrir otro catálogo o entrenamiento por inercia ni inferir aciertos del tamaño.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI191_FULL_SOURCE_RESULTS.md).
+[Divina](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI191_DIVINA_CYCLE3.md).
+
+
+
 ## CASMI190: costo medido de preparación estructural — 2026-10-22 UTC
 
 El diagnóstico sistemático procesó4.096 tareas nuevas en24,00s de supervisor:
