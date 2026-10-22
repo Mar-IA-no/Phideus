@@ -10656,3 +10656,15 @@ con datos sintéticos. No se abrieron targets reales195 ni se ejecutó su poblac
 Contador científico ciclo4:4/20; esta relectura del mismo hito no suma. Limpieza
 cerrada y versionada en SCI f162277, sin reabrir SHA de backups ni ampliar borrados.
 Fuentes: plan195 y crudo195_pre_effect_review_20261022 en el repositorio CASMI.
+
+
+### 2026-10-22 UTC — CASMI197 completo y auditado, sólo CPU
+
+Banco447.089estable bajo receta184, partición448.543con22casos inciertos conservados.
+214resultados recuperados sin recalcular y370.909nuevos completos, sin retry. Cgroup
+cerrado en33min27s,7,18GiB de pico; saldo común reconciliado2.187,065s de7200.
+Auditor nuevoSol6.1High y lectura completa dedicada de prosa sin diferencias
+materiales; root integró una sola vez4→5/ciclo4 y emitió closure197 operativo.
+No hay todavía nueva cobertura/ranking. Sigue195CPU sobre213expuestos con mismos
+logits/kernel187; su manifest/preflight aún deben cerrarse. GPU prohibida.
+Fuente: CASMI197_RECOVERY_BANK_RESULTS.md y crudo final197 en Phideus-CASMI.

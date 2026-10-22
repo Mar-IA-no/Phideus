@@ -10,7 +10,7 @@
 </div>
 
 > [!IMPORTANT]
-> **Retoma CASMI sólo CPU —2026-10-22 UTC:** Mariano reanudó trabajo útil CPU y prohibió GPU hasta nuevo aviso.197 está en ejecución:214resultados recuperados sin recalcular, cincoambiguos sin reintentar y sólo tareas nunca enviadas.4000s/8CPU/8GiB, banco todavía no consumible hasta cierre y auditoría.195 tiene integración CPU candidata revisada (90 fixtures independientes PASS, memoria corregida), todavía sin corrida real. La limpieza quedó cerrada.
+> **CASMI197 cerrado y auditado; continuidad sólo CPU —2026-10-22 UTC:**447.089candidatos exportados,22incertidumbres conservadas y370.909tareas nuevas completas, sin retry.214resultados recuperados sin recalcular. Scope cerrado en33min27s, cierre de consumo emitido y contadorciclo4:5/20. Sigue comparación195 bajo manifiesto/preflight propio; todavía sin nueva métrica de identificación. GPU prohibida y limpieza cerrada. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI197_RECOVERY_BANK_RESULTS.md).
 >
 > **Limpieza CASMI terminada: corte previo a retoma CPU —2026-10-22 UTC:**1.637.792archivos históricos retirados tras cotejo de metadatos, sin SHA por orden posterior. Reconciliación independiente completa sin errores; respaldo RAID y1.086dependencias conservados. CASMI pasó214,31→38,56GiB, reducción neta175,75GiB;263,12GiB libres en el volumen al medir.En ese corte197 quedó pausado y195 incompleto; la orden superior posterior reanuda sólo CPU. [Resultado y recuperación](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/storage-audit-20261022/CLEANUP_RESULT.md).
 >
