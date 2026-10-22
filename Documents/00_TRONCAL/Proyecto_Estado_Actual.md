@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI200 comparación completa y auditada, sólo CPU —2026-10-22 UTC:** la unión eleva cobertura44→48/213, pero el neuronal pasa10→8Top1,24→23Top5,35→36Top25 y caeMRR25.375scores selectivos, sin nuevo entrenamiento/química/forward/GPU; cierre40,70s. Auditoría/prosa integradas una vez8→9/ciclo4. Se conserva la comparación sin promover unión; sigue diseñoFIT discriminante. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI200_SELECTIVE_UNION_COMPARISON_RESULTS.md).
+>
 > **CASMI199 inventario completo, sólo CPU —2026-10-22 UTC:** unión de514.812candidatas; faltan190scores neuronales y184marginales distintos, más1conflicto marginal conservado. Sin scoring nuevo ni respuestas. Cierre15,50s, auditoría/prosa integradas una vez7→8/ciclo4. Sigue cálculo selectivoCPU bajo diseño y revisión propios; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI199_UNION_INVENTORY_RESULTS.md).
 >
 > **CASMI195/198 comparación completa, sólo CPU —2026-10-22 UTC:** cobertura44/213 frente30; bancos no anidados. Masa recupera38enTop25 y neuronal35, sin superioridad neuronal uniforme. TresCSV completos; diagnóstico30s y contraste125s, gasto común179,39s de600. Cgroups cerrados, auditoría y prosa integradas una vez6→7/ciclo4. Sigue comprobar combinación de fuentes completas reutilizando crudos; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI198_COMPARISON_RESULTS.md).

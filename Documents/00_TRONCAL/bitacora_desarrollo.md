@@ -10715,3 +10715,20 @@ emitido. Formal199complete tras Git. Sigue diseñoCPU200 para375scores selectivo
 no repetir masa/química/forward ni abrir otras fuentes. GPU prohibida.
 
 Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI199_UNION_INVENTORY_RESULTS.md.
+
+
+### CASMI200 — comparación selectiva completa y auditada (22/10/2026 UTC)
+
+375scores nuevos, sin química/forward/training/GPU:190neuralmissing+184marginalmissing
++1marginalconflict; disponibles199 intactos. Unión514812,coverage48vs44/30,165ausentes.
+Unión masa6/21/38MRR.065314; neural8/23/36.069581; marginal8/22/34.068353.
+Frente197neural pierde2Top1/1Top5 y gana1Top25; no mejora uniforme/promoción.
+Scope cerrado40.69838721305132s con suplemento/pico714379264BsinOOM,newdisk11.57MB,
+saldos199/195-198 intactos. Ownseal200 trascierre/replay antesgate187genuino/targets.
+Auditor nuevo01a164ab-2793-7fa3-a7fe-64756f80be62 verifica375tuples/6626requests/
+759grupos/639Top25unión/1917filas3bancos y3consultasdemasa sinBCE/targetscrudos.
+Rootleyócrudo+2JSON íntegros/prosaindependientecompleta; integraciónUNAvez8→9ciclo4.
+Closure200 emitido. Formalcomplete tras Git; siguiente diseñoFITdiscriminante,
+con factibilidadCPU en rebase, no otroexperimento declarado listo. GPU prohibida.
+
+Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI200_SELECTIVE_UNION_COMPARISON_RESULTS.md.
