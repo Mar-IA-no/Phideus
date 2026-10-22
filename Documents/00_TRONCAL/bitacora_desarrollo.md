@@ -1,3 +1,19 @@
+## CASMI192: agrupación completa, clasificación pendiente — 2026-10-22 UTC
+
+La pasada CPU conservó469.602aliases y460.926grupos:448.543elegibles,
+12.374fuera de dominio y nueveconflictos. Los448.543canónicos distintos quedaron
+congelados, todavía sin clasificar. No se conoce cuántos checks nuevos requieren.
+El control preventivo de capacidad cortó antes de esa etapa: reservaba espacio
+sobre toda la DB, aunque la continuación sólo necesita escribir metadata nueva.
+
+Cierre recuperable156,11s, pico387MB y cgroup ausente; originales/journals intactos.
+Auditor independiente verificó payloads, grupos, aliases y1140checkpoints;
+integración única0→1/ciclo4. Saldo tras suplemento4.401,45s de7200.
+El goal censal continúa:193 deberá adjuntar192/191 sólo lectura y clasificar
+sin repetir fuente/grupos ni copiar fingerprints. Banco/estabilidad/exportación
+siguen pendientes; no hay nuevas medidas de cobertura/ranking.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI192_CANONICAL_CENSUS_RESULTS.md).
+
 ## CASMI191: fuente completa y revisión de rumbo — 2026-10-22 UTC
 
 La corrida procesó462.206 textos nuevos y conserva resultados para las469.602
