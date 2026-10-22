@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI187 completo y auditado — 2026-10-22 UTC**: desempate neuronal Top1 de9 a12, MRR25 de0,067488 a0,078855 sobre213 históricos expuestos. Top25 sigue29;183 respuestas ausentes del banco. Sin ventajaMRR frente al marginal enFIT401. SeisCSV reconstruidos,42 pruebasPASS, cuatro scopes cerrados, sóloCPU. Auditoría integrada una vez15→16/ciclo3. Sigue contrato de cobertura188, todavía sin adquirir nuevas fuentes. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI187_CONDITIONAL_RANKING_RESULTS.md).
+>
 > **CASMI186 completo y auditado — 2026-10-22 UTC**: interfaz de doce observables y múltiples vistas verificada con dos poblaciones sintéticas; 42 filas CSV, scores y agrupación reproducidos por auditor nuevo. 73 pruebas pertinentes PASS, todo CPU, scope cerrado y fuentes184/185 intactas. Integración única14→15 del ciclo3. No mide acierto molecular ni entrega offline completa. Sigue conectar y medir un scorer/banco reales admitidos con dominio explícito. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI186_OBSERVABLE_INTERFACE_RESULTS.md).
 >
 > **CASMI185 completo y auditado — 2026-10-22 UTC**: banco103.955candidatas, cobertura30/213 frente6anterior. MasaTop1/5/25=9/20/29,MRR25=0,067488; neuronal/marginal0. Las183ausencias finales son exactas; incertidumbre fuente anterior a filtros32–213. TodoCPU, banco/CSV/fallos conservados y diez unidades cerradas. Auditor independiente integrado una vez,ciclo3:14/20. Sigue interfaz multivista finita, después scorer real/entrega offline; no prolongar cabeza porBCE ni declarar competitividad desde fixtures. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI185_CHEBI_BANK_RESULTS.md).

@@ -135,6 +135,24 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI187: mejora acotada del ranking; cobertura prioritaria — 2026-10-22 UTC
+
+El desempate neuronal dentro de grupos de masa exactamente igual elevó Top1
+histórico213 de9 a12 y MRR25 de0,067488 a0,078855; el marginal obtuvo11 y0,075335.
+Top25 permanece29 y cobertura30/213:183 respuestas están fuera del banco.
+En FIT401 el MRR neuronal0,063711 queda ligeramente bajo el marginal0,063749;
+son fases distintas y poblaciones expuestas, sin confirmación de generalización.
+
+Auditor nuevo reconstruyó scores, órdenes, métricas y seis CSV;42 pruebas PASS.
+Los cuatro scopes están ausentes y45 fuentes de código182/184–186 permanecen
+intactas. Coste original de supervisores78,04s, sólo CPU; el primer perfil fallido
+queda preservado. Auditoría final integrada una vez15→16, ciclo3:16/20.
+Conservar el desempate como candidata experimental; no prolongar training porBCE.
+Sigue revisar una ampliación estructural pública concreta frente al binding de
+referencias182. El diseño188 no equivale a adquisición o admisión de una fuente.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI187_CONDITIONAL_RANKING_RESULTS.md).
+
+
 ## CASMI186: interfaz multivista verificada — 2026-10-22 UTC
 
 El mismo recorrido procesó dos poblaciones sintéticas de 40 y 2 moléculas,
