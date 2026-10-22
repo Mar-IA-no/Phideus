@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI193 censo completo — 2026-10-22 UTC**:448.543 canónicos,63.590 válidos previos y384.953 nunca intentados. Auditoría independiente completa, ciclo4:2/20; saldo4.379,74s, scope cerrado. Sigue estabilidad/exportación194 bajo revisión; todavía sin banco ni nueva cobertura. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI193_CANONICAL_COMPLETION_RESULTS.md).
+>
 > **CASMI192 corte auditado — 2026-10-22 UTC**: fuente/agrupación completas,448.543grupos elegibles y canónicos congelados sin clasificar; capacidad preventiva cortó tras156,11sCPU. Scope cerrado, todo recuperable; auditor integrado una vez,ciclo4:1/20. Sigue193desde192/191RO sin repetir fuente/grupos; goal censal activo. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI192_CANONICAL_CENSUS_RESULTS.md).
 >
 > **CASMI191 fuente completa — 2026-10-22 UTC**:462.206 nuevas y469.602 totales(461.699 válidas/7.890 indeterminadas/13 rechazadas), cero pendientes/retries.42min39sCPU,pico5,39GB,scope cerrado; saldo4.557,57s. Auditoría independiente integrada20/20 y Divina ordinaria completa; ciclo4:0/20. Sigue censo de canónicos antes de estabilidad/exportación/cobertura; no es banco listo. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI191_FULL_SOURCE_RESULTS.md).
