@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **Comparación CASMI195 pendiente tras corte auditado —2026-10-22 UTC:** el gate preventivo de RAM detuvo el intento antes de puntuar; sin OOM, predicciones, CSV, sello ni lectura de respuestas. Scope cerrado; gasto24,10s y saldo575,90s del presupuesto600. Auditoría y prosa revisadas íntegramente, integración única5→6/ciclo4. Se revisa una continuación CPU con capacidad demostrada y el mismo saldo. GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI195_COMPARISON_CAPACITY_CUT.md).
+>
 > **CASMI197 cerrado y auditado; continuidad sólo CPU —2026-10-22 UTC:**447.089candidatos exportados,22incertidumbres conservadas y370.909tareas nuevas completas, sin retry.214resultados recuperados sin recalcular. Scope cerrado en33min27s, cierre de consumo emitido y contadorciclo4:5/20. Sigue comparación195 bajo manifiesto/preflight propio; todavía sin nueva métrica de identificación. GPU prohibida y limpieza cerrada. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI197_RECOVERY_BANK_RESULTS.md).
 >
 > **Limpieza CASMI terminada: corte previo a retoma CPU —2026-10-22 UTC:**1.637.792archivos históricos retirados tras cotejo de metadatos, sin SHA por orden posterior. Reconciliación independiente completa sin errores; respaldo RAID y1.086dependencias conservados. CASMI pasó214,31→38,56GiB, reducción neta175,75GiB;263,12GiB libres en el volumen al medir.En ese corte197 quedó pausado y195 incompleto; la orden superior posterior reanuda sólo CPU. [Resultado y recuperación](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/storage-audit-20261022/CLEANUP_RESULT.md).

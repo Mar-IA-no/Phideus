@@ -10668,3 +10668,17 @@ materiales; root integró una sola vez4→5/ciclo4 y emitió closure197 operativ
 No hay todavía nueva cobertura/ranking. Sigue195CPU sobre213expuestos con mismos
 logits/kernel187; su manifest/preflight aún deben cerrarse. GPU prohibida.
 Fuente: CASMI197_RECOVERY_BANK_RESULTS.md y crudo final197 en Phideus-CASMI.
+
+
+### 2026-10-22 UTC — CASMI195 corte preventivo auditado; continúa sólo CPU
+
+La comparación195 se detuvo antes de puntuar porque la cuenta conservadora
+de memoria no cabía en16GiB. No fue un OOM observado ni produjo CSV, sello,
+evaluación o acceso a respuestas. El proceso propio cerró; consumió24,10s
+y conserva575,90s de600, sin tomar el saldo de preparación ancestral.
+La revisión independiente del corte y lectura completa de prosa no encontraron
+diferencias materiales; integración única5→6/ciclo4. El desglose de memoria
+no quedó guardado y no se atribuye retroactivamente. Plan198 en revisión
+independiente propone reconstruirlo sin scoring y continuar la comparación
+CPU bajo ese mismo saldo. GPU local/remota prohibida; limpieza cerrada.
+Fuente: CASMI195_COMPARISON_CAPACITY_CUT.md en Phideus-CASMI.
