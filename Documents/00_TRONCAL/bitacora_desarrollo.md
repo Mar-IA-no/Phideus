@@ -1,3 +1,28 @@
+## CASMI185: soporte ampliado y contraste molecular auditado — 2026-10-22 UTC
+
+El banco oficial ChEBI preparado contiene103.955candidatas y cubre30/213
+respuestas, frente a6en184. Con logits y fórmulas congelados, masa alcanza
+Top1/5/25 de9/20/29 yMRR25 de0,0674877283; neuronal y marginal siguen en0.
+Entre las30cubiertas, masa recupera29enTop25. Las183ausencias del banco final
+son exactas; RAW y canónica antes de filtros conservan cotas32–213 por181
+identidades fuente desconocidas. Es un panel histórico expuesto y una métrica
+local: no equivale a rendimiento del concurso ni a una submission lista.
+
+Preparación49,58min, ranking20,06s y lectura final52,70s, todoCPU. El primer
+lector falló a33,27s; la reparación auditada interpreta7.823identidades
+parciales vacías como desconocidas sin alterar originales, banco o predicciones,
+y conserva el presupuesto común. TresCSV y scores completos quedan sellados.
+Auditor nuevo reprodujo evidencia, cifras y prosa íntegra; integración única
+13→14del ciclo3. Diez unidades propias ausentes, fuentes y fallos preservados.
+
+Masa queda como control útil; no prolongar la cabeza porBCE ni ajustar estos30
+positivos. Sigue un MVP finito de entrada variable/multivista y una lista por
+molécula, reutilizando el serializer; después conectar y medir un scorer real.
+La cobertura pendiente y el ranking espectral físicamente condicionado siguen
+siendo problemas científicos centrales. Los fixtures de interfaz no acreditarán
+competitividad. Phideus/geometría conservan su lugar de herramientas opcionales.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI185_CHEBI_BANK_RESULTS.md).
+
 ## CASMI184: primer ranking sin referencias, con cobertura insuficiente — 2026-10-22 UTC
 
 El contraste ya produjo y evaluó tres CSV completos de 213 consultas y 25
