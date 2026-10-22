@@ -10752,3 +10752,20 @@ e integró una vez9→10/ciclo4. No se repitió eljoin sobre originales en laaud
 Sigue revisión acotada de procedencia de la cola antes de otro ranking, no
 adoptar q99por cobertura. GPUlocal/remota prohibida, limpieza cerrada. Fuente:
 Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI201_FIT_MASS_RESIDUAL_RESULTS.md.
+
+
+### CASMI202 — procedencia FIT auditada y causa no resuelta (22/10/2026 UTC)
+
+Los2023precursores/aductos/modosRAWcoincidencon201;adduct_origtambién[M+H]+
+en2023. No seobservóalteraciónenese transporte; no confirmaotra carga ocausa
+química. q95train201intacto separa1540/82gradiente(core/cola)y389/12val.
+Contextofuentepreservado,instrument_type47null. No nuevoscuantiles, corrección
+labels,213,química/scoring/forward/trainingniGPU. OperaciónCPUcerrada
+5.353430903982371scon suplemento,pico3138994176B/sinOOM/scopeausente.
+Auditor nuevoverificó2023filas202/201,2014conteosliterales/8092celdas yleyó
+prosaíntegra. Rootleyócrudo completo+sumarioverificacióníntegro; cotejótodos
+losconteosporprograma, sin afirmarlecturaverbatimdetodosvalorescontinuos.
+IntegraciónUNAvez10→11/ciclo4; cierreemitido. La causa específica quedaabierta,
+sinprolongarcensos. Sigue contarsoporteq95conobservables401y banco197ya
+guardados, antesFP/logits/scoring, sinsuministrar masasde respuestas201alranker.
+GPUlocal/remotaprohibidos,limpiezacerrada. [Resultado202](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI202_FIT_MASS_PROVENANCE_RESULTS.md).
