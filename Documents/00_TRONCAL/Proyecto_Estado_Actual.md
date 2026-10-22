@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI189 inventario/perfil completos — 2026-10-22 UTC**:3.172 antecedentes exactos y466.430 nuevos sobre469.602 textos; perfil128 válido conservado,466.302 restantes. Inventario54,32s y perfil4,87s sóloCPU; dos scopes cerrados,51 fuentes intactas. Auditoría final integrada una vez, contador18/20. Presupuesto de preparación completa aún no acreditado; sigue diseño aditivo antes de efectos. No mide cobertura. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI189_STRUCTURAL_CACHE_PROFILE_RESULTS.md).
+>
 > **CASMI188 completo y auditado — 2026-10-22 UTC**:469.602 filasIdentifier/SMILES originales, sin faltantes ni duplicados textuales; cada fila y hashes verificados independientemente. Admisión limitada a preparación estructural local, sin química/cobertura/identidad molecular acreditadas. TodoCPU, tres scopes cerrados,49fuentes intactas, contador17/20. Sigue inventario cache y perfil128tareas nuevas, antes de preparación completa. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI188_PUBLIC_STRUCTURAL_PROJECTION_RESULTS.md).
 >
 > **CASMI187 completo y auditado — 2026-10-22 UTC**: desempate neuronal Top1 de9 a12, MRR25 de0,067488 a0,078855 sobre213 históricos expuestos. Top25 sigue29;183 respuestas ausentes del banco. Sin ventajaMRR frente al marginal enFIT401. SeisCSV reconstruidos,42 pruebasPASS, cuatro scopes cerrados, sóloCPU. Auditoría integrada una vez15→16/ciclo3. Sigue contrato de cobertura188, todavía sin adquirir nuevas fuentes. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI187_CONDITIONAL_RANKING_RESULTS.md).

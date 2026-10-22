@@ -1,3 +1,21 @@
+## CASMI189: inventario y perfil estructural completos — 2026-10-22 UTC
+
+Los469.602 textos de PubChemLite contienen3.172 antecedentes exactos en el cache:
+3.169 válidos, dos rechazados y un unknown conservados sin reintento. El primer
+prefijo de128 tareas nuevas terminó con128 resultados válidos; quedan466.302
+fuentes nunca intentadas. Esto mide preparación y costo, no cobertura del concurso.
+
+Inventario54,32s y perfil4,87s de supervisor, sóloCPU, cuatro workers en el perfil;
+dos scopes cerrados y51 fuentes previas intactas. Dieciséis pruebas sintéticas
+pasaron con autor y auditor independiente. Auditoría final integrada una vez17→18/ciclo3:18/20.
+
+La preparación completa aún requiere presupuesto: el prefijo fijo no representa
+la heterogeneidad del catálogo y el escalado ilustrativo del pipeline185 da unos
+7.272s, por encima del techo propuesto7200s, sin ser pronóstico ni cota. Sigue diseño
+aditivo que descomponga fuente, estabilidad y exportación, conserve intentos y
+revise capacidad antes de correr. Phideus/geometría siguen como herramientas opcionales.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI189_STRUCTURAL_CACHE_PROFILE_RESULTS.md).
+
 ## CASMI188: catálogo público autenticado y proyectado — 2026-10-22 UTC
 
 PubChemLite3.3.0 produjo469.602 filas con identificador y SMILES original,
