@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI203 inventario de ventana completo, sólo CPU —2026-10-22 UTC:** 401 consultas/370 componentes, banco447.089; 10.002 pares neuronales y hasta20.004 puntuaciones totales conservadoras. Unión marginal8.705 condicionada a verificar el prior. Solicitudes completas115KB, sinFP/logits/targets/scoring. Cierre6,1684s/pico52,65MB, scope ausente. Auditoría de derivados y prosa integrada una vez11→12/ciclo4. Sigue diseño/perfil de contraste con predicciones guardadas; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI203_FIT_WINDOW_SUPPORT_RESULTS.md).
+>
 > **CASMI202 procedencia FIT comprobada, sólo CPU —2026-10-22 UTC:**2023precursores/aductos/modos coinciden con el RAW; adduct_orig también[M+H]+en todos. Cola94segúnq95train201fijo, causa específica no resuelta; no corregirlabels ni prolongarcensos. Scope cerrado5,353s/pico3,139GB. Auditoría y prosa integradas una vez10→11/ciclo4, sin diferencias. Sigue soporte/coste de rankingcon ventanaestrecha FIT401antesFP/scoring; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI202_FIT_MASS_PROVENANCE_RESULTS.md).
 >
 > **CASMI201 diagnóstico FIT completo, sólo CPU —2026-10-22 UTC:**2023residuales conservados; mediana absppm0,857226, q95=3,547149ppm y q99=49368,305901ppm. Cobertura401con límites sólo gradiente:389/401y399/401; la cola no acredita precisión instrumental. Scope cerrado0,891s/pico199,36MB. Auditoría independiente y prosa integradas una vez9→10/ciclo4, sin hallazgos. Sigue procedencia de cola antes de otro ranking; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI201_FIT_MASS_RESIDUAL_RESULTS.md).

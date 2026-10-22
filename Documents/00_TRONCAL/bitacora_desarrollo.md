@@ -10769,3 +10769,19 @@ IntegraciónUNAvez10→11/ciclo4; cierreemitido. La causa específica quedaabier
 sinprolongarcensos. Sigue contarsoporteq95conobservables401y banco197ya
 guardados, antesFP/logits/scoring, sinsuministrar masasde respuestas201alranker.
 GPUlocal/remotaprohibidos,limpiezacerrada. [Resultado202](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI202_FIT_MASS_PROVENANCE_RESULTS.md).
+
+### CASMI203 — soporte de ventana auditado, sin scoring (22/10/2026 UTC)
+
+La ventanaq95train201 fija sobre401consultas y447.089candidatas produjo10.014
+incidencias; máximo290. Hay379consultas que necesitanordenespectral:10.002
+pares neuronales; unión marginal8.705 condicionada a igualdadbit futuraepoch000.
+Cota conservadora20.004puntuaciones, sin atribuir velocidad del kernel. Arrays
+completos115.092B, Top25masa global/window yfill conservados, cero unknown
+de observables;22incertidumbres197siguenhistóricas. SinFP/logits/targets/tabla201,
+química/scoring/forward/training/GPU. ÚnicaCPUcerrada6.168400077614933s con
+suplemento, pico52645888B/sinOOM, fuentescerradas/scopeausente. Auditornuevo
+verificó derivados/pines/recursos yleyó prosa completa:33229checks/0fallos.
+Rootleyó crudo yverificador compacto íntegros; integración única11→12/ciclo4,
+sinreproducir fullsupport original. Sigue diseño yperfil finitoCPUdelcontraste
+conprediccionesvalidationguardadas; no necesidadGPUdemostrada todavía.
+[Resultado203](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI203_FIT_WINDOW_SUPPORT_RESULTS.md).
