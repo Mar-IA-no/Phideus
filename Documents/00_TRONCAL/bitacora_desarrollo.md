@@ -1,3 +1,20 @@
+## CASMI204: señal útil frente al prior, sin ventaja uniforme sobre masa —2026-10-22 UTC
+
+El contraste CPU sobre401consultas FIT y370componentes conserva cuatroCSV,
+puntuaciones y rangos completos. Neuronal8/28/58Top1/5/25 frente a9/33/55masa;
+MRR25también menor. Supera al marginal7/23/53. La cobertura del banco es69/401:
+332respuestas ausentes no se recuperan reordenando ese conjunto. No se promueve
+la cabeza ni se interpreta esto como techo del problema;401es desarrollo expuesto.
+
+Logits guardados,18.707scores, sin nuevo forward/training/GPU. Cierre9,728s,
+pico419,94MB/sinOOM y scope exacto ausente. Auditoría independiente verifica
+identidades, CSV, filas/rangos/cobertura, pareados, componentes y prosa completa,
+0hallazgos. Root leyó crudo y resumen íntegros; conserva snapshot esparso derivado
+para reanálisis sin repetir stream400MB. Integración única12→13/ciclo4. Sigue
+censo O(401) de cobertura de unión ya fijada desde derivados, antes de scoring.
+GPU continúa prohibida, limpieza cerrada y datos/reservas intactos.
+[Resultado y fuentes](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI204_FIT_WINDOW_COMPARISON_RESULTS.md).
+
 ## Limpieza de almacenamiento CASMI concluida —2026-10-22 UTC
 
 La pausa solicitada por almacenamiento detuvo197 antes de reserva, salida o
