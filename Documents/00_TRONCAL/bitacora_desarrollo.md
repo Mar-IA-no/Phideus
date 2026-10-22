@@ -1,3 +1,17 @@
+## CASMI205: unión añade16respuestas presentes, sin medir ranking —2026-10-22 UTC
+
+El cruce CPU de las401consultas FIT validó digest, origen físico y representación
+comunes antes de combinar coberturas:35respuestas compartidas,16sólo185,
+34sólo197y316ninguna. Unión85/401,0desconocidos;370componentes. El censo usa
+13JSONya guardados, sin nuevos modelos, puntuaciones, GToriginal oGPU.
+
+Operación0,053s/RSS45,55MB; auditor nuevo reconstruye401filas y agregados con
+álgebra propia y lee prosa completa,0hallazgos. Root leyó crudo/verificación
+íntegros, integró UNAvez13→14/ciclo4 y conservó cierre. No esTop25ni resultado
+oficial. Sigue diseño del soporte de unión y puntuaciones realmente pendientes;
+se mantiene la pausaGPU, limpieza cerrada y fuentes/reservas sin ampliar.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI205_FIT_UNION_COVERAGE_RESULTS.md).
+
 ## CASMI204: señal útil frente al prior, sin ventaja uniforme sobre masa —2026-10-22 UTC
 
 El contraste CPU sobre401consultas FIT y370componentes conserva cuatroCSV,
