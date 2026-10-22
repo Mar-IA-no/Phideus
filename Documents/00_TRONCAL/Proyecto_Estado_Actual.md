@@ -10,6 +10,10 @@
 </div>
 
 > [!IMPORTANT]
+> **Retoma CASMI sólo CPU —2026-10-22 UTC:** Mariano reanudó trabajo útil CPU y prohibió GPU hasta nuevo aviso.197 está en ejecución:214resultados recuperados sin recalcular, cincoambiguos sin reintentar y sólo tareas nunca enviadas.4000s/8CPU/8GiB, banco todavía no consumible hasta cierre y auditoría.195 tiene integración CPU candidata revisada (90 fixtures independientes PASS, memoria corregida), todavía sin corrida real. La limpieza quedó cerrada.
+>
+> **Limpieza CASMI terminada: corte previo a retoma CPU —2026-10-22 UTC:**1.637.792archivos históricos retirados tras cotejo de metadatos, sin SHA por orden posterior. Reconciliación independiente completa sin errores; respaldo RAID y1.086dependencias conservados. CASMI pasó214,31→38,56GiB, reducción neta175,75GiB;263,12GiB libres en el volumen al medir.En ese corte197 quedó pausado y195 incompleto; la orden superior posterior reanuda sólo CPU. [Resultado y recuperación](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/storage-audit-20261022/CLEANUP_RESULT.md).
+>
 > **CASMI196 corte auditado — 2026-10-22 UTC**:14.039resultados durables,214a recuperar del journal,5envíos ambiguos sinretry y370.909nunca enviados. Callback SQLpreflight causó corte185,23s, cgroup cerrado; saldo4.194,31s,ciclo4:4/20. Sigue recuperación197revisada, sin banco todavía. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI196_STABILITY_CONTINUATION_CUT_RESULTS.md).
 >
 > **CASMI194 corte auditado — 2026-10-22 UTC**: control de capacidad cortó antes de química por ocho enlaces administrativos pytest. Cgroup cerrado, ceroDISPATCH, saldo4.379,54s y ciclo4:3/20. Sigue continuación aditiva196 revisada, banco aún pendiente. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI194_STABILITY_EXPORT_CUT_RESULTS.md).

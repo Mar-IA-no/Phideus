@@ -1,3 +1,23 @@
+## Limpieza de almacenamiento CASMI concluida —2026-10-22 UTC
+
+La pausa solicitada por almacenamiento detuvo197 antes de reserva, salida o
+corrida. Mariano pidió auditar todos los activos CASMI y autorizó después la
+selección propuesta. Su precisión posterior sustituyó SHA por cotejo de
+presencia, ruta, tipo, tamaño, mtime e identidad; los arranques anteriores
+quedaron sin retiros y conservados. El flujo efectivo retiró1.637.792archivos
+históricos, manteniendo respaldo RAID, dependencias, datos, entorno y otros
+frentes de Phideus. La única reconciliación independiente completa confirmó
+cero incidencias y1.086dependencias intactas. CASMI local pasó de214,31a38,56GiB:
+175,75GiB netos liberados, con inventario y ledger conservados. El volumen
+mostró263,12GiB libres; su delta global no se atribuye íntegramente a CASMI.
+
+La ruta181–197 y las dependencias históricas útiles siguen locales; recuperar
+otras trayectorias exige recomponer desde RAID y excepciones locales.195 conserva
+rebase parcial y hallazgo de consistencia entre shards pendiente.197 permanece
+pausado, sin banco, reserva ni lanzamiento. No se reanuda CPU/GPU experimental
+por concluir la limpieza; contadorciclo4:4/20 sin cambios. La selección exacta
+quedó agotada. [Informe de cierre y recuperación](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/storage-audit-20261022/CLEANUP_RESULT.md).
+
 ## CASMI196: resultados recuperables y callback SQL corregible — 2026-10-22 UTC
 
 El cierre auditado conserva14.044envíos y14.039resultados durables:14.036válidos
@@ -10619,3 +10639,20 @@ física. Un exceso se registra antes de jobs, sin eliminar casos o artefactos.
 Luego: admisión de todas las trazas→química→sello→S22→sello→139→métricas16/13/3.
 La sola generación no cierra175. Contador4/20 sin cambio, GPUlocal autorizada.
 [Contrato de ejecución](../../../Phideus-CASMI/docs/CASMI175_MOLECULAR_READOUT_EXECUTION.md).
+
+
+### 2026-10-22 UTC — CASMI retoma sólo CPU y comparación195 candidata revisada
+
+Mariano prohíbe GPU hasta nuevo aviso y habilita CPU materialmente útil.197 se
+retomó tras revisar fuentes/permisos y la capacidad liberada: recuperación214
+resultados sin recalcular y cola exclusivamente de tareas nunca enviadas, dentro
+del segmento4000s/8CPU/8GiB auditado. Conserva cincoambiguos sin retry; banco aún
+no consumible hasta partición/exportación, cierre y auditoría final independiente.
+
+195 tiene lectores/predicción/presupuesto/coordinador/readout candidatos revisados.
+La auditoría detectó memoria externa omitida y verificó su corrección antes de
+efectos;90fixtures propios pertinentes PASS, incluidos ambos gates auténticos
+con datos sintéticos. No se abrieron targets reales195 ni se ejecutó su población.
+Contador científico ciclo4:4/20; esta relectura del mismo hito no suma. Limpieza
+cerrada y versionada en SCI f162277, sin reabrir SHA de backups ni ampliar borrados.
+Fuentes: plan195 y crudo195_pre_effect_review_20261022 en el repositorio CASMI.

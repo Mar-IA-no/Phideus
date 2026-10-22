@@ -558,3 +558,64 @@ presupuestos ni regenerar canónicos. Reutilizar admisiónCPU3392 y sus compacto
 No habilita GPU remota, reservas nuevas, entrenamiento extra o promoción
 científica. Contador ciclo3:3/20; toda delegación nueva Sol6.1High, incluidas
 auditorías, según orden19/10. No repetir161 ni auditorías cerradas.
+
+
+## Phideus/CASMI: pausa inmediata por almacenamiento — 2026-10-22
+
+Mariano ordena detenerse ahora porque el volumen se está quedando sin espacio.
+Pausar toda la cadena, CPU/GPU y delegaciones, hasta retoma explícita. No limpiar,
+borrar, mover ni lanzar trabajos por esta orden. Corte14:01:38UTC: CASMI197 aún
+sin reserva, salida bank-1 ni scope;194/196/197 scopes not-found/inactive y cgroup
+vacío. Subagentes195sources/195audit interrumpidos; goal197 pausado, incompleto.
+Conservar fuentes, journals, código candidato y revisiones; contador ciclo4:4/20.
+197 plan/código/manifiesto revisados, sin efectos.195 tiene hallazgo cross-shard
+pendiente y reader en rebase interrumpido: no ejecutar ni declararlo listo.
+
+
+## Phideus/CASMI: auditoría de almacenamiento y propuesta previa — 2026-10-22
+
+Mariano encarga auditoría completa de todos los activos CASMI locales y su
+continuidad/necesidad futura, con copia declarada reciente en RAID1
+/mnt/raid1/m2-1tb_backup. Entregar informe preciso de candidatos ANTES de borrar
+nada. Alcance exclusivo CASMI: conservar otros frentes Phideus intactos. Verificar
+copia y dependencias reales; no asumir igualdad desde declaración o nombre.
+Esta etapa habilita inventario y auditoría documental/metadata, no borrados,
+movimientos ni reanudar experimentos CPU/GPU. Mantener goal197 pausado.
+
+
+## Phideus/CASMI: limpieza auditada autorizada — 2026-10-22
+
+Mariano autoriza «Adelante con la limpieza» tras el informe de almacenamiento.
+Retirar sólo archivos exactos del manifiesto aprobado SHA256
+fb1a76d57a6bcf1a5e1528ea155a980722544245a103843023a5ff06dfce7467,
+comprobando SHA256 íntegro y estabilidad de cada contraparte RAID antes del
+unlink local, con ledger durable y restauración pequeña verificada. Ausencias
+o discrepancias se conservan. RAID y otros frentes Phideus intactos. No borrar
+directorios/symlinks ni ampliar selección. Pausa experimental y goal197 vigentes.
+Ejecución/evidencia: Phideus-CASMI/.agent-work/casmi-storage-audit-20261022/cleanup-20261022/.
+
+
+## Phideus/CASMI: limpieza sin SHA por instrucción directa — 2026-10-22
+
+Mariano corrige: «no hagas ninguna comprobación SHA». Sustituye desde ahora
+el requisito SHA de esta limpieza CASMI por cotejo de los mismos archivos
+mediante presencia, ruta, tipo, tamaño y fecha, sin lectura integral de payloads
+ni hashes de contenido/manifiesto/código. Conservar selección exacta aprobada,
+RAID intacto, identidades estables, ledger y retención ante ausencia/discrepancia.
+Ejecutor SHA detenido antes del ledger y sin retiros; registrar transición.
+No reanuda experimentos CPU/GPU ni goal197; no amplía a otros frentes.
+
+
+## Phideus/CASMI: GPU suspendida y continuidad CPU reanudada — 2026-10-22
+
+Mariano ordena: «No uses el GPU hasta nuevo aviso. Si tenés algo para continuar
+sin GPU, continúalo». Revoca la habilitación GPU local: no CUDA, inferencia ni
+training GPU, relanzadores o GPU remota hasta nueva orden explícita. Reanuda
+trabajo CPU materialmente útil después de la limpieza cerrada, desde el corte
+197 y sus fuentes conservadas, sin repetir corridas/evaluaciones concluidas.
+Rebasar gates, saldo, capacidad y revisiones antes de cualquier efecto; preservar
+checkpoints, journals, incertidumbres y procesos ajenos. No nueva limpieza ni
+ampliación de datos/reservas. Al necesitar GPU para el siguiente avance útil,
+informar y detener la cadena, sin entrenamiento CPU largo sustitutivo ni relleno.
+La prohibición SHA de la operación de backup/limpieza queda vigente para esa
+operación cerrada; no reabrir sus comprobaciones de contenido.
