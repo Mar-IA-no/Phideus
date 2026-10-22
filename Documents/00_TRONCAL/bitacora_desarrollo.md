@@ -1,3 +1,19 @@
+## CASMI194: corte de arranque conservado y auditado — 2026-10-22 UTC
+
+El primer control de capacidad detuvo el lanzamiento antes de emitir intentos:
+ocho enlaces administrativos de pytest dentro de control eran incompatibles
+con el contador recursivo. La salida conserva sólo el recibo incompleto y tmp
+vacío; no hubo química, DB poblacional ni banco nuevo. Supervisor0,20s,
+scope ausente y saldo reconciliado4.379,54s. Auditoría del corte integrada una
+vez2→3/ciclo4; se registra también el límite de la revisión previa que no
+contrastó ambos recorridos del namespace.
+
+Sigue196, continuación aditiva revisada que reutiliza los helpers194 intactos,
+cuenta los enlaces exactos por lstat sin seguirlos y conserva el mismo techo
+común. No reejecutar194 ni borrar antecedentes. Comparación molecular195 queda
+condicionada al banco completo auditado; no hay nuevas métricas de competición.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI194_STABILITY_EXPORT_CUT_RESULTS.md).
+
 ## CASMI193: censo completo y auditado — 2026-10-22 UTC
 
 Los448.543 canónicos elegibles quedaron clasificados:63.590 tienen resultados
