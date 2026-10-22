@@ -10878,3 +10878,24 @@ Rootleyó crudo yverificador compacto íntegros; integración única11→12/cicl
 sinreproducir fullsupport original. Sigue diseño yperfil finitoCPUdelcontraste
 conprediccionesvalidationguardadas; no necesidadGPUdemostrada todavía.
 [Resultado203](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI203_FIT_WINDOW_SUPPORT_RESULTS.md).
+
+
+### 2026-10-22 — Pesos y caché reales reutilizables sin GPU (CASMI210)
+
+La preparación CPU dejó exportada la pareja validation029/inicial000 y una caché
+por tensor y runtime para las401observaciones de desarrollo ya codificadas.
+Los401lookups devuelven los embeddings originales sin conflictos; el cálculo
+histórico se reproduce exactamente. El cálculo de una fila conserva pequeñas
+diferencias de redondeo, por lo que sus futuras puntuaciones tendrán identidad
+propia y no heredarán scores anteriores por aproximación. Este cierre prepara
+la integración real con la entrega; no produce una evaluación molecular nueva.
+
+El diagnóstico consumió34,160s, con pico506,72MB y scope cerrado. Una instancia
+independiente reconstruyó los joins, preprocesamiento, lookup y nueve
+comparaciones completas desde los valores guardados, además de leer prosa y
+horizonte competitivo: cero hallazgos materiales. Su integración única deja el
+contador en19/20 del ciclo4. Se conservan fuentes y el límite histórico de las
+128filas heredadas. Sigue sólo diseñoCPU del caller real cacheado y soporte
+haciaCSV; la GPU local/remota permanece suspendida, sin nueva limpieza.
+
+Resultado canónico y evidencia: [CASMI210](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI210_REAL_PAIR_CACHE_RESULTS.md).
