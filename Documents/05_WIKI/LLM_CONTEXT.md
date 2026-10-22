@@ -135,6 +135,23 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI196: resultados recuperables y callback SQL corregible — 2026-10-22 UTC
+
+El cierre auditado conserva14.044envíos y14.039resultados durables:14.036válidos
+y tresindeterminados.214resultados faltan del índice y se recuperan desde journal;
+cincoenvíos sin respuesta no se repiten. Quedan370.909tareas nunca enviadas.
+Roster completo, cincoambiguos distintos de events pendientes y todos los hashes
+fueron cotejados independientemente. No hay banco ni nueva métrica de ranking.
+
+Cortó tras185,23s porque SQLite conservó el callback preflight180s durante la
+cola y recuperación. Cgroup cerrado; saldo4.194,31s tras suplemento. Auditoría
+integrada una vez3→4/ciclo4. Sigue197aditivo: recuperar journals sin recalcular,
+corregir callbacks de ejecución/cierre, conservar incertidumbre explícita y
+reducir sobrecarga del coordinador antes de otra corrida.195 sigue condicionado
+al banco estable; no abrir otra fuente ni prolongar preparación por inercia.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI196_STABILITY_CONTINUATION_CUT_RESULTS.md).
+
+
 ## CASMI194: corte de arranque conservado y auditado — 2026-10-22 UTC
 
 El primer control de capacidad detuvo el lanzamiento antes de emitir intentos:
