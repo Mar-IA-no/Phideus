@@ -10682,3 +10682,19 @@ no quedó guardado y no se atribuye retroactivamente. Plan198 en revisión
 independiente propone reconstruirlo sin scoring y continuar la comparación
 CPU bajo ese mismo saldo. GPU local/remota prohibida; limpieza cerrada.
 Fuente: CASMI195_COMPARISON_CAPACITY_CUT.md en Phideus-CASMI.
+
+
+### 2026-10-22 UTC — CASMI195/198 contraste terminado y auditado en CPU
+
+La continuación completó213consultas y tresCSV sin GPU ni química repetida.
+Cobertura44frente30, con26respuestas compartidas,18exclusivas197 y4exclusivas185.
+Masa recupera38enTop25, neuronal35y marginal33; la ganancia de cobertura no
+implica una mejora uniforme del ranking neuronal. El panel sigue expuesto y
+no acredita competitividad del concurso ni una entrega oficial.
+
+Diagnóstico30s y comparación125s cerraron sus scopes; pico10,66GiB sinOOM,
+gasto común179,39s de600 sin reset. Auditor nuevo verificó639filas Top25 y
+1278filas de métricas y leyó íntegra la prosa. Root integró una sola vez6→7/ciclo4.
+Se conserva todo crudo. El siguiente diseño CPU examina combinar las fuentes
+completas y reutilizar scores; no seleccionar cuatro moléculas por sus targets
+ni prolongarBCE. Fuente: CASMI198_COMPARISON_RESULTS.md en Phideus-CASMI.
