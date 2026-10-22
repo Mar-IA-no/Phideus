@@ -1,3 +1,17 @@
+## Diferencia respecto al prior: mejora local auditada — 2026-10-22 UTC
+
+CASMI208 obtiene 17/46/73 Top1/5/25 y MRR25 0,072409 en las 401 consultas
+FIT de desarrollo, frente a 8/30/70 neuronal y 11/34/65 masa. La cobertura sigue
+en 85 presentes y 316 ausentes; no es validación del concurso ni señal causal
+aislada. Reutiliza 22.385 observaciones y guarda 11.934 diferencias FP64,
+sin nuevos kernels, entrenamiento, forward o GPU. Un CSV nuevo realmente releído.
+Cierre CPU 6,800 s, pico 211,80 MB, sin OOM y scope exacto ausente. Auditor nuevo
+reconstruyó todas las listas y métricas, leyó prosa y horizonte; cero hallazgos,
+integración única 16→17/ciclo 4. Se cierra la búsqueda de microvariantes de esta
+cabeza. Sigue conectar el cálculo real con transporte186 y preparar contrato
+multivista/soporte y paquete offline. GPU local/remota y CUDA suspendidos.
+[Resultado208](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI208_PRIOR_LIFT_RESULTS.md).
+
 ## CASMI207: mejora de Top25 con pérdidas parciales —2026-10-22 UTC
 
 El contraste fijo CPU completó401consultas/370componentes con unión514812:
