@@ -10899,3 +10899,27 @@ contador en19/20 del ciclo4. Se conservan fuentes y el límite histórico de las
 haciaCSV; la GPU local/remota permanece suspendida, sin nueva limpieza.
 
 Resultado canónico y evidencia: [CASMI210](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI210_REAL_PAIR_CACHE_RESULTS.md).
+
+
+### 2026-10-22 — Consumidor real cacheado y entrega CPU comprobados (CASMI211)
+
+El consumidor conectó los observables ya admitidos con 22.385 puntuaciones C
+propias, listas para 401 consultas FIT/370 componentes y cinco CSV completos,
+realmente releídos. Conservó el primer corte de 32 puntuaciones; una recuperación
+explícita revisada completó las pendientes sin reiniciar el presupuesto ni
+repetir kernels del prefijo. Los dos efectos consumieron 78,005 s; fuentes y
+scopes quedaron cerrados. No hubo encoder/cabeza nuevos, GT o GPU.
+
+Un auditor nuevo reconstruyó por código propio las tuplas y bits guardados,
+pooling, listas, proyección y cinco CSV, además del transporte Arrow y su
+procedencia. Ambos checkers pasaron, con cero hallazgos materiales y lectura
+íntegra de prosa/horizonte. Se integró una vez 19→20 del ciclo 4; la Divina
+ordinaria completa reinicia el contador en ciclo 5:0/20. El recorrido cacheado
+queda cerrado, sin acreditar entrada online, instalación limpia o calidad
+molecular competente. El próximo perfil del encoder real requiere GPU; la
+cadena se detiene conforme a la suspensión vigente, sin CPU larga sustitutiva,
+otra variante del consumidor ni nueva limpieza. Plan y presupuesto concretos
+de ese perfil aún deben rebasarse antes de ejecutarlo.
+
+[Resultado y evidencia](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI211_REAL_CACHED_CONSUMER_RESULTS.md).
+[Divina ordinaria](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI211_DIVINA_CYCLE4.md).
