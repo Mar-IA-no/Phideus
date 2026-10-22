@@ -135,6 +135,25 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI190: costo medido de preparación estructural — 2026-10-22 UTC
+
+El diagnóstico sistemático procesó4.096 tareas nuevas en24,00s de supervisor:
+4.027 representaciones válidas,68unknown por enumeración y un rechazo de parseo.
+De las válidas,3.915 cumplen dominio y112 quedan fuera; no hay banco estable ni
+medición de cobertura. Todos los resultados se conservan, sin retries; quedan
+462.206 textos fuente nunca enviados.
+
+La fase de cola duró12,84s y los workers sumaron67,71sCPU. Flush/fsync midió3,80s;
+no acredita speedup causal ni explica todo el costo. Pico1,32GB, scope cerrado,
+53 fuentes previas intactas; saldo común7.116,81s. Auditoría final integrada una vez18→19/ciclo3:19/20.
+
+Sigue preparar todas las fuentes restantes bajo un tramo finito revisado, sin
+otro perfil del mismo ejecutor. Fuente completa precede al gate real de checks,
+estabilidad y exportación. Los tiempos proporcionales son escenarios, no ETAs;
+no promover arquitectura ni inferir aciertos del tamaño del catálogo.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI190_PREPARATION_COST_RESULTS.md).
+
+
 ## CASMI189: inventario y perfil estructural completos — 2026-10-22 UTC
 
 Los469.602 textos de PubChemLite contienen3.172 antecedentes exactos en el cache:
