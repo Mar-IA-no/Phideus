@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI199 inventario completo, sólo CPU —2026-10-22 UTC:** unión de514.812candidatas; faltan190scores neuronales y184marginales distintos, más1conflicto marginal conservado. Sin scoring nuevo ni respuestas. Cierre15,50s, auditoría/prosa integradas una vez7→8/ciclo4. Sigue cálculo selectivoCPU bajo diseño y revisión propios; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI199_UNION_INVENTORY_RESULTS.md).
+>
 > **CASMI195/198 comparación completa, sólo CPU —2026-10-22 UTC:** cobertura44/213 frente30; bancos no anidados. Masa recupera38enTop25 y neuronal35, sin superioridad neuronal uniforme. TresCSV completos; diagnóstico30s y contraste125s, gasto común179,39s de600. Cgroups cerrados, auditoría y prosa integradas una vez6→7/ciclo4. Sigue comprobar combinación de fuentes completas reutilizando crudos; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI198_COMPARISON_RESULTS.md).
 >
 > **Comparación CASMI195 pendiente tras corte auditado —2026-10-22 UTC:** el gate preventivo de RAM detuvo el intento antes de puntuar; sin OOM, predicciones, CSV, sello ni lectura de respuestas. Scope cerrado; gasto24,10s y saldo575,90s del presupuesto600. Auditoría y prosa revisadas íntegramente, integración única5→6/ciclo4. Se revisa una continuación CPU con capacidad demostrada y el mismo saldo. GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI195_COMPARISON_CAPACITY_CUT.md).

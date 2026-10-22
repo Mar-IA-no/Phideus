@@ -10698,3 +10698,20 @@ gasto común179,39s de600 sin reset. Auditor nuevo verificó639filas Top25 y
 Se conserva todo crudo. El siguiente diseño CPU examina combinar las fuentes
 completas y reutilizar scores; no seleccionar cuatro moléculas por sus targets
 ni prolongarBCE. Fuente: CASMI198_COMPARISON_RESULTS.md en Phideus-CASMI.
+
+
+### CASMI199 — inventario completo y auditado (22/10/2026 UTC)
+
+Unión197 íntegro + todas67723claves185 ausentes:514812 representantes y36232aliases,
+137300grupos exactos. Sobre213consultas:715grupos distintos/759incidencias y6626requests.
+190tuples neuralmissing,184marginalmissing y1marginalconflict (3ocurrencias,1ULP),
+sin completar ni elegir valores. Columnas de masa reutilizadas, sin scoring/targets/GPU.
+Único scope cerrado exit0:15,503991701174527s con suplemento, pico486834176B, sinOOM;
+saldo300 separado de195/198 cerrado. Auditor nuevo01a16493-b39c-7c23-b693-e6f3361ebc31
+reconcilió proyección/grupos/cache completos yTop25 muestreado0/106/212, prosa íntegra.
+Rootleyó crudo/verificador íntegros, integraciónUNAvez7→8/ciclo4. Closure199 externo
+emitido. Formal199complete tras Git. Sigue diseñoCPU200 para375scores selectivos:
+190neural+184marginalfaltantes+1conflictiva, política numérica explícita antes de efectos;
+no repetir masa/química/forward ni abrir otras fuentes. GPU prohibida.
+
+Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI199_UNION_INVENTORY_RESULTS.md.
