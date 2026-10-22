@@ -1,3 +1,17 @@
+## Interfaz dispersa y traslado sintético auditados — 2026-10-22 UTC
+
+CASMI209 conecta observables variables con backend explícito, soporte disperso,
+listas y CSV reconstruibles. Dos poblaciones sintéticas (8mol/32vistas y2mol/3)
+produjeron los mismos CSV desde el checkout y desde código trasladado sin red.
+Cinco métodos completos por recorrido; veinte CSV verificados, sin encoder,
+pesos entrenados, datos o GT reales. No acredita instalación de dependencias,
+notebook final ni rendimiento molecular.66casos distintos pertinentes pasaron.
+Cierre10,334s/pico153,06MB/sinOOM/scope ausente. Auditor nuevo verificó todos
+los cálculos, listas, CSV y prosa;0materiales abiertos, integración única17→18
+/ciclo4. Sigue preparación CPU de pareja real y cache184, con revisión propia,
+sin repetir encoder o evaluación208. GPU local/remota/CUDA suspendidos.
+[Resultado209](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI209_SPARSE_INTERFACE_RESULTS.md).
+
 ## Diferencia respecto al prior: mejora local auditada — 2026-10-22 UTC
 
 CASMI208 obtiene 17/46/73 Top1/5/25 y MRR25 0,072409 en las 401 consultas
