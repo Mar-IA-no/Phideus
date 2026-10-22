@@ -1,3 +1,22 @@
+## CASMI188: catálogo público autenticado y proyectado — 2026-10-22 UTC
+
+PubChemLite3.3.0 produjo469.602 filas con identificador y SMILES original,
+sin faltantes ni duplicados textuales de esos campos. Auditor independiente
+cotejó cada fila contra elCSV y confirmó hashes, procedencia y admisión limitada
+a preparación estructural local. No se calcularon identidades químicas ni
+cobertura: más registros no equivalen todavía a nuevas respuestas recuperables.
+
+Descarga única544,62s; inspección0,32s y censo8,51s, sóloCPU. Tres scopes cerrados,
+49 fuentes previas intactas, originales y proyección preservados.48 pruebas
+sintéticas pertinentes pasaron antes de efectos; auditoría final integrada una
+vez16→17/ciclo3. Phideus/geometría siguen como herramientas opcionales.
+
+Sigue inventariar cache por SMILES exacto y perfilar128 tareas realmente nuevas,
+bajo receta184, antes de fijar preparación completa. Mantenerunknowns e intentos;
+no repetir química para fabricar cobertura. Redistribución, elegibilidad de
+solución ganadora, ranking y entregaoffline no están acreditados por este hito.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI188_PUBLIC_STRUCTURAL_PROJECTION_RESULTS.md).
+
 ## CASMI187: mejora acotada del ranking; cobertura prioritaria — 2026-10-22 UTC
 
 El desempate neuronal dentro de grupos de masa exactamente igual elevó Top1

@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI188 completo y auditado — 2026-10-22 UTC**:469.602 filasIdentifier/SMILES originales, sin faltantes ni duplicados textuales; cada fila y hashes verificados independientemente. Admisión limitada a preparación estructural local, sin química/cobertura/identidad molecular acreditadas. TodoCPU, tres scopes cerrados,49fuentes intactas, contador17/20. Sigue inventario cache y perfil128tareas nuevas, antes de preparación completa. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI188_PUBLIC_STRUCTURAL_PROJECTION_RESULTS.md).
+>
 > **CASMI187 completo y auditado — 2026-10-22 UTC**: desempate neuronal Top1 de9 a12, MRR25 de0,067488 a0,078855 sobre213 históricos expuestos. Top25 sigue29;183 respuestas ausentes del banco. Sin ventajaMRR frente al marginal enFIT401. SeisCSV reconstruidos,42 pruebasPASS, cuatro scopes cerrados, sóloCPU. Auditoría integrada una vez15→16/ciclo3. Sigue contrato de cobertura188, todavía sin adquirir nuevas fuentes. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI187_CONDITIONAL_RANKING_RESULTS.md).
 >
 > **CASMI186 completo y auditado — 2026-10-22 UTC**: interfaz de doce observables y múltiples vistas verificada con dos poblaciones sintéticas; 42 filas CSV, scores y agrupación reproducidos por auditor nuevo. 73 pruebas pertinentes PASS, todo CPU, scope cerrado y fuentes184/185 intactas. Integración única14→15 del ciclo3. No mide acierto molecular ni entrega offline completa. Sigue conectar y medir un scorer/banco reales admitidos con dominio explícito. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI186_OBSERVABLE_INTERFACE_RESULTS.md).
