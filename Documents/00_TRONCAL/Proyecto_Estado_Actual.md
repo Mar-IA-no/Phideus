@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI201 diagnóstico FIT completo, sólo CPU —2026-10-22 UTC:**2023residuales conservados; mediana absppm0,857226, q95=3,547149ppm y q99=49368,305901ppm. Cobertura401con límites sólo gradiente:389/401y399/401; la cola no acredita precisión instrumental. Scope cerrado0,891s/pico199,36MB. Auditoría independiente y prosa integradas una vez9→10/ciclo4, sin hallazgos. Sigue procedencia de cola antes de otro ranking; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI201_FIT_MASS_RESIDUAL_RESULTS.md).
+>
 > **CASMI200 comparación completa y auditada, sólo CPU —2026-10-22 UTC:** la unión eleva cobertura44→48/213, pero el neuronal pasa10→8Top1,24→23Top5,35→36Top25 y caeMRR25.375scores selectivos, sin nuevo entrenamiento/química/forward/GPU; cierre40,70s. Auditoría/prosa integradas una vez8→9/ciclo4. Se conserva la comparación sin promover unión; sigue diseñoFIT discriminante. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI200_SELECTIVE_UNION_COMPARISON_RESULTS.md).
 >
 > **CASMI199 inventario completo, sólo CPU —2026-10-22 UTC:** unión de514.812candidatas; faltan190scores neuronales y184marginales distintos, más1conflicto marginal conservado. Sin scoring nuevo ni respuestas. Cierre15,50s, auditoría/prosa integradas una vez7→8/ciclo4. Sigue cálculo selectivoCPU bajo diseño y revisión propios; GPU prohibida. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI199_UNION_INVENTORY_RESULTS.md).

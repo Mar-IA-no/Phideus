@@ -10732,3 +10732,23 @@ Closure200 emitido. Formalcomplete tras Git; siguiente diseñoFITdiscriminante,
 con factibilidadCPU en rebase, no otroexperimento declarado listo. GPU prohibida.
 
 Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI200_SELECTIVE_UNION_COMPARISON_RESULTS.md.
+
+
+### CASMI201 — núcleo de masa estrecho y cola no instrumental (22/10/2026 UTC)
+
+El diagnósticoCPU conservó2023filasFIT:1622gradiente y401validación, con
+componentesdisjuntos. Todas satisfacen el dominio formal; la mediana absoluta
+de gradiente es0,857226ppm y q95=3,547149ppm. El salto aq99=49368,305901ppm
+impide leer esa cola como precisión instrumental. No se recortaron outliers
+ni se corrigieron labels. Límites sólo gradiente, persistidos antes de evaluar:
+389/401dentroq95 y399/401dentroq99, validación históricamente expuesta.
+
+No se abrieron213ni se hicieron scoring, química, forward o entrenamiento.
+Única operación cerrada en0,890851132106036s con suplemento; pico199356416B
+sinOOM, namespace6,34MB alprimercierre. Cgroup propio ausente y fuentes cerradas.
+Auditor nuevo reprodujo fórmulas/bits/cuantiles/estadísticas desde tabla201,
+contrastó código/recibos y leyó completa la prosa. Rootleyó crudo/verificadores
+e integró una vez9→10/ciclo4. No se repitió eljoin sobre originales en laauditoría.
+Sigue revisión acotada de procedencia de la cola antes de otro ranking, no
+adoptar q99por cobertura. GPUlocal/remota prohibida, limpieza cerrada. Fuente:
+Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI201_FIT_MASS_RESIDUAL_RESULTS.md.
