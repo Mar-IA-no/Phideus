@@ -1,3 +1,21 @@
+## CASMI207: mejora de Top25 con pérdidas parciales —2026-10-22 UTC
+
+El contraste fijo CPU completó401consultas/370componentes con unión514812:
+neuronal8/30/70Top1/5/25frente8/28/58histórico, masa11/34/65 yprior9/26/62.
+MRR25neuronal0,048167vs0,056388masa;85presentes y316ausentes. Las16incorporadas
+aportan13Top25NN, pero las69antespresentes pierden1Top25/3Top5. La mejora agregada
+no acredita superioridad uniforme ni competitividad del concurso.
+
+Reutilizó18707observaciones verificadas actualmente y calculó3678nuevas con
+logitsguardados, sinforward/training/GPU. Fuentescerradas y sellopropio antesGT,
+cuatroCSVreales/snapshotesparsoderivado. Cierre10,635179s/180,pico2,505GB/sinOOM,
+scopeausente. Auditornuevo reconstruyótodaslistas/scoresguardados/GT/proyección/
+CSV/métricas/componentes/cohortes/pares yleyóprosaíntegra,0hallazgos. Rootleyó
+crudo/verificador completos e integró UNAvez15→16/ciclo4. READMErebasado al
+objetivocompetitivo181. Sigueelegirhipótesis útil de ordenación/alcance, no
+prolongar ajustesporinercia. GPUprohibida ylimpieza cerrada.
+[Resultado y fuentes](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI207_SELECTIVE_FIT_UNION_RESULTS.md).
+
 ## CASMI206: dimensionado el contraste de unión sin puntuar —2026-10-22 UTC
 
 El soporte de401consultas/370componentes sobre514812candidatas quedó completo:
