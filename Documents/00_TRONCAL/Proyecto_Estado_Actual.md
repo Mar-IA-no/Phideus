@@ -10,7 +10,7 @@
 </div>
 
 > [!IMPORTANT]
-> **CASMI184 activo — 2026-10-21 UTC**: protocolo/componentes auditados y2023pares FIT preparados;401validación interna/1622ajuste, por componentes. Perfil químico256estructuras:244válidas y12identidades desconocidas,1,945s con4workers; sinGPU/training/labels213. Sigue preparación completa y contraste molecular, todavía sin resultado competitivo. [Protocolo](../../../Phideus-CASMI/docs/CASMI184_MOLECULAR_RANKING_PROTOCOL.md).
+> **CASMI184 completo y auditado — 2026-10-22 UTC**: tres CSV reales de 213 consultas; el banco de 12.497 candidatas sólo cubre 6 respuestas. Masa obtiene Top1/5/25 de 3/6/6; neuronal y marginal, 0/213. La mejora de bits FIT no se tradujo en identificación. Sigue ampliar soporte público concreto y conservar masa como control, sin prolongar esta cabeza por BCE ni ajustar213. No es entrega Kaggle lista. Auditor nuevo integrado una vez, ciclo3:13/20. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI184_MOLECULAR_RANKING_RESULTS.md).
 >
 > **CASMI183: fuente estructural material — 2026-10-21 UTC**: COCONUT2024autenticado,695133filas;14358deprocedenciaChEBIadmitidas sólo para preparación estructural local. Auditor nuevo confirmó censo/proyección byte por byte y alcance de derechos, sin índice químico/identidades/cobertura afirmados. Sintraining/GPU, cinco unidades cerradas, integración única11→12/ciclo3:12/20. Sigue preparación común y piloto sin referencia desdeFITcon validación por componente. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI183_STRUCTURAL_BANK_RESULTS.md).
 >

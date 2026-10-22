@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-10-20
+updated: 2026-10-22
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -134,6 +134,32 @@ source_paths:
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
+
+## CASMI184: primer ranking sin referencias, con cobertura insuficiente — 2026-10-22 UTC
+
+El contraste ya produjo y evaluó tres CSV completos de 213 consultas y 25
+candidatas por consulta. El banco común de 12.497 estructuras contiene sólo
+6 respuestas: el control de masa recuperó esas seis entre las primeras cinco
+candidatas; cabeza neuronal y marginal FIT obtuvieron 0/213 en Top25. Masa
+alcanzó 3/213 en Top1 y MRR25 de 0,018545. Todos los targets y embeddings tienen
+estado conocido; la ausencia de las otras 207 respuestas en el banco final es
+exacta. La cobertura canónica hipotética anterior a exclusiones conserva un
+intervalo 6–213 por fuentes sin canonicalización resuelta; no confundir ambas
+etapas ni atribuir toda pérdida a filtros.
+
+La validación interna FIT seleccionó 29 épocas y mejoró las métricas de bits,
+pero esa señal no se tradujo en identificación. Se conservan química, pesos,
+embeddings, scores y CSV sellados antes de respuestas. Los IDs son locales y el
+panel está expuesto: todavía no hay submission Kaggle lista ni resultado del
+concurso. La auditoría nueva reprodujo cifras, implementación y prosa completa;
+integración única 12→13 del ciclo3. Las unidades propias quedaron ausentes.
+
+Sigue ampliar el soporte estructural con una fuente pública concreta, ChEBI256,
+y conservar masa como control fuerte. Una futura combinación neuronal deberá
+fijarse con física/FIT, sin ajustar los seis positivos de este panel. No extender
+esta cabeza por BCE ni repetir generación histórica. La interfaz oficial y el
+paquete offline siguen entre los objetivos principales del plan competitivo181.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI184_MOLECULAR_RANKING_RESULTS.md).
 
 ## CASMI184 activo — preparación para ranking molecular sin referencia
 
