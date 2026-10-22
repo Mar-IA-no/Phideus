@@ -1,3 +1,19 @@
+## CASMI206: dimensionado el contraste de unión sin puntuar —2026-10-22 UTC
+
+El soporte de401consultas/370componentes sobre514812candidatas quedó completo:
+11934pares neuronales y10451representaciones marginales.18707observaciones son
+elegibles por referencias históricas204, mientras3678son nuevas; tres singleton
+197se activan. Se guardaron solicitudes íntegras y controlesmasa con replay,
+sinFP/logits/GT/scoring/GPU. Los valores históricos aún deben revalidarse antes
+que el consumidor dé crédito efectivo.
+
+CierreCPU7,055s/pico71,94MB/sinOOM, fuentescerradas yscopeausente. Un auditor
+nuevo reconstruyó todasfilas,20050controles yrequests mediante lector y sort
+propios,0hallazgos; leyó prosa íntegra. Root leyó crudo/verificación completos,
+integróUNAvez14→15/ciclo4 y conservó cierre. Sigue207comparación fija conperfil
+reutilizable y sello propio antesGT, sin ampliar bancos ni usar GPU.
+[Resultado y fuentes](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI206_UNION_FIT_SUPPORT_RESULTS.md).
+
 ## CASMI205: unión añade16respuestas presentes, sin medir ranking —2026-10-22 UTC
 
 El cruce CPU de las401consultas FIT validó digest, origen físico y representación
