@@ -135,6 +135,30 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI186: interfaz multivista verificada — 2026-10-22 UTC
+
+El mismo recorrido procesó dos poblaciones sintéticas de 40 y 2 moléculas,
+con 96 y 3 vistas únicas, y produjo una fila CSV por molécula. Proyecta doce
+observables antes de Python, conserva IDs fuera del scorer y mantiene estados
+explícitos para vistas inválidas o no soportadas. La media FP64 usa sólo vistas
+completas; una ausencia no aporta cero. Los duplicados exactos pesan una vez y
+una entrada vacía no produce éxito. Se reutilizó el serializer184 sin modificarlo.
+
+El auditor nuevo reconstruyó todos los scores, medias, listas y 42 filas CSV;
+73 pruebas pertinentes pasaron. La corrida sintética duró 0,2533 s, sin GPU,
+modelos ni química; scope cerrado y fuentes184/185 preservadas. La integración
+única lleva el contador del ciclo3 a15/20. Se conservaron fallos de prueba y
+correcciones previas al único ensayo integral, sin repetir sus artefactos.
+
+Este cierre acredita integridad de entrada y entrega, no rendimiento molecular,
+soporte aprendido de diez iones ni instalación offline. Sigue conectar y perfilar
+un scorer y banco reales ya admitidos, con dominio explícito y contraste molecular
+predeclarado; después, notebook offline. No prolongar fixtures ni entrenar la
+cabeza por BCE. La cobertura30/213 y masa29/213 enTop25 siguen siendo el último
+resultado molecular185; la interfaz no los mejora por sí sola.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI186_OBSERVABLE_INTERFACE_RESULTS.md).
+
+
 ## CASMI185: soporte ampliado y contraste molecular auditado — 2026-10-22 UTC
 
 El banco oficial ChEBI preparado contiene103.955candidatas y cubre30/213
