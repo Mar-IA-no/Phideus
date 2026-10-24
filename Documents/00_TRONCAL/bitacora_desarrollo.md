@@ -11078,3 +11078,18 @@ Checker61,385s, sin nuevoskernels oquímica; crudo/checkers/logs/proofs leídos
 Sigue mejor discriminación frente a distractores cercanos: revisar contrato
 concretoMIST frente a supervisión local, sin ajustar sobre401targets o volver
 al controlador por inercia. GPU local continúa habilitada. [Resultado216](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI216_CHEMBL_COMPARISON_RESULTS.md).
+
+
+### 2026-10-24 — CASMI217: MIST admitido y perfil GPU cerrado
+
+La caída de ranking216 orienta un contraste de discriminación en el mismo banco,
+sin agregar bibliotecas. El predictor MIST requiere fórmula; el plan usa todas
+las fórmulas candidatas de cada ventana y coseno heurístico, nunca fórmulaGT.
+Admisión de un checkpoint CANOPUSnoaug/MIT/código48e339be y entorno privado
+Torch2.7.1 cerrada725,237sCPU. PREP19,578s obtuvo1693hipótesis/81581candidatas
+compatibles;12fuera de soporte se conservan. PerfilGPU4,174s completo:32canónicas
+B32 y controlesB1 mismosinputs separados, maxdelta1,43e-6; reserved398,46MB.
+AuditorSol6.1High limpio corrigió F3ruta vacía antesdelGPU; precheckperfil0M.
+El comparador restante1661 está escrito y espera dictamen exacto independiente;
+no hay resultado molecular nuevo ni integraciónfinal/counteravance. Ciclo5:5/20.
+Fuentes y scopes conservados/cerrados. Plan en Phideus-CASMI/docs/CASMI217_MIST_CANDIDATE_FORMULA_PLAN.md.
