@@ -10,6 +10,8 @@
 </div>
 
 > [!IMPORTANT]
+> **CASMI218: preparación y perfil GPU cerrados — 2026-10-24:**1.622consultas gradient,3.647hipótesis y367consultas con pares potenciales. Roster predictivo sellado antes de proyección supervisada separada;401predicciones217se reutilizan. Gasto28,168s/1800;32predicciones nuevas guardadas, scopes cerrados. El contraste aprendido completo todavía espera revisión exacta de integración/capacidad; no hay resultado molecular218. Ciclo5:6/20. [Plan](../../../Phideus-CASMI/docs/CASMI218_LEARNED_RANKING_PLAN.md).
+>
 > **CASMI217: resultado mixto, cierre experimental completo — 2026-10-24:** MIST28/39/61Top1/5/25frente10/31/72del scorer216, MRR25 0,084121frente0,051446; mejora primeras posiciones y pierdeTop25. Mismo banco585.942/cobertura124/401,1.693fórmulas candidatas sin fórmulaGT;32predicciones reusadas y1.661nuevas. Tres efectos36,142s/1800s,135outputs308,84MB, scopes ausentes/GPUvacía. Auditor final nuevo reconstruyó crudos/listas/CSV/métricas/prosa;0hallazgos abiertos, integración única ciclo5:5→6/20. [Resultado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI217_MIST_COMPARISON_RESULTS.md).
 >
 > **CASMI217 en ejecución revisada — 2026-10-24:** MIST se prueba sobre las mismas401consultas/banco585.942de216, con1.693hipótesis de fórmulas derivadas de candidatas, sin fórmula verdadera. PREP19,578s y perfilGPU4,174s cerrados;32salidasB32 guardadas/controlB1 aparte, allocatorpeak387,65MB. Uncheckpoint CANOPUSnoaug admitido; todavía sin resultado molecular nuevo. Resto1661 espera precheck independiente; contador ciclo5:5/20. [Plan](../../../Phideus-CASMI/docs/CASMI217_MIST_CANDIDATE_FORMULA_PLAN.md).

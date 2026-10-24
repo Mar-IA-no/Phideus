@@ -11111,3 +11111,21 @@ sinMIST, sujeto aplan/fuentes/auditoría; no búsqueda de mezclas sobre401. El
 contrato preliminar debe evitar falsaCV con C029 entrenado1622/elegido sobre401.
 Cobertura permanece problema principal; expansión nueva requiere fuente y aporte
 medibles, no sólo potencial teórico. Informe: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI217_MIST_COMPARISON_RESULTS.md.
+
+### 2026-10-24 — CASMI218 — preparación y perfil cerrados; contraste pendiente (24/10/2026)
+
+El roster predictivo conserva las1.622 consultas/1.482componentes,111.119pares,
+67.026candidatas distintas y3.647hipótesis de fórmula, sin selección porrespuesta.
+Se reutilizaron40.183compatibilidades217 y calcularon26.843faltantes;66.972son
+compatibles,50fórmulas y4isótopos fuera de soporte. La proyección supervisada
+separada se abrió después del sello predictivo:367consultas con pares potenciales,
+1.218ausentes del banco,33fuera de ventana y4sin negativa conocida;27.556pares
+potenciales. No cambió roster, ventanas ni fórmulas. La máscara real de ocho
+features todavía espera el productor ciego y su sello antes del aprendizaje.
+
+Preparación23,906185s y perfilGPU4,261548s, ambos exit0/cgroup ausente; gasto
+conjunto28,167733s/1800. El perfil conserva32predicciones canónicasB32 sinrepetirB1,
+peakallocated387.650.048B/reserved398.458.880B yRSS1295096KiBdel proceso.
+El contraste completo aún NO se ejecutó: nueva integración y manifiesto propios
+a revisión independiente, reutilizando401predicciones217sin forward nuevo.
+Contadorciclo5:6/20sin cambio. Plan:docs/CASMI218_LEARNED_RANKING_PLAN.md.
