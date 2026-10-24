@@ -11268,3 +11268,8 @@ cero hallazgos, integración única ciclo5:11→12/20. Esto todavía no modifica
 de desarrollo ya fijados, reutiliza intentos químicos y perfila sólo un prefijo
 nunca calculado antes de presupuestar el resto. Goal223sigue activo.
 Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_SELECTION_RESULTS.md.
+
+
+### 2026-10-24 — CASMI223: corte de clasificación preservado y auditado
+
+La proyección401conservó4853055CID y4852716textos. El efecto900s terminó antes de química, con2583552clasificaciones confirmadas y2269164pendientes;858,060s físicos y scopeausente. Auditor nuevo reconstruyó losaliases,75322hechos adicionales e historias del corte:0hallazgos, integración única ciclo5:12→13/20.0química nueva y124/401sin cambio. Continúa una terminación integrada desde copia cerrada/merge de pendientes y resultados íntegros comprimidos; plan revisado y candidatoen precheck, sin efecto nuevo todavía. Fuente:Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_CHEMISTRY_PROFILE_RESULTS.md.
