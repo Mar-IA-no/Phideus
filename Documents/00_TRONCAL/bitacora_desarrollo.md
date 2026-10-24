@@ -11238,3 +11238,18 @@ yCSVexactos y leyóprosa/horizonte;0hallazgos, integración única ciclo5:9→10
 Se integra su prioridad: contrato finito de cobertura para277estructuras
 ausentes, manteniendo empaquetado indispensable en paralelo; sin otra cadena
 de calibraciónMIST. Fuente:CASMI222_ONLINE_DELIVERY_RESULTS.md enPhideus-CASMI/Biblioteca.
+
+
+### 2026-10-24 — CASMI223: fuente PubChem auditada; cobertura pendiente
+
+El par completo de masas y SMILES aporta124.857.128filas por archivo;2,88GB
+comprimidos conservados, sin escribir14,67GBexpandidos. Auditor nuevo reconstruyó
+conteos/formato/CRC/hashes/orden y digest de secuenciaCIDidéntico,0hallazgos.
+Integración única del hito fuente ciclo5:10→11/20; no Divina debida. B dejó su
+scope vacío activo: launcherexit1 conservado, stop específico y ausencia final
+verificados, sin repetir censo. A+B669,142s hasta cierre comprobado. La admisión
+sigue siendo experimental local mínima, sin premio/redistribución certificados.
+No cambió banco585.942o cobertura124/401. CASMI223continúa abierto: índice global
+por masa y selección target-free2023antesde química de faltantes yreadout; plan C
+en revisión independiente. No nueva calibración MIST. Fuente:resultado223 en
+Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso.
