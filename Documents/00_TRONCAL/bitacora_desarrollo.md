@@ -11223,3 +11223,18 @@ El plan222ya revisado0M lleva MIST+ranker218 desde observables hastaCSV sobre
 cuatro espectrosFITexpuestos, sin más calibración/evaluación401 o nuevas fuentes.
 Mariano mantieneGPUlocal habilitada; los próximos efectos requieren pines,
 capacidad y ownership frescos. Cobertura124/401 y277ausentes siguen abiertos.
+
+
+### 2026-10-24 — CASMI222: consumidor MIST y ranking aprendido hastaCSV
+
+Cuatro espectrosFITexpuestos recorrieron preparación,unbatchGPUrealde9hipótesis
+MIST y refit218congelado hastaCSV4×25, sinlookup deprobabilidades porID niGT.
+Las460representaciones necesarias se reutilizaron sin nuevaquímica;460scores
+conocidos. De100posiciones finales,70soninside y30rellenos de masa. No hay
+evaluaciónmolecular o consulta virgen acreditadas. Dos efectos16,023233s,
+32outputs1,081MB conservados,scopes/PIDausentes yGPUlibre en cierre.
+Auditor nuevoSol6.1High reconstruyó147fuentes,arrays/460×8features/scores/listas
+yCSVexactos y leyóprosa/horizonte;0hallazgos, integración única ciclo5:9→10/20.
+Se integra su prioridad: contrato finito de cobertura para277estructuras
+ausentes, manteniendo empaquetado indispensable en paralelo; sin otra cadena
+de calibraciónMIST. Fuente:CASMI222_ONLINE_DELIVERY_RESULTS.md enPhideus-CASMI/Biblioteca.
