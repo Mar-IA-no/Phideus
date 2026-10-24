@@ -11093,3 +11093,21 @@ AuditorSol6.1High limpio corrigió F3ruta vacía antesdelGPU; precheckperfil0M.
 El comparador restante1661 está escrito y espera dictamen exacto independiente;
 no hay resultado molecular nuevo ni integraciónfinal/counteravance. Ciclo5:5/20.
 Fuentes y scopes conservados/cerrados. Plan en Phideus-CASMI/docs/CASMI217_MIST_CANDIDATE_FORMULA_PLAN.md.
+
+
+### 2026-10-24 — CASMI217 completo y auditado: resultado mixto de MIST
+
+MIST28/39/61Top1/5/25 yMRR25 0,084121 frente10/31/72 y0,051446del scorer216
+sobre mismo banco585.942. Gana primeras posiciones y pierde11Top25; cobertura124
+sin cambio/277ausentes. Fórmulas de candidatas, sin fórmula verdadera,1693salidas
+canónicas;32reusadas y1661nuevas. Se conserva controlB1 separado. Tres efectos
+36,142197s y135outputs308,84MB, adquisiciónCPU725,237s aparte. Scopes ausentes,
+GPUempty en consulta puntual durable17:52:16UTC. No superioridad global/promoción.
+Auditor final nuevo Sol6.1High limpio01a16f07-9476-7290-a3e0-24d5b5daae2a:
+80pines/recibos/95339cosines/1693tensores/ranking/CSV/GTpostseal/métricas y prosa;
+0hallazgos abiertos. Root leyó íntegros crudo/checkers/logs/results e integró
+UNAvez ciclo5:5→6/20. Sigue UNcontraste aprendido finito con1622gradient ycontrol
+sinMIST, sujeto aplan/fuentes/auditoría; no búsqueda de mezclas sobre401. El
+contrato preliminar debe evitar falsaCV con C029 entrenado1622/elegido sobre401.
+Cobertura permanece problema principal; expansión nueva requiere fuente y aporte
+medibles, no sólo potencial teórico. Informe: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI217_MIST_COMPARISON_RESULTS.md.
