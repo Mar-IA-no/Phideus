@@ -1,3 +1,17 @@
+## CASMI220: censo LOTUS auditado y cambio de oportunidad — 2026-10-24
+
+Se adquirió y proyectó la fuente fija completa, 709.740 ocurrencias, sin química
+ni GPU. Sus 151.885 prefijos públicos incluyen 110.719 que no aparecen en banco,
+pero sólo tres consultas antes ausentes coinciden nominalmente. El banco conserva
+124/401 de cobertura química; no se transforma la unión textual127en cobertura.
+El censo y el índice se sellaron antes del cruce201. Diez salidas360,72MB,
+185,111s/1200 y scope ausente. Auditor nuevo reconstruyó todo y leyó prosa y
+horizonte, cero hallazgos: integración única ciclo5:7→8/20. Se preservaLOTUS
+sin ampliación química masiva por inercia. Sigue revisión puntual de DiffMS
+preentrenado con fórmulas inferidas para generar fuera del inventario; todavía
+sin pesos o ejecución nuevos. La entrega reproducible sigue siendo principal.
+[Resultado220](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI220_LOTUS_SOURCE_RESULTS.md).
+
 ## Interfaz dispersa y traslado sintético auditados — 2026-10-22 UTC
 
 CASMI209 conecta observables variables con backend explícito, soporte disperso,
