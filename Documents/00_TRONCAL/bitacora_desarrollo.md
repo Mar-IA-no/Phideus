@@ -11163,3 +11163,33 @@ pares/normalizadores/ocho trazasNewton/scores/listas/CSV/métricas/prosa/horizon
 0hallazgos materiales abiertos. Integración única ciclo5:6→7/20. Se cierra218
 sin más calibraciones MIST. La revisión siguiente de cobertura sólo examina
 procedencia/licencias; no admite nuevos datos ni ejecuta otra ampliación.
+
+
+### 2026-10-24 — CASMI219: decisión de cobertura, sin nuevos datos
+
+Tras cerrar218, el trabajo pasa a seleccionar una fuente capaz de añadir
+estructuras. La revisión documental de COCONUT no produjo una ampliación nueva
+lista: las fuentes grandes conservan términos pendientes; ChEMBL ya fue usado.
+Se inspeccionó metadata oficial PubChem, sin abrir moléculas ni enviar entradas
+del concurso aAPIs. La candidata para revisión es LOTUS19360665, archivo90,3MB
+con licenciaCCBY4 del depósito, distinta delCC0 general de la homepage.
+
+Sólo se leyeron documentos, metadata y código del publicador estáticamente;
+ningún dataset, química, entrenamiento o inferencia nuevo. El códigoAGPL3 no
+se ejecuta o incorpora al producto. Plan y decisión en Phideus-CASMI/docs/
+CASMI219_COVERAGE_SOURCE_DECISION_PLAN.md y Biblioteca/Geometria_Problema_Inverso/
+CASMI219_SOURCE_DECISION.md. Auditor nuevoSol6.1High revisa campos, procedencia,
+coste y horizonte antes de una adquisición futura propia. Contador7/20sin cambio.
+
+
+### 2026-10-24 — decisión219 revisada: siguiente fuente LOTUS
+
+Auditor nuevoSol6.1High corroboró fuentes exactas y revisó el plan completo:
+cero hallazgos materiales para preparar adquisición inerte/proyección local
+limitada deLOTUS19360665. No se afirma permiso universal, cobertura nueva o
+paquete ganador elegible. El archivoCCBY4fijo90,3MBsigue sin descargarse;
+registro/notices/código/manifiesto/capacidad se preparan antes del efecto220.
+El contrato COCONUT y alternativaPubChem permanecen recuperables, sin prolongar
+una ola de licencias.219cierra como decisión documental; contador7/20sin cambio.
+Fuentes y revisión en Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/
+CASMI219_SOURCE_DECISION.md y agent_reports/casmi219_plan_audit_20261024.md.
