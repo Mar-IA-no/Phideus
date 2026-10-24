@@ -10979,3 +10979,32 @@ campaña de microperfiles, nueva limpieza, reservas o GPUremota. GPUlocal sigue
 habilitada, sin obligación de ocuparla durante el trabajo documental.
 
 [Resultado213](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI213_ONLINE_CONSUMER_RESULTS.md).
+
+
+### 2026-10-24 — Soporte publicado ChEMBL37, sin química nueva (CASMI214)
+
+Se eligió una fuente alternativa concreta para interrogar la falta de identidades,
+sin reimportar el ChEBI completo/PubChemLite ya consumidos. Licencia y notices,
+archivo fijo y SHA del publicador se revisaron antes de adquirir. El único GET
+entregó292540141B; gzip completo773781908B leídos por streaming,2.897.819filas
+con SMILES y clave publicada de formato válido,2.756.580bloques14 distintos.
+Índice y fuente completa se sellaron antes de abrir derivados201/205 expuestos.
+
+El screening encuentra101matches frente araw184 y100frente alocal184; en ambos,
+39consultas antes ausentes/37componentes. No se verificó química del SMILES de
+ChEMBL, dominio o identidad local: son soporte potencial, sin cobertura canónica
+ni aciertos acreditados. Los regímenes de identidad permanecen separados. No se
+incorporó al banco un subconjunto elegido por respuestas.
+
+Transferencia397,008s, efecto total415,085s,8outputs624880628B. Snapshot de RAM
+893906944B/OOM0 y scope exacto cerrado; sin GPU/modelos/RDKit o procesos ajenos
+intervenidos.7tests propios y revisión previa pasaron. Auditor final nuevo
+Sol6.1High/contexto limpio reconstruyó gzip/CRC, todas lasfilas del índice y401
+uniones/matches/accesiones con stdlib propio,11,708936s/AS2GiB. Coordinador leyó
+crudo/checker/logs/resultados íntegros;0hallazgos, integración única ciclo5:2→3/20.
+
+Sigue un contraste molecular acotado desde fuente completa y observables, con
+perfil del selector ligero y reutilización de representaciones anteriores. No
+calcular millones de fingerprints ni convertir el screening en otra campaña de
+controlador. No se amplían datos privados, reservas, GPUremota o limpieza.
+GPUlocal continúa habilitada. [Resultado214](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI214_CHEMBL_SUPPORT_RESULTS.md).
