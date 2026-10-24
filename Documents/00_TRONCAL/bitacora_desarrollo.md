@@ -11273,3 +11273,14 @@ Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_SELECTION_R
 ### 2026-10-24 — CASMI223: corte de clasificación preservado y auditado
 
 La proyección401conservó4853055CID y4852716textos. El efecto900s terminó antes de química, con2583552clasificaciones confirmadas y2269164pendientes;858,060s físicos y scopeausente. Auditor nuevo reconstruyó losaliases,75322hechos adicionales e historias del corte:0hallazgos, integración única ciclo5:12→13/20.0química nueva y124/401sin cambio. Continúa una terminación integrada desde copia cerrada/merge de pendientes y resultados íntegros comprimidos; plan revisado y candidatoen precheck, sin efecto nuevo todavía. Fuente:Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_CHEMISTRY_PROFILE_RESULTS.md.
+
+
+### 2026-10-24 — CASMI223: gate químico y continuidad con reloj original
+
+La clasificación completa y el banco de referencia quedaron guardados. E reutilizó12526hechos y produjo258resultados antes de su gate: la extrapolación temporal no cabía en4h. Cierre472,824s, fuentes conservadas y un envío incierto bloqueado. Auditor independiente verificó población, baseline y frames;240resultados durables todavía sin índice son recuperables. No hay cobertura nueva. Sigue revisión de una continuación por lotes32 que conserva el deadline absolutoE y todo lo calculado; replay de sólo persistencia muestra reducción de coste, sin acreditar ETA ni aceleración total. Contador13sin duplicar el hito químico pendiente. Fuente:Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_CHEMISTRY_FINISH_CUT.md.
+
+
+### 2026-10-24 22:51 UTC — CASMI223: continuación química por lotes
+
+R inició desde el corte E cerrado y auditado, con 23 pruebas aprobadas y cero hallazgos pendientes. Recupera los 240 resultados durables sin índice y bloquea task639 como ambiguo, sin repetir química. Usa lotes de32 en ocho procesos (máximo ocho llamadas simultáneas), con persistencia durable antes de liberar cada lote. Manifiesto `e5287e8a639a92df397888dba13248d8ef4290445bf4661c76b4c5336b2c3972`, 26 pins y71 referencias; scope `casmi223-chemistry-batched-finish-1.scope`, InvocationID `f52a42f2bc8348fd82688944c9be1a1d`. Conserva el deadline original25/10 02:24:39UTC; saldo al arrancar12796,383s, sin renovación. CPU8/RAM12GiB/salida24GiB, CUDA oculta. Sin cobertura nueva todavía: banco585942/124de401 intactos. Goal223 activo, ciclo5:13/20; la revisión de recuperación/precheck no duplica el hito químico pendiente.
+
