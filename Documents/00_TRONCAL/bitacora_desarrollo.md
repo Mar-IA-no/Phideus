@@ -11008,3 +11008,31 @@ perfil del selector ligero y reutilización de representaciones anteriores. No
 calcular millones de fingerprints ni convertir el screening en otra campaña de
 controlador. No se amplían datos privados, reservas, GPUremota o limpieza.
 GPUlocal continúa habilitada. [Resultado214](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI214_CHEMBL_SUPPORT_RESULTS.md).
+
+
+### 2026-10-24 — Perfil de masa para ampliar candidatas (CASMI215)
+
+El perfil leyó las primeras 2048 filas ChEMBL antes de calcular química. Reutilizó
+72 hechos y fijó 256 nuevas llamadas por ordinal, sin reemplazar fallos. De las
+fuente quedaron 237 comparaciones válidas, 91 identidades desconocidas y 1720
+no seleccionadas para representación completa. Las 237 masas raw/registro184
+coincidieron por bits. Ese resultado no demuestra un selector universal seguro.
+
+Los ocho controles se mantuvieron separados. El control con deuterio [2H]OC=C
+dio masa raw45.032491494 frente a46.040316526 y un canónico [2H]O=CC que no
+vuelve a parsear; se conserva literalmente, sin modificar receta o historia.
+Además tres canónicos naturales reparseados varían un ULP respecto al registro,
+una escala distinta de la igualdad raw/record. El siguiente selector requiere
+política numérica y rutas explícitas para excepciones, sin ajustar a respuestas.
+
+Una reserva CPU de180s cerró en47,180s; 262nuevas llamadas incluidos seis
+controles, diez salidas6,75MB y scope propio ausente. Auditor nuevo Sol6.1High
+reconstruyó26fuentes11,69GB, punteros/roster/propiedades/comparaciones con código
+propio ligero, sin Enumerate o fingerprints nuevos. Checker exitoso13,96s;
+supuesto propio de serialización cero corregido y preservado con su log. Root
+leyó todo el crudo/código/logs/recibos y confirmó0hallazgos materiales abiertos;
+integración única3→4/ciclo5. Sigue comparación molecular desde la fuente completa,
+no otro microperfil del controlador. GPU local sigue habilitada; sin nueva
+limpieza, datos privados/reservas, GPU remota o promoción científica.
+
+[Resultado215](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI215_MASS_PROFILE_RESULTS.md).
