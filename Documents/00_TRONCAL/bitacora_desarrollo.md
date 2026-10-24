@@ -11129,3 +11129,37 @@ peakallocated387.650.048B/reserved398.458.880B yRSS1295096KiBdel proceso.
 El contraste completo aún NO se ejecutó: nueva integración y manifiesto propios
 a revisión independiente, reutilizando401predicciones217sin forward nuevo.
 Contadorciclo5:6/20sin cambio. Plan:docs/CASMI218_LEARNED_RANKING_PLAN.md.
+
+### 2026-10-24 — CASMI218: resultado experimental; auditoría pendiente
+
+CASMI218 obtiene 30/40/67 aciertos Top1/5/25 y MRR25 0,088963 en FIT401,
+frente a 28/39/61 de MIST217 y 10/31/72 del scorer216 sobre el mismo banco.
+El control aprendido sin probabilidades MIST obtiene 2/11/36. Mejora posiciones
+tempranas, sin superioridad global sobre los comparadores. Cobertura sin cambio:
+124 respuestas presentes, 277 ausentes. Desarrollo expuesto, evaluador local.
+
+La supervisión se limita a 1.622 consultas gradient: tres folds por componente
+y refit fijo, sin ajuste con401. OOF completo:126/213/299, MRR25 0,101744;
+367 consultas de310 componentes aportan27.556pares, todas las1.622 se evalúan.
+Se reutilizaron probabilidades401 de217;3.647hipótesis gradient conservadas,
+32del perfil y3.615nuevas. Features y máscara ciegas selladas antes de targets;
+modelos/listas y dosCSV literales sellados antes del readout201. Gasto físico
+conjunto53,617263s/1800, tres scopes cerrados,238archivos412,90MB conservados.
+Auditor final nuevo Sol6.1High está reconstruyendo evidencia y leyendo el informe;
+contadorciclo5:6/20 aún sin cambio. No se encadenan calibraciones MIST.
+
+### 2026-10-24 — CASMI218 completo y auditado: mejora frente a MIST, límite de cobertura
+
+CASMI218 mejora a MIST217:30/40/67 frente28/39/61 Top1/5/25, MRR25 0,088963
+frente0,084121. El scorer216 mantiene más Top25:10/31/72. Control aprendido sin
+probabilidades MIST:2/11/36. Banco fijo585.942, cobertura124/401 y277ausentes;
+no superioridad global ni rendimiento oculto acreditados. Sólo1.622gradient
+para supervisión; tresfolds por componente y refit sin selección401. Features,
+máscaras, modelos, listas y ambosCSV fueron reconstruidos independientemente.
+
+Tres efectos53,617263s/1800,238archivos412.896.031B conservados, scopes ausentes.
+Auditor nuevo Sol6.1High reconstruyó206.458filas de features(error≤4,44e-16),
+pares/normalizadores/ocho trazasNewton/scores/listas/CSV/métricas/prosa/horizonte;
+0hallazgos materiales abiertos. Integración única ciclo5:6→7/20. Se cierra218
+sin más calibraciones MIST. La revisión siguiente de cobertura sólo examina
+procedencia/licencias; no admite nuevos datos ni ejecuta otra ampliación.
