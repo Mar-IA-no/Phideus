@@ -11207,3 +11207,19 @@ El contrato COCONUT y alternativaPubChem permanecen recuperables, sin prolongar
 una ola de licencias.219cierra como decisión documental; contador7/20sin cambio.
 Fuentes y revisión en Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/
 CASMI219_SOURCE_DECISION.md y agent_reports/casmi219_plan_audit_20261024.md.
+
+
+### 2026-10-24 — CASMI221: faltante concreto de estado, entrega como siguiente tramo
+
+Los pesos deDiffMS/MIST-CF quedaron autenticados y conservados. La cargaCPU
+restringida confirma CANOPUSstate_dictúnico/366tensores sin configuración o
+marginales, necesarias para fijar el sampler publicado. No se ejecutó piloto
+GPU ni se infiere inutilidad del modelo; se conserva una candidata recuperable
+sin improvisar distribuciones o descargar un corpus. Tres efectos398,487951s,
+25outputs1106578845B y tres scopes ausentes. Auditor nuevoSol6.1High leyó prosa
+y horizonte y reconstruyó113checks/fuentesGit/19fixturesPASS,0hallazgos abiertos;
+integración única ciclo5:8→9/20. Fuente:resultado221enPhideus-CASMI/Biblioteca.
+El plan222ya revisado0M lleva MIST+ranker218 desde observables hastaCSV sobre
+cuatro espectrosFITexpuestos, sin más calibración/evaluación401 o nuevas fuentes.
+Mariano mantieneGPUlocal habilitada; los próximos efectos requieren pines,
+capacidad y ownership frescos. Cobertura124/401 y277ausentes siguen abiertos.
