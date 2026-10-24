@@ -10952,3 +10952,30 @@ sin Torch/GPU/GT. Crudo, checker y evidencia leídos íntegros por el coordinado
 0hallazgos materiales; integración única ciclo5:0→1/20. Cierra funciónonline
 con FIT expuesto; no acredita mejora molecular. Continúa hacia conexión mínima
 al consumidor fijo, sin reabrir microperfiles, limpieza ni evaluaciones cerradas.
+
+
+### 2026-10-24 — Cuatro espectros online hasta cinco CSV (CASMI213)
+
+La conexión mínima entre encoder fuera de caché y consumidor fijo quedó cerrada:
+cuatro entradas FIT admitidas, fijadas antes del soporte, produjeron cuatro
+llamadas reales al encoder,178puntuaciones,89agregados y cincoCSV×4filas. Se
+conservan observables, tensores, embeddings/logits, scores, listas y bytesCSV.
+Supervisor14,014s, GPUreserved486,54MB; RAMsnapshot3,178GB antes del cierre
+final, sinOOM. Scope exacto ausente y GPU sin procesos de cómputo al cerrar.
+No hay entrenamiento, respuestas, nuevas fuentes o calidad molecular acreditada.
+
+Precheck independiente y cuatro pruebas propias pasaron. Auditor final nuevo
+Sol6.1High/contexto limpio autenticó37fuentes/11extras/22codepins y40outputs,
+reconstruyó tensores/soporte/listas/CSV sin encoder/cabeza/kernels y revisó prosa
+y horizonte. Checker5,334300s; dos supuestos propios corregidos con parciales
+conservados, sin repetir inferencia. Coordinador leyó íntegros informe, checker,
+logs, resultados y cierre;0hallazgos materiales, integración única ciclo5:1→2/20.
+
+El próximo contraste debe mejorar cobertura o identificación. La unión actual
+ya incluye el ChEBI completo pertinente y PubChemLite; reimportarlos no añade
+identidades. Comienza revisión puntual de metadatos/licencia de una fuente
+estructural alternativa, con contrato previo a cualquier adquisición. Sin
+campaña de microperfiles, nueva limpieza, reservas o GPUremota. GPUlocal sigue
+habilitada, sin obligación de ocuparla durante el trabajo documental.
+
+[Resultado213](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI213_ONLINE_CONSUMER_RESULTS.md).
