@@ -1,3 +1,14 @@
+## Phideus/CASMI: GPU local habilitada para continuar — 2026-10-24
+Mariano indica «tenes gpu para continuar». Levanta la suspensión GPU del22/10
+para Phideus/CASMI y permite continuar trabajo experimental pertinente sin
+permisos por corrida. Retomar desde211 cerrado y Divina/ciclo5:0/20, rebasando
+plan, fuentes, capacidad y auditoría antes del encoder real fuera de caché401.
+Verificar disponibilidad/ownership antes de cargar; conservar checkpoints,
+crudos y parada recuperable, sin intervenir procesos ajenos. No habilita GPU
+remota, reservas/datos nuevos, limpieza ni promoción científica automática.
+No repetir161,210/211 ni evaluaciones cerradas. Nuevas delegaciones de CASMI
+GPT6.1SolHigh conforme orden19/10; la política Astra de PMP es otro frente.
+
 ## Phideus/CASMI: competitividad del concurso como objetivo central — 2026-10-21
 
 Mariano ordena: «de ahora en mas el objetivo central es lograr resultados

@@ -10923,3 +10923,32 @@ de ese perfil aún deben rebasarse antes de ejecutarlo.
 
 [Resultado y evidencia](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI211_REAL_CACHED_CONSUMER_RESULTS.md).
 [Divina ordinaria](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI211_DIVINA_CYCLE4.md).
+
+
+### 2026-10-24 — Reanudación GPU y encoder real fuera de caché (CASMI212)
+
+Mariano habilitó GPUlocal para continuar. La RTX3090 estaba libre; no se
+intervinieron procesos o servicios ajenos. Desde211cerrado y la Divina se diseñó
+un perfil de32observaciones FIT admitidas fuera de caché401 y del prefijo128.
+La revisión independiente corrigió selecciónporíndicefísico, observaciónBLAS,
+estabilidadfinal de código y margen de cierre. Trece pruebas dehelpers y tres
+del runner pasaron por separado; no se repitieron corridas/evaluaciones previas.
+
+La única corrida codificó32/32espectros,32llamadasE1 y1E32diagnóstica, con
+outputs crudos/normas/logits y estados recuperables.4,942s supervisor, picoCUDA
+reserved2,156GB, RAMsnapshot1,693GB/sinOOM. Los endpoints conservan diferencias
+de bits; no se elige por allclose ni se atribuye mejora de identificación.
+Scopepropio ausente y GPU sin procesos al cerrar. Auditorfinalnuevo en curso;
+contadorciclo5:0/20 hasta integrar. [Evidencia212](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI212_ONLINE_ENCODER_RESULTS.md).
+
+Mensaje recursivo 050 integrado: la exclusividad de Biblioteca editorial para
+multi-agent-research no se extiende a Phideus. Esta evidencia permanece en
+Biblioteca de CASMI; sin reorganizar históricos ni ampliar limpieza o permisos.
+
+Cierre212: auditor nuevo Sol6.1High/contextolimpio reconstruyó401joins y las32
+entradas con norma/logits bitwise en ambos endpoints,18fuentes/12codepins/
+80archivossellados y cierre propio reconsultado. CheckerCPU0,293337s/AS4GiB,
+sin Torch/GPU/GT. Crudo, checker y evidencia leídos íntegros por el coordinador,
+0hallazgos materiales; integración única ciclo5:0→1/20. Cierra funciónonline
+con FIT expuesto; no acredita mejora molecular. Continúa hacia conexión mínima
+al consumidor fijo, sin reabrir microperfiles, limpieza ni evaluaciones cerradas.
