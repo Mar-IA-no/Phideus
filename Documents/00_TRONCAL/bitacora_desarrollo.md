@@ -11253,3 +11253,18 @@ No cambió banco585.942o cobertura124/401. CASMI223continúa abierto: índice gl
 por masa y selección target-free2023antesde química de faltantes yreadout; plan C
 en revisión independiente. No nueva calibración MIST. Fuente:resultado223 en
 Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso.
+
+
+### 2026-10-24 — CASMI223: selección PubChem completa y auditada
+
+El índice global de124.857.128registros permitió seleccionar28.483.335pares
+para2023observables y recuperar17.693.206textos con CID y ordinal. Un corte
+preventivo de RAM quedó conservado; la continuación reutilizó el índice y
+escribió por tramos con un bitmap, sin volver a adquirir o censar la fuente.
+Cconsumió261,954s físicos,5,055GBcombinados y cerró ambos scopes. Un auditor
+nuevo reconstruyó íntegros índice, pares, unión y textos contra las fuentes;
+cero hallazgos, integración única ciclo5:11→12/20. Esto todavía no modifica
+124/401de cobertura: la siguiente derivación proyecta todoslos401observables
+de desarrollo ya fijados, reutiliza intentos químicos y perfila sólo un prefijo
+nunca calculado antes de presupuestar el resto. Goal223sigue activo.
+Fuente: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_SELECTION_RESULTS.md.
