@@ -11036,3 +11036,45 @@ no otro microperfil del controlador. GPU local sigue habilitada; sin nueva
 limpieza, datos privados/reservas, GPU remota o promoción científica.
 
 [Resultado215](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI215_MASS_PROFILE_RESULTS.md).
+
+
+### 2026-10-24 — Comparación ChEMBL: corte conservado y continuación revisada (CASMI216)
+
+La selección ligera superó el roster previsto de65536textos y cortó a69,779s
+antes de nueva química184, scoring o respuestas. Se conservaron2492645decisiones
+y405174posiciones255 potencialmente no contiguas. Nueve salidas79,20MB yscope
+ausente; una verificación independiente autenticó vectores y128587excepciones.
+No es un resultado molecular negativo ni una comparación terminada.
+
+El diseño de recuperación conserva el mismo presupuesto físico1800s y todoslos
+originales: reusa0/1/2, calcula sólo255, reconstruye aliases en orden de fuente y
+fija las primeras256tareas nuevas como parte científica de la comparación.
+Una proyección medida decide si puede ejecutar el resto, sin renovar tiempo
+tras otro corte. Código nuevo con cinco pruebas dirigidas aprobadas; auditor
+revisa manifiesto exacto antes de efectos. Contador4/20 sin cambio; goal216activo.
+[Corte216](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI216_CAPACITY_CUT.md).
+
+
+### 2026-10-24 — Más cobertura no mejora la ordenación: cierre auditadoCASMI216
+
+La comparación completa añadió71.130claves desde77.224textosChEMBL; banco585.942,
+cobertura85→124/401consultasFIT/370componentes. Con neuronal menos prior,
+Top1/5/25pasa17/46/73→10/31/72 yMRR25 0,072409→0,051446. Las85ya presentes
+pierden23Top25 netos(73→50);39nuevas aportan22,277siguen ausentes. Desarrollo
+expuesto/local_key14/scorerlocal: no leaderboard, techo o mejora aprobada.
+Se conservan ambas variantes y los324unknown/148.919excepciones sin reintentos.
+
+Tercer corte trasquímica fue error propio del lector (banco185/197 frentecódigo0/1).
+Reparación explícita revisada sobre514.812filas; sin repetir representación.
+Cuatro efectos1672,429s/1800s,61salidas1,087GB, scopes y cgroups ausentes.
+GPU no usada; última memoria máxima11,462GB/12GiB,0OOM. El reloj físico no
+incluye todo el trabajo del agente/diseño/errores/revisiones.
+
+Auditor final nuevoSol6.1High/none01a16ed2-277a-7d82-9cf3-851dd180247b autenticó
+121fuentes/55pines y reconstruyó selección guardada, hechos, agrupaciones,
+cache, aritmética/ventanas/listas/cuatroCSV y métricas401/370 después del sello.
+Checker61,385s, sin nuevoskernels oquímica; crudo/checkers/logs/proofs leídos
+íntegros,0materiales abiertos inclprosa/horizonte. Integración única4→5/ciclo5.
+Sigue mejor discriminación frente a distractores cercanos: revisar contrato
+concretoMIST frente a supervisión local, sin ajustar sobre401targets o volver
+al controlador por inercia. GPU local continúa habilitada. [Resultado216](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI216_CHEMBL_COMPARISON_RESULTS.md).
