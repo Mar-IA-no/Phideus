@@ -11562,3 +11562,8 @@ CASMI254 cerró auditado sin mejora del primario: ampliar585→1407supervisiones
 ## CASMI255 — soporteFIT desde fuentes existentes
 
 CASMI255 prepara la misma selección pública ya existente para las1.622consultasFIT: pares de proveedor10ppm, reuso de hechos químicos y llamadas nuevas sólo para textos nunca intentados. El banco224 conserva sus4.225.218índices y representantes; las cuarentenas históricas se heredan incluso cuando FIT selecciona sólo parte de sus aliases. La ventana químicaQ95 se aplica después de representar, separada de la selección del proveedor. Método independiente aprobado para implementar; código y ocho pruebas sintéticas preparados, revisión/precheck aún pendientes. No reserva, lectura de payloads científicos, química real o resultado de cobertura255 todavía. Contador ciclo7:4/20 sin incremento. GPU local autorizada; este operador usa CPU8/RAM12GiB, máximo8h/output64GiB/margenhost96GiB y corte recuperable. No nuevas fuentes, reservas, limpieza ni ranking por este bloque.
+
+
+## CASMI255 — efecto iniciado y proyecciónFIT
+
+La corrida255 comenzó tras revisar el método y el código con cero hallazgos materiales residuales, ocho pruebas sintéticas y176identidades/39pines exactos. Código SCI2188460 y continuidad M6beb492 guardados antes del efecto. El único reloj tiene máximo8h/CPU8/RAM12GiB/salida64GiB y margen96GiB; la primera proyección seleccionó15.372.388CIDFIT y continúa el roster por texto, todavía sin nuevas llamadas químicas ni lectura de respuestas. Contador ciclo7:4/20 conservado. La GPU sigue autorizada; esta fase química esCPU. No es resultado de cobertura o ranking terminado.
