@@ -630,3 +630,12 @@ ampliación de datos/reservas. Al necesitar GPU para el siguiente avance útil,
 informar y detener la cadena, sin entrenamiento CPU largo sustitutivo ni relleno.
 La prohibición SHA de la operación de backup/limpieza queda vigente para esa
 operación cerrada; no reabrir sus comprobaciones de contenido.
+
+
+## Phideus/CASMI: continuar prueba larga y gestión periódica de espacio — 2026-10-25
+
+Mariano autoriza continuar CASMI255 aunque requiera unas14horas, disponer de los recursos locales disponibles y decidir pertinencia sin consultas por corrida. Esta orden supera el bloqueo por el presupuesto8h de la ejecución anterior: fijar prospectivamente nueva continuación, conservar ambos cortes y no repetir intentos. No convierte estimación conservadora en duración medida ni garantiza mejora molecular. Revisar periódicamente artefactos CASMI que convenga trasladar a /mnt/raid1/m2-1tb_backup para evitar llenar M2; conservar dependencias activas y recuperación, selección exacta y ledger. Verificar traslados por ruta/presencia/tipo/tamaño/fecha, sin SHA ni lecturas integrales de comprobación del backup. Sólo retirar locales con copia comprobada y sin dependencia activa; otros frentes y archivos ajenos intactos. GPU local autorizada, química184 es CPU; no GPU remota/datos/reservas nuevos ni promoción.
+
+
+## Phideus/CASMI: esperar backup M2→RAID1 antes del efecto largo — 2026-10-25
+Mariano informa que está corriendo su backup de M2 a RAID1 y propone esperar. Esperar cierre observable de la copia antes de lanzar continuación larga255 o trasladar/retirar artefactos; revisión de código y documentación pequeña pueden avanzar. No intervenir el backup ni inferir copia íntegra sólo por fin del proceso. Proceso observado bash ./backup_m2_to_drive.sh PID2091742 y rsync2091746/48/49 hacia /mnt/raid1/m2-1tb_backup; revalidar por identidad/starttime, sin controlar procesos ajenos.
