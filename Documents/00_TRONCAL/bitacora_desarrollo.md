@@ -11362,3 +11362,13 @@ CASMI226 prepara el censo target-free de1622consultas de entrenamiento/1482compo
 
 CASMI226 completo y auditado sin hallazgos materiales:2.508.394parejas sobre1622consultas/1482componentes, unión1.406.844candidatas y217.325compatibilidades aún no comprobadas. Grupos conocidos6231son límite inferior, no forwards exactos. La ampliación alcanza320consultas;1302no ganan candidatas. Mediana20frente a5724de401guardadas: no asumir distractores representativos. Sin targets/química/modelos/scores/GPU. Productor1,489s; auditor23,301s con barrido completo de4.225.218masas por consulta, igualdad de todas las salidas/OOM0/scopes ausentes. Integración única ciclo5:16→17/20. Sigue plan y presupuesto de preparación aditiva/contraste fijo de aprendizaje gradient1622contra224congelado, sin tuning401 o catálogo por inercia.
 Fuentes: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI226_TRAINING_SUPPORT_CENSUS_RESULTS.md y auditoría individual final.
+
+
+### 2026-10-25UTC — CASMI227: diseño de un contraste fijo
+
+CASMI227 tiene plan revisado independientemente, cero hallazgos materiales: un único aprendiz completo218 ajustado en soporte ampliado gradient1622contra224congelado, sin tuning401. Se reutilizarán features401; cuatro ajustes (tresOOFyrefit), misma receta. Preparación aditiva217325compatibilidadesfaltantes/encoder sóloinputs nuevos. Propuesta900sCPU8/RAM12GiB/GPUallocator8GiB/salida4GiB sujeta a gates exactos. Dos identidades separadas: anotación completa y forward por tensoresW11; no compartir árboles por igualdad de tensores reducidos. Implementación directaROOTen curso; helpercommon+5fixturesPASS, inventario de fuentes target-free delegado y activo. No main227listo/manifiesto exacto/reserva/experimento/GT/GPU todavía. Goal227activo, contador17/20.
+
+
+### 2026-10-25UTC — CASMI227 candidato completo, antes de efectos
+
+El contraste fijo de aprendizaje sobre soporte ampliado tiene preparación, encoder, features, cuatro ajustes y CSV/readout implementados. Se conservan los productores y resultados anteriores. Dieciocho pruebas sintéticas aprobadas; doce arrays antiguas reales se cotejan por bytes antes del reuso, manteniendo independientes las anotaciones completas. La candidata5 y su manifiesto exacto están en revisión independiente antes de reservar900s/CPU8/RAM12GiB/salida4GiB. No hay corrida227, apertura de targets o usoGPU todavía. Inventario y módulo puntual integrados sin sumar auditorías; contador ciclo5:17/20.
