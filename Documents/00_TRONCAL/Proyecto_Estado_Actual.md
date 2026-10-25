@@ -10,7 +10,7 @@
 </div>
 
 > [!IMPORTANT]
-> **CASMI223: cobertura preliminar376/401, auditoría final en curso —2026-10-25UTC:** química4839931textos completa yscopecerrado; poolcondicional4225218identidades,baseline585942conservado. Presencia124→376(252nuevas/25ausentes),367dentroQ95; todavía sin ranking sobre el ampliado ni promoción científica. R4602,128s/calendarioE6205,745sdelmismoreloj,10,276GBpredictivos/OOM0. Auditor nuevo contrasta crudos/cobertura/prosa; goal223activo/ciclo5:13/20sin sumar hasta integración. [Resultado preliminar](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_CHEMISTRY_COVERAGE_RESULTS.md).
+> **CASMI223: cobertura376/401 completa y auditada —2026-10-25UTC:** pool condicional de4.225.218identidades, con585.942baseline conservadas. Presencia124→376 (252nuevas/25ausentes),367dentroQ95; todavía sin ranking sobre el ampliado ni promoción científica. Auditor independiente reconstruyó todos los crudos y revisó prosa/horizonte, cero hallazgos materiales; integración única ciclo5:13→14/20. Productor y auditoría cerrados con scopes ausentes/OOM0. Goal223completo; sigue contraste224 del ranking congelado, con plan revisado y gates exactos antes de efectos. [Resultado auditado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_CHEMISTRY_COVERAGE_RESULTS.md).
 >
 > **CASMI223: continuación por lotes activa —2026-10-24 22:51UTC:** recupera el corte químico E sin repetir clasificación, baseline ni llamadas; 23 pruebas y revisión independiente sin hallazgos. Ocho procesos/lotes32, CPU8/12GiB/salida24GiB. Conserva deadline25/10 02:24:39UTC, sin renovar cuatro horas. Banco585942 y cobertura124/401 todavía intactos; goal223activo/ciclo5:13/20. [Plan](../../../Phideus-CASMI/docs/CASMI223_BATCHED_FINISH_PLAN.md).
 >

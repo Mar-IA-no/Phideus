@@ -11290,3 +11290,13 @@ Durante R se registró inventario/diseño del consumidor sin Internet desde222: 
 ### 2026-10-25UTC — CASMI223: cobertura ampliada, pendiente de auditoría
 
 La continuación química por lotes terminó4839931textos sin repetir lo conservado enE. Su pool condicional añade3639276identidades albaseline585942yreporta376de401respuestas presentes frente124antes:252recuperadas,25aúnausentes,367dentroQ95. Es un cambio de presencia, no una mejora de ranking demostrada;216ya había mostrado esa diferencia.4.428grupos cuarentenados y34.739overlaps discordantes no sustituyen baseline. Rcerró exit0/scopeausente en4602,128s,calendarioE6205,745sdelrelojoriginal,10,276GBpredictivosyOOM0. La auditoría final independiente real ya está activa con evidencia y prosa preliminar; goal223sigue activo ycontador13sin incrementohasta integrarla. Fuente:Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_CHEMISTRY_COVERAGE_RESULTS.md.
+
+
+### 2026-10-25UTC — propuesta del contraste tras cobertura
+
+Se diseñó el contraste224del ranker218congelado frente a su referencia y masa sobre el pool ampliado, con banco sustituible,CSVliteral y costefinito. Auditor nuevoconcontextolimpioSol6.1High encontró que ampliar la multiplicidad de una fórmula modifica una feature aprendida: conservar pesos no conserva el orden de originales. Se corrigió para recalcular features/scores y conservar sólo índices/ties,con reuso del encoder por inputs efectivos. Crudo yrelectura preservados,0hallazgosmaterialesabiertos. Es plan propuesto, sin implementación/goaloefectos224; sigue pendiente cierre223, autoridades/capacidad y precheck exacto. Contador13sincambio. Fuente:Phideus-CASMI/docs/CASMI224_EXPANDED_POOL_FROZEN_RANKING_PLAN.md.
+
+
+### 2026-10-25UTC — CASMI223 cerrado y auditado
+
+La auditoría independiente reconstruyó todos los registros químicos, su derivación y las401filas de cobertura, y contrastó la explicación con el objetivo competitivo. Confirmó cero hallazgos materiales:4.225.218identidades candidatas y376respuestas presentes frente a124antes;367dentro deQ95. Esta presencia todavía no acredita ranking mejor. Productor y auditoría terminaron naturalmente, con scopes ausentes y OOM0; integración única ciclo5:13→14/20, sin contar de nuevo recuperación o prechecks. Goal223completo y fuentes conservadas. El siguiente avance es el contraste224del modelo congelado sobre el banco ampliado, según plan independiente ya corregido; no otro catálogo o entrenamiento. Evidencia:Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI223_CHEMISTRY_COVERAGE_RESULTS.md y crudo final enlazado.
