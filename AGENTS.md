@@ -639,3 +639,7 @@ Mariano autoriza continuar CASMI255 aunque requiera unas14horas, disponer de los
 
 ## Phideus/CASMI: esperar backup M2→RAID1 antes del efecto largo — 2026-10-25
 Mariano informa que está corriendo su backup de M2 a RAID1 y propone esperar. Esperar cierre observable de la copia antes de lanzar continuación larga255 o trasladar/retirar artefactos; revisión de código y documentación pequeña pueden avanzar. No intervenir el backup ni inferir copia íntegra sólo por fin del proceso. Proceso observado bash ./backup_m2_to_drive.sh PID2091742 y rsync2091746/48/49 hacia /mnt/raid1/m2-1tb_backup; revalidar por identidad/starttime, sin controlar procesos ajenos.
+
+
+## Phideus/CASMI: copia local terminada, continuar durante subida Drive — 2026-10-25
+Mariano confirma que terminó la copia M2→RAID1 y autoriza continuar mientras el script sube a Google Drive. Rebasar espera sobre rsync local, sin esperar al padre que continúa la subida ni intervenirlo. Rsync2091746/48/49 ausentes comprobados; parent2091742 conservado. La orden supera la espera del padre completo, mantiene comprobacionesmetadata de traslados y recursos actuales.
