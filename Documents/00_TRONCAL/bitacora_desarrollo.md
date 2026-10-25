@@ -11404,3 +11404,15 @@ CASMI229 cerró el primer consumidor CPU general: múltiples vistas por molécul
 CASMI230 continúa la integración del contrato general con banco y modelo reales. El código candidato pasó seis casos sintéticos de adaptadores e importa sin cargar Torch/RDKit/CUDA; su revisión independiente corrigió controles de integridad de índices/clave del banco. La candidata2 está en precheck exacto, sin reserva, inferencia o GPU nuevas. El ensayo propuesto usa las mismas cuatro observaciones FIT cerradas, conserva soporte neuronal sólo Hpositivo y no leerá respuestas para medir calidad. Contador19/20 intacto.
 
 230precheck2 integrado sin incremento:33pines y35metadatos actuales,106refs de fixtures verificadas por ROOT; cero hallazgos materiales después de corregir integridad del banco. Falta el intento real único, auditor final distinto y cierre. Contador19/20.
+
+
+## CASMI230 — recorrido real completo, revisión final —25/10/2026 UTC
+
+CASMI230 completó el ensayo real en17,315s: cuatro moléculas/cuatro vistas Hpositivas,7.879pares yCSV4/4completo. Reutilizó nueve forwards y calculó siete en un batchGPU;16hipótesis conocidas. Sin nuevos datos, entrenamiento, respuestas o evaluación molecular. Exit0 yscope/cgroup ausentes; crudos yfuentes conservados. El checker independiente final recibió autorización exacta600sCPU4/AS8GiB/salida512MiB yCUDAoculta; pendiente su cierre/dictamen ylectura deprosa. Contador19/20hasta integración única; al20correspondeDivina literal antesdel próximo bloque. Paquete offline autónomo todavía pendiente.
+[Resultado preliminar](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI230_REAL_CONSUMER_RESULTS.md).
+
+
+## CASMI230 — cierre auditado y Divina del ciclo5 —25/10/2026 UTC
+
+CASMI230 cerró y fue auditado sin discrepancias materiales: cuatro moléculas/cuatro vistas H positivas,7.879parejas yCSV4/4completo; nueve forwards reutilizados y siete nuevos en un batchGPU. Productor17,315s ychecker independiente16,685s, ambos cerrados ysin procesos propios residuales. No hubo nuevos datos, entrenamiento, respuestas o evaluación molecular. El checker reconstruyó35fuentes/33pines, inputs/features/scores/listas/CSVyparidad222; prosa181/230 íntegra revisada. Integración única ciclo5:19→20; ROOT completó laDivina literal ycerró ese ciclo. Estado vigente ciclo6:0/20. Sigue paquete mínimo autónomo con prueba sin caché de consultas, ydespués una pregunta discriminante de ranking; sin variantes401o catálogo por inercia. El paqueteoffline yla calidad molecular siguen pendientes.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI230_REAL_CONSUMER_RESULTS.md), [ejercicio completo](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI230_DIVINA_CYCLE5.md).
