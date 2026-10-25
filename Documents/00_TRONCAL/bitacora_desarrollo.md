@@ -11604,3 +11604,10 @@ Mariano autorizó continuar la prueba larga aunque requiera unas14horas, con rec
 La revisión detectó y resolvió una omisión de proyección del crecimiento en el ledger periódico. Se revisaron los pines finales y la identidad runtime de ambos agentes nuevos: GPT6.1SolHigh. El backup se observa por sus procesos exactos y startticks; no se interviene ni se deduce igualdad integral por su finalización. No se ejecutaron química, nuevas evaluaciones o traslados en esta preparación.
 
 Antes de la reserva se corrigió un posible falso rechazo del plazo por restafloat; la comparación usa la misma suma exacta de la reserva. Regresión y relectura independiente aprobadas, nuevefixtures en total. Manifiesto largo2 conserva el preparatorio1, sin ejecución mientras siga el backup.
+
+
+### CASMI255 — continuación CPU tras copia M2→RAID1,25/10/2026UTC
+
+CASMI255 está ejecutando la continuación larga autorizada después de comprobar ausentes los tres rsync locales; el proceso de subida a Drive se conserva. La unidad CPU casmi255-fit-bank-balance-long-1.scope mantiene InvocationID242b4e06310249f7b9c4a1ab481e996a, con manifiesto3 y reloj prospectivo24h/16workers/RAM16GiB. El gate conservador permitió continuar: proyección51.883,759s y67.983.880.951B de namespace, margenhost96GiB. Observación 2026-10-25T18:55:22.827257+00:00: 185,760 cálculos nuevos de12.798.392 completados por el productor, 12,612,632 pendientes; no es resultado final ni coberturaFIT auditada. Los2.572.682hechos previos y todos los desconocidos quedan excluidos de reintento. Se revisa crecimiento de espacio cada cinco minutos, sin traslado ni retiro local por esta anotación. GPU habilitada pero sin uso en esta químicaCPU. Objetivo íntegro incompleto, contadorciclo7:4/20 sin incremento.
+
+Referencias: Phideus-CASMI/docs/GOAL_CHAIN.md y namespace255/control/long-precheck-1.json, long-root-resource-ledger-1.json. Plan/código y nueve fixtures comprobados antes del efecto; cierre y auditoría completos pendientes.
