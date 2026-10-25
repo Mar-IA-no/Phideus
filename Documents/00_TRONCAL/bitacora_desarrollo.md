@@ -11422,3 +11422,15 @@ CASMI230 cerró y fue auditado sin discrepancias materiales: cuatro moléculas/c
 
 CASMI231 tiene código de inferencia proyectado, manifiesto plano de nueve roles (ocho activos y observables) y lanzamiento con aislamiento de red/PID/filesystem. Tres casos de contrato y equivalencia de doce salidas de preparación sintética aprobaron; el smoke final verifica imports sin Torch/RDKit, rutas de host excluidas, mounts readonly y salida writable. Revisión independiente del plan sin hallazgos abiertos tras corregir /proc; gateROOT de candidata4 pasó49pines y30py, sin afirmar un tercer precheck independiente. Todavía no hay reserva, ejecución científica o GPU231. Propuesta única900s/CPU8/RAM12GiB/swap0/allocator8GiB/nuevas salidas1GiB. El entorno existente se comparte readonly; no instalación limpia o distributivo autocontenido. Contador ciclo6:0/20.
 [Plan](../../../Phideus-CASMI/docs/CASMI231_OFFLINE_DELIVERY_PLAN.md).
+
+
+## CASMI231 — aislamiento e inferencia sin caché, cierre compuesto —25/10/2026 UTC
+
+CASMI231 completó un ensayo offline compuesto sin caché histórica:16anotaciones en el primer proceso y16forwards nuevos/unbatch enla continuación,0reusos,CSV4/4. Primer scope exit1porPATH antesdeCUDA(6,648s), conservado; R15,805s físicos/14,973s entrypoint exit0, sinrepetirpreparación. Calendario común295,263s<900, ambosscopes/cgroups ausentes; GPUlibre alrelistar. Código/runtime/activosreadonly, PID/red distintos yfuentesoriginales excluidas comprobados. El comando original conPATHincompleto permanece como fallo; composición recuperada no equivale a pasadafría única. No calidad molecular/instalaciónlimpia/Kaggle. Auditorfinal nuevo tieneAUTHexactaCPU600s; contadorciclo6:0hasta integración única.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI231_OFFLINE_DELIVERY_RESULTS.md).
+
+
+## CASMI231 — cierre compuesto auditado —25/10/2026 UTC
+
+CASMI231 cerró como ensayo offline compuesto y auditado: cuatro moléculas, 16 anotaciones únicas, 16 forwards nuevos en un batch, cero predicciones históricas reutilizadas y CSV4/4. El fallo original de PATH permanece conservado; la continuación reutilizó sólo su preparación readonly, sin repetirla ni renovar900s. Calendario295,263s; continuación15,805s físicos; checker independiente16,799s. Ambos scopes/cgroups y el PG auditor ausentes. Verificados aislamiento efectivo, nueve fuentes, 29 proyecciones/30Python y7.879pares. Instalación limpia, distributivo autosuficiente, Kaggle y calidad molecular siguen sin acreditarse. Integración única ciclo6:0→1/20. El siguiente bloque será un diagnóstico de fórmula frente a estructura en OOF de entrenamiento, sin nuevos scores401, modelos o catálogo.
+[Resultado](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI231_OFFLINE_DELIVERY_RESULTS.md).
