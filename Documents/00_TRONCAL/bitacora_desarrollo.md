@@ -11351,3 +11351,14 @@ CASMI225 prepara un diagnóstico posterior de los cambios de224 desde scores y �
 
 CASMI225 cerró y fue auditado sin hallazgos materiales. Las 23 pérdidas Top25 requieren nuevas candidatas por encima: las respuestas siguen en puestos6–25 entre antiguas, pero pasan a35–1079 en el banco ampliado. Hay25 respuestas ausentes,9fueraQ95 y367dentroQ95 con score conocido; ninguna respuesta tiene score unknown. De247recién cubiertas y puntuables,154quedan después del puesto1000. Son posiciones descriptivas de scores guardados, sin nuevo entrenamiento/inferencia. Productor2,453s y auditor1,280s, sinGPU/OOM y con scopes ausentes;401registros completos verificados. Integración única ciclo5:15→16/20. Sigue censar soporte/distractores de1622consultas de entrenamiento para presupuestar un contraste pertinente, con plan propio, sin selección sobre401 ni otro catálogo por inercia.
 Fuentes: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI225_STORED_RANKING_DIAGNOSTIC_RESULTS.md e informe individual final.
+
+
+### 2026-10-25UTC — CASMI226: censo de soporte preparado
+
+CASMI226 prepara el censo target-free de1622consultas de entrenamiento/1482componentes sobre el banco ampliado, sin respuestas, química, modelos, scores oGPU. Candidata exacta176f2729... y manifiesto6744B/fe8c7b079d0072607543e745cb41dc5ffb0af7979ace0873056cd417ef645f6e,15fuentes/127237517B. Plan/código/manifiesto revisados por instancia nuevaSol6.1High, cero hallazgos materiales;5pruebasROOT/410checks propios/14joins de autoridades aprobados. RangoQ95literal/orden físico completo y overlaycache218sin cambiar224. Una pasada propuesta120sCPU2/RAM2GiB/swap0/salida128MiB, sin retry. Aún sin efecto/censo226. Goalactivo, contador16/20; grupos conocidos serán límite inferior, no presencia de targets ni inferencias exactas.
+
+
+### 2026-10-25UTC — CASMI226: soporte desigual comprobado
+
+CASMI226 completo y auditado sin hallazgos materiales:2.508.394parejas sobre1622consultas/1482componentes, unión1.406.844candidatas y217.325compatibilidades aún no comprobadas. Grupos conocidos6231son límite inferior, no forwards exactos. La ampliación alcanza320consultas;1302no ganan candidatas. Mediana20frente a5724de401guardadas: no asumir distractores representativos. Sin targets/química/modelos/scores/GPU. Productor1,489s; auditor23,301s con barrido completo de4.225.218masas por consulta, igualdad de todas las salidas/OOM0/scopes ausentes. Integración única ciclo5:16→17/20. Sigue plan y presupuesto de preparación aditiva/contraste fijo de aprendizaje gradient1622contra224congelado, sin tuning401 o catálogo por inercia.
+Fuentes: Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI226_TRAINING_SUPPORT_CENSUS_RESULTS.md y auditoría individual final.
