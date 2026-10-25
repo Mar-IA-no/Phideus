@@ -11387,3 +11387,8 @@ CASMI227: resultado preliminar sin mejora —2026-10-25UTC: El ajuste único con
 ### 2026-10-25UTC — CASMI227 auditado y cierre del ajuste
 
 CASMI227 cerrado y auditado —2026-10-25UTC: El único ajuste sobre soporte ampliado dio32/44/58Top1/5/25 yMRR25=0,09356575, frente a224congelado34/44/60 y0,09769879. Aumentar consultas entrenables367→581no mejoró este contraste. Auditor independiente reconstruyó todos los2.508.394pares/features, cuatroajustes yCSVliteral, yleyó prosa181después del cierre: cero hallazgos materiales. Productor136,148s/auditor131,610s/scopes y cgroups ausentes; resultados y activos preservados. Integración única ciclo5:17→18/20. Se cierra este refit sin promoción ni rescate con variantes sobre401; sigue rebasar contrato real de entrega, multivista/aductos y paquete reproducible. [Resultado auditado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI227_EXPANDED_SUPPORT_LEARNING_RESULTS.md).
+
+
+### 2026-10-25 UTC — contrato CASMI228 y siguiente implementación
+
+CASMI228 completó el rebase de entrega y la revisión independiente del plan: cero hallazgos materiales abiertos. El ensayo existente usa una vista protonada por molécula; el diseño conserva múltiples vistas, diez reglas de masa y soporte neuronal explícito sólo para H positivo, sin convertir fallos en predicciones. Se fijaron las convenciones de masa/Q95 y la paridad con el dominio histórico. No hubo nueva corrida, datos o GPU. Sigue implementación CPU sintética finita; la calidad molecular y el paquete offline permanecen pendientes. Revisión previa sin incremento: ciclo5 conserva18/20. [Plan](../../../Phideus-CASMI/docs/CASMI228_GENERAL_DELIVERY_PLAN.md).
