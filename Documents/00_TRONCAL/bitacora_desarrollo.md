@@ -11382,3 +11382,8 @@ CASMI227 en ejecución —2026-10-25UTC: Contraste fijo de un aprendiz con sopor
 ### 2026-10-25UTC — CASMI227 completo, comprobación independiente pendiente
 
 CASMI227: resultado preliminar sin mejora —2026-10-25UTC: El ajuste único con soporte ampliado obtiene32/44/58Top1/5/25 yMRR25=0,09356575, frente a224congelado34/44/60 y0,09769879. Soporte gradient628presentes/581consultas entrenables; cuatrofits convergidos.4053prediccionesGPU nuevas y3647reusadas; GPUlibre al concluir. Productor cerrado en136,148s, dentro de900s;4272salidas/1,674GBconservadas. Auditor independiente nuevo reconstruye features, diseños, modelos yCSVliteral bajo presupuesto propio; contador ciclo5:17/20hasta integración. No repetir variantes de esta receta sobre401para rescatar el resultado. [Resultado preliminar](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI227_EXPANDED_SUPPORT_LEARNING_RESULTS.md).
+
+
+### 2026-10-25UTC — CASMI227 auditado y cierre del ajuste
+
+CASMI227 cerrado y auditado —2026-10-25UTC: El único ajuste sobre soporte ampliado dio32/44/58Top1/5/25 yMRR25=0,09356575, frente a224congelado34/44/60 y0,09769879. Aumentar consultas entrenables367→581no mejoró este contraste. Auditor independiente reconstruyó todos los2.508.394pares/features, cuatroajustes yCSVliteral, yleyó prosa181después del cierre: cero hallazgos materiales. Productor136,148s/auditor131,610s/scopes y cgroups ausentes; resultados y activos preservados. Integración única ciclo5:17→18/20. Se cierra este refit sin promoción ni rescate con variantes sobre401; sigue rebasar contrato real de entrega, multivista/aductos y paquete reproducible. [Resultado auditado](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI227_EXPANDED_SUPPORT_LEARNING_RESULTS.md).
