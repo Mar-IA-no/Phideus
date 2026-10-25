@@ -11440,3 +11440,9 @@ CASMI231 cerró como ensayo offline compuesto y auditado: cuatro moléculas, 16 
 
 CASMI232 cerró y fue auditado sin hallazgos materiales: 1.622 consultas/1.482 componentes y2.508.394 pares OOF reproducidos, sin nuevos scores, entrenamiento, química oGPU. Hay994 respuestas ausentes,43 fuera de ventana y585 puntuables dentro. El Top25literal285 incluye281 puntuadas y cuatro de relleno exterior. La fórmula oracular rescata sólo5/585;299 siguen fuera del25 intrafórmula, incluidos247/272 en ventanas>1.000. La lectura orienta un único contraste de objetivo o señal estructural, sin generalizar al concurso ni elegir variantes sobre401. Productor5,619s ychecker independiente5,187s físicos, scopes/cgroups ausentes. Integración única ciclo6:1→2/20; Divina no corresponde todavía.
 [Resultado y límites](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI232_OOF_FORMULA_DIAGNOSTIC_RESULTS.md).
+
+
+## CASMI233 — el objetivo intrafórmula no añadió aciertos —25/10/2026 UTC
+
+CASMI233 cerró y fue auditado sin hallazgos materiales: seis ajustes emparejados conservaron positivos, normalizadores, ocho features y receta; sólo cambió la población de negativos. El primario Top25 intrafórmula quedó288/585 en ambos brazos (tres ganados/tres perdidos); el global operativo bajó287→282/1.622 (dos ganados/siete perdidos). No hay mejora observada que justifique otra grilla de esta cabeza. Sigue cambiar señal estructural con un único diseño y presupuesto propios, sin usar401 para seleccionar. Productor27,895s ychecker independiente28,961s físicos; scopes/cgroups ausentes, crudos/rosters/trazas/scores preservados. No GPU, encoder, química, datos nuevos o refit401. Integración única ciclo6:2→3/20, sin Divina pendiente.
+[Resultado y límites](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI233_WITHIN_FORMULA_OBJECTIVE_RESULTS.md).
