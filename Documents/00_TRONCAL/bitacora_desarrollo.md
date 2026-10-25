@@ -11616,3 +11616,10 @@ Referencias: Phideus-CASMI/docs/GOAL_CHAIN.md y namespace255/control/long-preche
 ### CASMI255 — preparar la pregunta de identificación siguiente,25/10/2026UTC
 
 Mientras continúa la químicaCPU, se releyeron planes181/248/254/255, resultado248 y código vigente del scorer. Se registró como candidata medir el banco ampliado con los modelos y cabezas248 congelados antes de otro entrenamiento. El pool nuevo modifica log1p(group_size), incluso en candidatas previas; no corresponde exigir seisfeatures idénticas por inercia. Nuevas hipótesis pueden requerir asignaciones/inferencia propias, sin asumir que7700alcanzan. Nota condicional, sin datos científicos nuevos/implementación/corrida/contador; plan concreto después de cierre255 auditado. Fuente: Phideus-CASMI/docs/CASMI255_AFTER_COVERAGE_DIRECTION.md.
+
+
+### CASMI255 — progreso de la continuación CPU,25/10/2026UTC
+
+La continuación larga255S sigue activa en CPU tras la copia local terminada y sin intervenir la subida a Drive. Observación2026-10-25T21:21:58.095812+00:00: 8,798,832 de12.798.392cálculos nuevos completados (68.75%), con todoslos2.572.682hechos anteriores conservados y excluidos de retry. Tiempo observado9017.475s, M2libre159.84GiB y namespace39.51GiB; última proyección conservadora deja139.09GiB libres tras crecimiento, sobre margen96GiB. SinOOM, intervención o traslados. Misma unidad/InvocationID y reloj24h/CPU16/RAM16GiB/cap96GiB. Faltan cálculo restante, derivación, sello, coberturaFIT y auditoría final: no hay nuevos aciertos ni métricas de ranking por este progreso. PREP del auditor leído íntegro porROOT y30fixturesPASS; transporte8h/CPU8/RAM8GiB/output2GiB preparado, sinAUTH ni checkerreal. Objetivo íntegro incompleto, contadorciclo7:4/20 sin cambio; GPUhabilitada sinuso en esta fase.
+
+Fuente: namespace255/control/long-progress-1.json y long-storage-ledger-1.jsonl; observaciónROOT conservada en control/long-root-running-observation-2.json. Sin repetición de pruebas ni efectos científicos adicionales.
