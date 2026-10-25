@@ -11392,3 +11392,8 @@ CASMI227 cerrado y auditado —2026-10-25UTC: El único ajuste sobre soporte amp
 ### 2026-10-25 UTC — contrato CASMI228 y siguiente implementación
 
 CASMI228 completó el rebase de entrega y la revisión independiente del plan: cero hallazgos materiales abiertos. El ensayo existente usa una vista protonada por molécula; el diseño conserva múltiples vistas, diez reglas de masa y soporte neuronal explícito sólo para H positivo, sin convertir fallos en predicciones. Se fijaron las convenciones de masa/Q95 y la paridad con el dominio histórico. No hubo nueva corrida, datos o GPU. Sigue implementación CPU sintética finita; la calidad molecular y el paquete offline permanecen pendientes. Revisión previa sin incremento: ciclo5 conserva18/20. [Plan](../../../Phideus-CASMI/docs/CASMI228_GENERAL_DELIVERY_PLAN.md).
+
+
+### 2026-10-25 UTC — CASMI229 auditado: transporte sin omisiones
+
+CASMI229 cerró el primer consumidor CPU general: múltiples vistas por molécula, diez reglas de masa, fusión de listas completas y exportación recuperable con todas las moléculas contabilizadas. Dieciséis casos propios y pruebas independientes aprobados, sin hallazgos materiales abiertos; un desborde numérico extremo quedó corregido. Soporte neuronal sigue limitado a Hpositivo. No hubo inferencia, entrenamiento o evaluación molecular nuevos ni usoGPU. Integración única ciclo5:18→19/20. Sigue conectar el consumidor real de banco/modelo y comprobar paquete offline, con presupuesto propio; los fixtures no acreditan competitividad. [Fuentes y límites](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI229_CPU_DELIVERY_RESULTS.md).
