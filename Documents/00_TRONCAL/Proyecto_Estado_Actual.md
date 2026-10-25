@@ -1,5 +1,8 @@
 <div align="center">
 
+> **CASMI241 auditado —25/10/2026 UTC:** CASMI241 cerró auditado: el residual contextual de rango16 empeoró Top25 literal 366→329/1.622 (21 ganadas,58 perdidas), Top1 180→150, Top5 286→243 e intrafórmula366→335/585. Los tres folds bajaron; ventanas>1.000 pasaron81→39/291. Se conserva237/238/239 y la receta negativa, sin otra grilla sobre el mismo panel. Tres ajustes de300updates, sin nuevos encoderforwards, química, datos o401. Auditor independiente reprodujo los900updates y todos los scores/rangos/métricas, sin hallazgos materiales. Productor60,946s y auditor115,898s físicos; scopes/cgroups ausentes yGPU libre. La traza original omitió normas de parámetros porupdate: se conserva intacta, con903normas derivadas del replay y cotejo de checkpoints; no son observaciones originales. Integración única ciclo6:10→11/20, sinDivina pendiente. El resultado limita esta receta contextual/hardnegative, no la familia de fingerprints ni competitividad oculta. Sigue diseñar una señal estructural distinta con fuentes y revisión propias; ninguna candidatura nueva está ejecutada. [Resultado](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI241_CONTEXTUAL_FINGERPRINT_RESULTS.md).
+
+
 # Proyecto Estado Actual
 ### Phideus v5.0
 
