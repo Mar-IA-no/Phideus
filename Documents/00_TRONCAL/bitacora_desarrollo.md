@@ -11372,3 +11372,8 @@ CASMI227 tiene plan revisado independientemente, cero hallazgos materiales: un �
 ### 2026-10-25UTC — CASMI227 candidato completo, antes de efectos
 
 El contraste fijo de aprendizaje sobre soporte ampliado tiene preparación, encoder, features, cuatro ajustes y CSV/readout implementados. Se conservan los productores y resultados anteriores. Dieciocho pruebas sintéticas aprobadas; doce arrays antiguas reales se cotejan por bytes antes del reuso, manteniendo independientes las anotaciones completas. La candidata5 y su manifiesto exacto están en revisión independiente antes de reservar900s/CPU8/RAM12GiB/salida4GiB. No hay corrida227, apertura de targets o usoGPU todavía. Inventario y módulo puntual integrados sin sumar auditorías; contador ciclo5:17/20.
+
+
+### 2026-10-25UTC — contraste CASMI227 iniciado
+
+CASMI227 en ejecución —2026-10-25UTC: Contraste fijo de un aprendiz con soporte ampliado frente a224congelado, reutilizando las características de validación. Revisión independiente sin hallazgos materiales y18pruebas acotadas aprobadas. Una reserva de900s/CPU8/RAM12GiB/salida4GiB, sin reintentos; prefijo256compatibilidades ya guardado y gate de coste positivo. PreparaciónCPUactiva, sin métricas nuevas; auditor final distinto preparado y contador ciclo5:17/20sin cambio. [Plan](../../../Phideus-CASMI/docs/CASMI227_EXPANDED_SUPPORT_LEARNING_PLAN.md).
