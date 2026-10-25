@@ -11377,3 +11377,8 @@ El contraste fijo de aprendizaje sobre soporte ampliado tiene preparación, enco
 ### 2026-10-25UTC — contraste CASMI227 iniciado
 
 CASMI227 en ejecución —2026-10-25UTC: Contraste fijo de un aprendiz con soporte ampliado frente a224congelado, reutilizando las características de validación. Revisión independiente sin hallazgos materiales y18pruebas acotadas aprobadas. Una reserva de900s/CPU8/RAM12GiB/salida4GiB, sin reintentos; prefijo256compatibilidades ya guardado y gate de coste positivo. PreparaciónCPUactiva, sin métricas nuevas; auditor final distinto preparado y contador ciclo5:17/20sin cambio. [Plan](../../../Phideus-CASMI/docs/CASMI227_EXPANDED_SUPPORT_LEARNING_PLAN.md).
+
+
+### 2026-10-25UTC — CASMI227 completo, comprobación independiente pendiente
+
+CASMI227: resultado preliminar sin mejora —2026-10-25UTC: El ajuste único con soporte ampliado obtiene32/44/58Top1/5/25 yMRR25=0,09356575, frente a224congelado34/44/60 y0,09769879. Soporte gradient628presentes/581consultas entrenables; cuatrofits convergidos.4053prediccionesGPU nuevas y3647reusadas; GPUlibre al concluir. Productor cerrado en136,148s, dentro de900s;4272salidas/1,674GBconservadas. Auditor independiente nuevo reconstruye features, diseños, modelos yCSVliteral bajo presupuesto propio; contador ciclo5:17/20hasta integración. No repetir variantes de esta receta sobre401para rescatar el resultado. [Resultado preliminar](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI227_EXPANDED_SUPPORT_LEARNING_RESULTS.md).
