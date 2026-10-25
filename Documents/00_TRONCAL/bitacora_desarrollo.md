@@ -11310,3 +11310,18 @@ CASMI224 inició el contraste congelado sobre el banco ampliado, tras precheck i
 ### 2026-10-25UTC —CASMI224: corte integrado y continuación aditiva
 
 CASMI224 conserva el banco completo de4.225.218candidatas. El intento inicial cerró naturalmente en243,751174s antes de compatibilidad, anotación oGPU: el estimador proyectó8.847.684.063B frente al cap8GiB. Auditor independiente reconstruyó banco/censo401 y leyó prosa/horizonte181, cero hallazgos materiales. Recuperación integrada sin nuevo conteo: ciclo5:14/20; goal224incompleto. Continuación aditivaR preparada en archivos nuevos, con RESULT completos y descriptor sin copia consolidada, banco padre sólo lectura y arrays compactos para ranking. Conserva cap combinadoE+R8GiB ydeadline original25Oct01:42:54UTC; manifiesto exacto29193B/d5e98a1759160548e34729d86ce10258ca14c4a298db4d4a0b5939322cefd5e1 en revisión independiente antes de reservar. Sin nueva inferencia, métricas oCSV hasta ahora; GPUlocalautorizada. Ninguna limpieza ni fuentes nuevas.
+
+
+### 2026-10-25UTC —continuación CASMI224R iniciada
+
+CASMI224R inició25Oct01:05UTC tras precheck exacto independiente0hallazgos y siete pruebasR aprobadas. Reutiliza banco cerrado sin copiarlo; conserva RESULT completos con descriptor y lookup compacto. Reserva sólo2272,446728s de saldo hasta el deadline original4082633.418851804 (01:42:54UTC), cap conjuntoE+R8GiB/CPU8/RAM12GiB/swap0. Scope casmi224-additive-ranking-1.scope, InvocationID907ebf2fd75541b9b858a7edcc9c7f7a; arranque yclaim verificados. Primero autentica y mide preparación, luegoGPUconguarda fresca si cabe. Sin nuevos scores/CSV/métricas todavía; goal224activo y contador14/20sin sumar recuperación/precheck. SCI3a1ac00/M27bd941publicados; fuentes/código originales intactos.
+
+
+### 2026-10-25UTC —corte temporal del prefijo224R
+
+La continuación224R cerró naturalmente en38,054248s, exit1 yscope/cgroup ausentes. El prefijo realizó256comprobaciones completas en ocho lotes sin pendientes: todas compatibles; cpu0,662380s ywallacumulado0,741106s. La retención estimada8.006.838.602,54B cabe en8GiB, pero el coste conservador restante2240,265819s no cabía en el saldo utilizable. No se inició anotación, inferenciaGPU, ranking oGT; seis salidas220.961B preservadas. Contador14/20yobjetivo224incompleto. Auditoría independiente del corteR en preparación; un plan nuevo somete a revisión ampliar explícitamente sólo1800s el límite absoluto autoimpuesto yreusar los256sinrepetición, sin nuevo prefijo ni cap. Aún sin nuevo efecto.
+
+
+### 2026-10-25UTC —corteR auditado y terminación medida en revisión
+
+La auditoría real del corte224R terminó en26,593361s, exit0/OOM0/scopes ausentes:256hechos íntegros y0ambiguos, censo ycausa temporal confirmados. ROOT leyó crudo/pruebas/recursos/cierre/prosa181 e integró recuperación sin incremento: ciclo5:14/20. Una instancia nueva revisó el plan de terminación medida, cero hallazgos conceptuales: cambio explícito único de1800s sobre deadline original, inicio preservado/calendario5400s ycapE+R+S8GiB. Cinco módulosS nuevos y tres fixturesPASS implementan reuso256sinrepetir, descriptor multijournal, gateestricto de coste antesreserva ydespuéswarmup, modelos/rosters/scores de referencia intactos. SnapshotS32712B/272999fd85d2864759b4d80285791207b5de953af2134b064a3e7a888e465fc0,110pins59sources4readout enprecheck exacto independiente. Todavía sinreserva/efectoS, GPU224no usada, contraste224incompleto.
