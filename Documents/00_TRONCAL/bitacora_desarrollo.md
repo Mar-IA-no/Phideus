@@ -11397,3 +11397,10 @@ CASMI228 completó el rebase de entrega y la revisión independiente del plan: c
 ### 2026-10-25 UTC — CASMI229 auditado: transporte sin omisiones
 
 CASMI229 cerró el primer consumidor CPU general: múltiples vistas por molécula, diez reglas de masa, fusión de listas completas y exportación recuperable con todas las moléculas contabilizadas. Dieciséis casos propios y pruebas independientes aprobados, sin hallazgos materiales abiertos; un desborde numérico extremo quedó corregido. Soporte neuronal sigue limitado a Hpositivo. No hubo inferencia, entrenamiento o evaluación molecular nuevos ni usoGPU. Integración única ciclo5:18→19/20. Sigue conectar el consumidor real de banco/modelo y comprobar paquete offline, con presupuesto propio; los fixtures no acreditan competitividad. [Fuentes y límites](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI229_CPU_DELIVERY_RESULTS.md).
+
+
+### 2026-10-25 UTC — CASMI230 antes del primer efecto
+
+CASMI230 continúa la integración del contrato general con banco y modelo reales. El código candidato pasó seis casos sintéticos de adaptadores e importa sin cargar Torch/RDKit/CUDA; su revisión independiente corrigió controles de integridad de índices/clave del banco. La candidata2 está en precheck exacto, sin reserva, inferencia o GPU nuevas. El ensayo propuesto usa las mismas cuatro observaciones FIT cerradas, conserva soporte neuronal sólo Hpositivo y no leerá respuestas para medir calidad. Contador19/20 intacto.
+
+230precheck2 integrado sin incremento:33pines y35metadatos actuales,106refs de fixtures verificadas por ROOT; cero hallazgos materiales después de corregir integridad del banco. Falta el intento real único, auditor final distinto y cierre. Contador19/20.
