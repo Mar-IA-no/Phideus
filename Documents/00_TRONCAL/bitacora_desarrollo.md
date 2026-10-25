@@ -11567,3 +11567,10 @@ CASMI255 prepara la misma selección pública ya existente para las1.622consulta
 ## CASMI255 — efecto iniciado y proyecciónFIT
 
 La corrida255 comenzó tras revisar el método y el código con cero hallazgos materiales residuales, ocho pruebas sintéticas y176identidades/39pines exactos. Código SCI2188460 y continuidad M6beb492 guardados antes del efecto. El único reloj tiene máximo8h/CPU8/RAM12GiB/salida64GiB y margen96GiB; la primera proyección seleccionó15.372.388CIDFIT y continúa el roster por texto, todavía sin nuevas llamadas químicas ni lectura de respuestas. Contador ciclo7:4/20 conservado. La GPU sigue autorizada; esta fase química esCPU. No es resultado de cobertura o ranking terminado.
+
+
+## CASMI255 — clasificación terminada; reuso en marcha
+
+El productor255 completó el registro de15.371.074textos y su clasificación histórica:2.532.096hechosR,32.138otros resultados históricos y12.806.840textos nunca intentados. Conserva75.322punteros adicionales y4.428cuarentenas; el prefijo224 de4.225.218candidatas quedó materializado sin reemplazos. Comenzó el reuso de hechos antes de la química nueva, siempre bajo el único reloj8h/CPU8/RAM12GiB/salida64GiB/margen96GiB. Son resultados intermedios del productor, pendientes de verificación independiente; todavía sin coberturaFIT final ni ranking. El contador permanece ciclo7:4/20 y la GPU local sigue habilitada.
+
+Fuente: balance-1/predictive/population.json y control/root-population-observation-1.json en el namespace255. No se cuenta una auditoría nueva por este avance.
