@@ -3558,3 +3558,10 @@ No hay GO/promoción científica; GPUlocal autorizada hasta aviso, sin procesos
 experimentales propios activos. La entregaGit y el cierre formal se verifican
 tras este corte auditado.
 [Resultado completo](../../../Phideus-CASMI/Biblioteca/Geometria_Problema_Inverso/CASMI175_CONSTRUCTIVE_MOLECULAR_RESULTS.md).
+
+
+## Actualización CASMI255 —26/10/2026 UTC
+
+CASMI255 cerró completo y auditado: el banco pasa de 4.225.218 a 14.128.250 candidatas y las respuestas FIT dentro de Q95 de 585 a 1.481 sobre 1.622 consultas y 1.482 componentes; presentes totales 628→1.549. Se conservaron 2.572.682 hechos anteriores y se completaron 12.798.392 cálculos nuevos sin repetir intentos. El productor tomó 14.691,789 s y el checker independiente 8.727,101 s; ambos scopes/cgroups ausentes y sin OOM. Se verificaron selección, preservación, todos los frames, grupos y cobertura; la comprobación química se limita a 64 casos válidos con algoritmo compartido. El auditor alcanzó 8 GiB y registró presión de memoria explícita, sin OOM. Dictamen final leído íntegro e integrado una sola vez, sin hallazgos materiales abiertos: ciclo7:4→5/20. Es mayor cobertura, todavía sin mejora de ranking medida ni rendimiento oculto acreditado. No hicieron falta traslados al RAID o retiros locales; se conservó la subida a Drive. GPU local habilitada, sin uso en esta fase CPU.
+
+Sigue el contraste del banco ampliado con los tres predictores, cabezas y normalizadores OOF248 congelados, antes de otro entrenamiento. Requiere plan, catálogo observable y capacidad propios: nuevas hipótesis pueden exigir asignación e inferencia; log1p(group_size) cambia con el pool. Mantener FIT expuesto/pretraining desconocido, reservas y401/213 cerrados, sin promoción o GO/NO-GO científico. La síntesis vigente está en la [wiki CASMI](../../../Phideus-CASMI/docs/wiki/geometria-del-inverso.md); los cortes anteriores de este contexto conservan valor histórico.
