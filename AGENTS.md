@@ -643,3 +643,16 @@ Mariano informa que está corriendo su backup de M2 a RAID1 y propone esperar. E
 
 ## Phideus/CASMI: copia local terminada, continuar durante subida Drive — 2026-10-25
 Mariano confirma que terminó la copia M2→RAID1 y autoriza continuar mientras el script sube a Google Drive. Rebasar espera sobre rsync local, sin esperar al padre que continúa la subida ni intervenirlo. Rsync2091746/48/49 ausentes comprobados; parent2091742 conservado. La orden supera la espera del padre completo, mantiene comprobacionesmetadata de traslados y recursos actuales.
+
+
+## Phideus/CASMI: GPU suspendida hasta nueva orden — 2026-10-25 (26 UTC)
+
+Mariano ordena «No uses el GPU hasta que yo te diga». Revoca la habilitación
+GPU local anterior para este frente: no CUDA, inferencia/training GPU,
+supervisores capaces de activarla ni sustitución remota hasta nueva orden
+explícita. Conservar artefactos y detener recuperablemente sólo trabajo propio
+si lo hubiera; procesos ajenos intactos. CASMI255 está completo y auditado,
+ciclo7:5/20. CASMI256 sólo tiene plan revisado y código CPU candidato, sin
+reserva ni corrida iniciada; no había proceso de cómputo GPU al comprobar.
+Continuar únicamente CPU materialmente útil; al depender de GPU, informar
+y detener la cadena sin CPU larga sustitutiva ni relleno. No repetir255.
