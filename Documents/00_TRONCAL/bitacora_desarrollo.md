@@ -11654,3 +11654,10 @@ CASMI256,02:14UTC: el productorCPU sigue construyendo la vista física; censo ob
 
 
 CASMI256 2026-10-26T02:26:02.551189+00:00: La vista física terminó y la compatibilidad nuevaCPU está activa: 114,048 resultados de5.898.657nuevos, con7305501seleccionadas/10485499pares. La primeraoleada real512retenidos permitió continuar: proyección conservadora28.855,002s frentea85.143,773s de saldo,3×costo observado sinaceleraciónparalelaasumida; no esETA ni garantía decola. Misma reserva/InvocationID, sinreinicio. Mempeak12GiB/reclamaciónsinOOM; M2libre149257019392B ynamespace5422728400B al observar. NoGPUnitargets/resultadosderanking nuevos; etapaCPUyelobjetivo256todavíaincompletos. Elcheckerindependiente sigue preparado,sinAUTH; supresupuesto1h se rebasará antesdeefecto desdecostereal/censocerrado. Ciclo7:5/20intacto. Véase Phideus-CASMI/docs/GOAL_CHAIN.md.
+
+
+## CASMI256: productorCPU cerrado; comprobación independiente en curso —26/10/2026UTC
+
+Terminó la preparaciónCPU en7446,522s, exit0 y scope/cgroup ausentes. El productor guardó5.898.657comprobaciones nuevas de compatibilidad y24.972anotaciones, con32672inputsREADY y10.485.499pares para las1622consultasFIT. Es un avance de preparación, todavía sin ranking ni mejora molecular comprobada. No huboOOM, GPU o lectura de respuestas. Se conservan crudos, catálogo, arreglos efectivos y sello antes de cualquier predicción.
+
+Inició el verificador independiente después del cierre y de revisiónROOTcompleta:55fixtures previas intactas,7focalesPASS y presupuesto prospectivo4h desdeAUTH,8CPU/12GiB/swap0. Comprueba todos los datos seleccionados, ventanas yW61; las muestras químicas64+64 comparten algoritmos fuente y tienen ese límite. El dictamen aún está pendiente. La prohibiciónGPU reiterada porMariano sigue vigente; los procesosGPU dePMP pertenecen a otrofrente y se preservaron. Ciclo7:5/20 intacto, goal256 incompleto. [Plan](../../../Phideus-CASMI/docs/CASMI256_EXPANDED_BANK_RANKING_PLAN.md); evidencia control/root-running-observation-12.json ycpu-audit-root-resource-ledger-1.json en el namespace256. M2con~132GiB libres, sin necesidad de traslado ni borrado.
