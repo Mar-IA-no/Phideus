@@ -3576,3 +3576,8 @@ CASMI256 molecular queda en pausa por dependencia de GPU, suspendida por Mariano
 [Plan](../../../Phideus-CASMI/docs/CASMI256_EXPANDED_BANK_RANKING_PLAN.md); los bloques255 anteriores son históricos.
 
 [Informe del corte CPU](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI256_CPU_PREPARATION_RESULTS.md).
+
+
+## AlmacenamientoCASMI —limpieza recuperable26/10/2026
+
+La limpieza CASMI autorizada del26/10 retiró1.353 payloads históricos recuperables en RAID1 y liberó91,16GiB; quedaron176,31GiB libres al cierre de la retirada. Se copiaron previamente las rutas útiles ausentes o diferentes, sin sobrescribir versionesRAID, y se comprobaron las1.353 contrapartes y177.884 entradas retenidas por metadatos, sinSHA. Los modelos248, bancos224/255, checkpointCPU256 y entorno217 siguen intactos. CASMI256 continúa pausado porGPU, objetivo molecular incompleto y contador ciclo7:5/20 sin cambio. El detalle y el mapa exacto de restauración están en el informe de limpieza; no se tocaron otros frentes. [Informe](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI_STORAGE_CLEANUP_20261026.md).
