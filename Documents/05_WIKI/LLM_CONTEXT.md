@@ -1155,9 +1155,11 @@ Resultado: Phideus-CASMI/docs/RESULTS_CASMI150_ALIGNMENT_OBJECTIVE.md.
 
 # Contexto integral de Phideus para LLMs
 
-## CASMI257 —ejecución de cabezas,1/11/2026
+## CASMI257 —cierre auditado,1/11/2026
 
-Tras cerrar256 auditado (ciclo7:6/20),257 está ejecutando el refit de tres cabezas de ocho pesos con encoders/normalizadores248 fijos. Código y admisión revisados,19pruebasCPU focales;49944inputs nuevos/1563batches,48072slots reusados. Plazo único4h,CPU8/RAM12GiB/swap0; ownership comprobado. GPUlocal autorizada porMariano. Todavía sin resultado257 ni efecto delcheckerfinal, cuyo método independiente está preparado. FITexpuesto/pretrainingdesconocido; no promoción ni nuevas estructuras/reservas/limpieza. [Plan](../../../Phideus-CASMI/docs/CASMI257_EXPANDED_BANK_HEAD_PLAN.md). Los cortes siguientes son históricos.
+CASMI257 cerró completo y auditado, sin hallazgos materiales abiertos. Refitó tres cabezas con encoders/escalas248 fijos sobre banco255: MRR25literal0,19522392→0,19794138 yTop1/5/25 230/416/631→233/423/635, mismos1622FIT/1482componentes. RR mejora69/empeora33; las585ya cubiertas bajan255→252Top25. Ganancia pequeña y no uniforme. Checker independiente verificó98.016slots/49.944forwards nuevos,96muestrasexactas, todas15.940.876tailsTRAIN nuevas, tres diseños y21puntosNewton, scores/rangos/listas/lector completo. Primer fallo propio de formato preservado; recuperación exit0 dentro del mismo reloj, sin repetir productor. Tres scopes/cgroups ausentes,GPUlibre. ROOT integró una sola vez ciclo7:6→7/20. FITexpuesto/pretrainingdesconocido; sin rendimiento oculto ni promoción. Sigue propuesta258 de cobertura/coste del banco ampliado en401desarrollo, todavía sin efectos.
+
+[Informe](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI257_EXPANDED_BANK_HEAD_RESULTS.md). Los cortes siguientes son históricos.
 
 ## Corte2026-10-15 CASMI149 cerrado
 

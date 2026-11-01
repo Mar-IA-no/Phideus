@@ -11701,3 +11701,15 @@ CASMI256 cerró completo y auditado, sin hallazgos materiales abiertos. Con banc
 CASMI257 comenzó con implementación y admisión revisadas, sin hallazgos materiales abiertos y19pruebasCPU pertinentes aprobadas. Reajusta sólo tres cabezas de ocho pesos con encoders/medias/escalas248 congelados, mismo banco255 y comparador256. Censo49944inputs nuevos/1563batches; reusa48072slots previos. Scope propio activo, ownership yCPU8/RAM12GiB/swap0 comprobados, plazo único4h desdeAUTH; GPUlocal autorizada porMariano. El método independiente final está preparado; su efecto sólo se admitirá tras cierre delproductor y revisión de su código. Todavía sin resultado257 ni incremento delcontador ciclo7:6/20. FITexpuesto/pretrainingdesconocido; sin datos/reservas nuevos, limpieza o promoción.
 
 [Plan](../../../Phideus-CASMI/docs/CASMI257_EXPANDED_BANK_HEAD_PLAN.md).
+
+
+## CASMI257: productor completo y recuperación del verificador —1/11/2026
+
+CASMI257 terminó el productor en499,391s, sin errores y con scope/cgroup ausentes. Provisional: MRR25 0,19522392→0,19794138 yTop25 631→635; las585ya cubiertas bajan255→252. Las tres cabezas convergieron en7iteraciones cadauna, encoders/escalas248 fijos. El primer checker cortó antes deGPU/labels por confundir bindingpath+SHA con referencia completa; intento preservado. Su recuperación aditiva está activa, revisada sin materiales abiertos y bajo el mismo reloj original, sin repetir productor. Cierre/auditoría molecular257 pendientes, ciclo7:6/20 sin incremento; no promoción ni rendimiento oculto.
+
+
+## CASMI257: contraste cerrado y auditado —1/11/2026
+
+CASMI257 cerró completo y auditado, sin hallazgos materiales abiertos. Refitó tres cabezas con encoders/escalas248 fijos sobre banco255: MRR25literal0,19522392→0,19794138 yTop1/5/25 230/416/631→233/423/635, mismos1622FIT/1482componentes. RR mejora69/empeora33; las585ya cubiertas bajan255→252Top25. Ganancia pequeña y no uniforme. Checker independiente verificó98.016slots/49.944forwards nuevos,96muestrasexactas, todas15.940.876tailsTRAIN nuevas, tres diseños y21puntosNewton, scores/rangos/listas/lector completo. Primer fallo propio de formato preservado; recuperación exit0 dentro del mismo reloj, sin repetir productor. Tres scopes/cgroups ausentes,GPUlibre. ROOT integró una sola vez ciclo7:6→7/20. FITexpuesto/pretrainingdesconocido; sin rendimiento oculto ni promoción. Sigue propuesta258 de cobertura/coste del banco ampliado en401desarrollo, todavía sin efectos.
+
+Informe: ../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI257_EXPANDED_BANK_HEAD_RESULTS.md.
