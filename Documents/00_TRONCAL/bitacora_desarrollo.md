@@ -11694,3 +11694,10 @@ La limpieza CASMI autorizada del26/10 retiró1.353 payloads históricos recupera
 CASMI256 cerró completo y auditado, sin hallazgos materiales abiertos. Con banco255 y modelos/cabezas248 congelados, MRR25literal sube0,14755934→0,19522392 yTop25 381→631 sobre1622FIT/1482componentes; las585consultas ya cubiertas bajan377→255. El checker independiente recompuso todos10485499pares, error máximo de score5,33e-15;96forwards de muestra coinciden exactamente. Orden canónico y lectorFIT propios verificados; réplicasFP64 conservan diferencias de rangos, sin cambiosTop25. Control248 reconstruido bitexact; fallos de admisión/lector y recuperaciones intactos. Cuatro scopes/cgroups ausentes, GPUlibre. ROOT leyó e integró el dictamen final una sola vez: ciclo7:5→6/20. FIT expuesto/pretrainingdesconocido; no rendimiento oculto ni promoción. Siguiente257: refit de tres cabezas con encoders/escalas248 congelados; plan conceptual revisado y49944inputs/1563batches nuevos censados por metadatos, todavía sin implementación/admisión/efectos.
 
 [Plan](../../../Phideus-CASMI/docs/CASMI256_GPU_CONTINUATION_20261101.md).
+
+
+## CASMI257: refit en ejecución —1/11/2026
+
+CASMI257 comenzó con implementación y admisión revisadas, sin hallazgos materiales abiertos y19pruebasCPU pertinentes aprobadas. Reajusta sólo tres cabezas de ocho pesos con encoders/medias/escalas248 congelados, mismo banco255 y comparador256. Censo49944inputs nuevos/1563batches; reusa48072slots previos. Scope propio activo, ownership yCPU8/RAM12GiB/swap0 comprobados, plazo único4h desdeAUTH; GPUlocal autorizada porMariano. El método independiente final está preparado; su efecto sólo se admitirá tras cierre delproductor y revisión de su código. Todavía sin resultado257 ni incremento delcontador ciclo7:6/20. FITexpuesto/pretrainingdesconocido; sin datos/reservas nuevos, limpieza o promoción.
+
+[Plan](../../../Phideus-CASMI/docs/CASMI257_EXPANDED_BANK_HEAD_PLAN.md).

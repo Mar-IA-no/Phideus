@@ -1155,6 +1155,10 @@ Resultado: Phideus-CASMI/docs/RESULTS_CASMI150_ALIGNMENT_OBJECTIVE.md.
 
 # Contexto integral de Phideus para LLMs
 
+## CASMI257 —ejecución de cabezas,1/11/2026
+
+Tras cerrar256 auditado (ciclo7:6/20),257 está ejecutando el refit de tres cabezas de ocho pesos con encoders/normalizadores248 fijos. Código y admisión revisados,19pruebasCPU focales;49944inputs nuevos/1563batches,48072slots reusados. Plazo único4h,CPU8/RAM12GiB/swap0; ownership comprobado. GPUlocal autorizada porMariano. Todavía sin resultado257 ni efecto delcheckerfinal, cuyo método independiente está preparado. FITexpuesto/pretrainingdesconocido; no promoción ni nuevas estructuras/reservas/limpieza. [Plan](../../../Phideus-CASMI/docs/CASMI257_EXPANDED_BANK_HEAD_PLAN.md). Los cortes siguientes son históricos.
+
 ## Corte2026-10-15 CASMI149 cerrado
 
 El diagnóstico congelado completó5408exposiciones sobre165fit y4selección
