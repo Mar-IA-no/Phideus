@@ -1,5 +1,10 @@
 ## CASMI220: censo LOTUS auditado y cambio de oportunidad — 2026-10-24
 
+## CASMI261: resultado productor cerrado; checker completo pendiente —1/11/2026
+
+CASMI261 completó adaptación186updates y32672prediccionesOOF, y el finalizador cerróexit0 en190,034536s bajo el mismo start/deadlineAUTH2, sin nuevo presupuesto ni repetir entrenamiento/OOF. Se preservaron2048filas de los dos tiles previos y se calcularon10474817filas conocidas nuevas;10476865conocidas/8634desconocidas sobre10485499pares. Lectura provisionalFIT1622: MRR25 0,19794137857659627→0,20838876944414897; Top1/5/25 233/423/635→240/453/671. Macro1482 0,18673641022569593→0,19659310046722292; Top25gana61/pierde25. La verificación independiente íntegra sigue pendiente: goal261incompleto/ciclo7:10/20. FITexpuesto/pretrainingdesconocido, sin401 ni promoción; GPUlocalautorizada. Los dos CUT previos permanecen íntegros y sus cierresexit1 no se convierten enCLOSED0.
+
+
 ## CASMI261: corte recuperable y continuación propuesta —1/11/2026
 
 
