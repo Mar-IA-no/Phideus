@@ -135,6 +135,12 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI267: aprendizaje completo; CUT en scoring, finalización en revisión —2/11/2026
+
+Los186updates nuevos y32672prediccionesOOF/1022batches terminaron completos y sellados. El productor cerróexit1controlado en248,171658s, RAM10,736GB, sinOOM/max/throttling ni acciones de cierre; scope/cgroupausentes yGPUvacía al revisar.32tiles de scoring/32768filas físicas/32755conocidas quedaron durables. El primer ciclo0,155036197s fue mayor que los restantes(≤0,025946253s): el gate original proyectó5473,855641s frente3352,900527s restantes y conservóCUT. No se atribuye causa comprobada ni se convierte ese corte enPASS. Todavía no hay métricas267.
+
+ROOT propone una finalización técnica únicafeatures+lector que reutilice todoTRAIN/OOF ylas32tails, preservando originales, código yAUTH1. Mantendría start4799803,935293805/deadline4803403,935293805 exactos, sin renovar presupuesto; inicialización de operador con un único tileGPU sintético antes de32ciclos nuevos, todos incluidos en un nuevo gate prospectivo con las mismas reservas. No otro training/OOF, cambio de matemática, datos, limpieza o promoción. Plan y tresmódulos de finalización revisados0M; cincofixturesCPU PASS,105pines/119identidades ytransporteROOT separado cotejados. ProyecciónW6.486.473.685bytes<7GiB, checker2GiB reservado/margen96GiB. Adaptación final del checker y admisiónROOT pendientes; ningunaAUTH2 emitida. Plan versionado: docs/CASMI267_FINALIZATION_PLAN.md. Goal267incompleto/ciclo7:16/20, sin incremento por recuperación.
+
 ## CASMI267: segunda pasada preparada y código revisado —2/11/2026
 
 La candidata267 continúa una única pasada pairwise desde los tres estados finales261, restaurando exactamente modelo, Adam y RNG. Conserva head257, escalas248, orden, todas las negativas y divisor16 incluso en la cola2. Prevé186updates nuevos/372acumulados y32672prediccionesOOF nuevas; comparación primaria literal261, secundaria257. No añade los residuales265/266 ni abre401.

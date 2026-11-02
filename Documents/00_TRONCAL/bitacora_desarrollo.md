@@ -11843,3 +11843,9 @@ Presupuesto prospectivo3600s/CPU8/RAM12GiB/GPU8GiB/cierre120s. Gates sobre dos c
 
 FuentesCASMI: docs/CASMI267_SECOND_PAIRWISE_PASS_PLAN.md; Biblioteca/Competition_Delivery/casmi267_code_audit_20261102.md; W267/control/ROOT-code-review-1.json ymetadata-retention-preflight-1.json. GPUlocalautorizada; sin nuevosdatos/reservas/remoto/limpieza ni cambiosajenos. Los cortes siguientes conservan historia.
 
+
+## CASMI267: aprendizaje completo; CUT en scoring, finalización en revisión —2/11/2026
+
+Los186updates nuevos y32672prediccionesOOF/1022batches terminaron completos y sellados. El productor cerróexit1controlado en248,171658s, RAM10,736GB, sinOOM/max/throttling ni acciones de cierre; scope/cgroupausentes yGPUvacía al revisar.32tiles de scoring/32768filas físicas/32755conocidas quedaron durables. El primer ciclo0,155036197s fue mayor que los restantes(≤0,025946253s): el gate original proyectó5473,855641s frente3352,900527s restantes y conservóCUT. No se atribuye causa comprobada ni se convierte ese corte enPASS. Todavía no hay métricas267.
+
+ROOT propone una finalización técnica únicafeatures+lector que reutilice todoTRAIN/OOF ylas32tails, preservando originales, código yAUTH1. Mantendría start4799803,935293805/deadline4803403,935293805 exactos, sin renovar presupuesto; inicialización de operador con un único tileGPU sintético antes de32ciclos nuevos, todos incluidos en un nuevo gate prospectivo con las mismas reservas. No otro training/OOF, cambio de matemática, datos, limpieza o promoción. Plan y tresmódulos de finalización revisados0M; cincofixturesCPU PASS,105pines/119identidades ytransporteROOT separado cotejados. ProyecciónW6.486.473.685bytes<7GiB, checker2GiB reservado/margen96GiB. Adaptación final del checker y admisiónROOT pendientes; ningunaAUTH2 emitida. Plan versionado: docs/CASMI267_FINALIZATION_PLAN.md. Goal267incompleto/ciclo7:16/20, sin incremento por recuperación.
