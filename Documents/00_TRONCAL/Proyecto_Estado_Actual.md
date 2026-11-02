@@ -1,5 +1,10 @@
 <div align="center">
 
+## CASMI262: preparación final con censo prospectivo —1/11/2026
+
+CASMI262 prepara la contraparte final del aprendizaje molecular261: una pasada ALLFIT desde249model74, cabeza259 y normalizador249 fijos, seguida de7668prediccionesDEV nuevas y CSV401 frente259. Plan revisado0M; preflightCPU4,300s autenticó1481queries/1358componentes y8.021.363negativas intrafórmula desde9.863.138GLOBAL,93updates/cola9. OncefixturesCPU sintéticas PASS; catálogo candidate1 tiene93pines/71roles. Cinco dependencias restauradas por metadatos sinSHAbackup:42.579.798B. Presupuesto prospectivo2400s/CPU8/RAM12GiB/GPU8GiB/cap5GiB/margen96GiB/cierre120; revisión de código cerrada0M con31refs verificadas y método checker leído íntegro antes del efecto. No AUTH ni cargaGPU262; contadorciclo7:11/20 sin cambio, no resultados nuevos ni selección por401. GPUlocalautorizada, sin datos/reservas/química nuevos, limpieza, remoto o promoción.
+
+
 ## CASMI261: mejora molecular cerrada y auditada —1/11/2026
 
 CASMI261 cerró completo y auditado: una pasada molecular intrafórmula desde248 con head257/normalizador248 fijos lleva MRR25 literalFIT1622 de0,19794137857659627 a0,20838876944414897 y Top1/5/25 de233/423/635 a240/453/671. Top25 gana61/pierde25; RR mejora226/empeora124/empata1272. Tresfolds mejoranMRR, pero Top1f0 pierdeun caso. Checker reprodujo186updates/estados/Adam/RNG/gradientes exactos,96forwards muestrales conerror0 y todoslos10.476.865kernels conocidos/scores/rangos/listas/1622registros; agregadosmax5,55e-17. Los dosCUTexit1 quedan preservados: continuación añade184updates yfinalizador concluye sólofeatures/lector condeadlineAUTH2original, sin repetir entrenamiento/OOF. Checker568,075s/exit0/RAM9.973GB/maxOOMthrottle0; cinco scopes/cgroupsausentes yGPUlibre. ROOTleyórawíntegro y136refs exactas; integraciónúnica ciclo7:10→11/20,sinDivina. FITexpuesto/pretrainingdesconocido,sin401 ni promoción. Sigue plan262 condicionado a revisión propia: singlefinal249/head259fijo/ALLFIT1pass yCSV401frente259; no otraépoca/lr/headgrid. GPUlocal continúaautorizada.
