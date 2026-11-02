@@ -135,6 +135,13 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI260: preparación de contraste no lineal —1/11/2026
+
+CASMI260 tiene plan revisado e integrado0M y código CPU inerte para tres ensembles residuales de hasta40árboles sobre las ocho señales257. Conserva encoder/cabezas/normalizador y rostersTRAIN de cada fold; BASE se reproduce en217/BLAS4 antes de pasar al entorno aislado LightGBM4.6.0. Doce fixtures CPU pertinentes pasan, incluido init_score/reload con>10000filas. La revisión detectó que un corte de capacidad debía conservar el modelo: corregido antes deAUTH con prefijo nativo inmutable/fsync por árbol. Preparación de dependencias cerrada, entornos anteriores intactos. Catálogo final/admisión científica todavía pendientes; no resultado molecular260. Presupuesto prospectivo1800s/CPU8/RAM12GiB/CUDAoculta/cap4GiB, sin nuevosforward/401/química/datos/reservas/limpieza o promoción. Ciclo7:9/20 sin incremento; GPUlocal sigue autorizada para lo pertinente.
+
+[Plan](../../../Phideus-CASMI/docs/CASMI260_NONLINEAR_RESIDUAL_RANKER_PLAN.md).
+
+
 ## CASMI196: resultados recuperables y callback SQL corregible — 2026-10-22 UTC
 
 El cierre auditado conserva14.044envíos y14.039resultados durables:14.036válidos

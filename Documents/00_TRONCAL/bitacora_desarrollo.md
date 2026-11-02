@@ -1,5 +1,11 @@
 ## CASMI220: censo LOTUS auditado y cambio de oportunidad — 2026-10-24
 
+## CASMI260: preparación de contraste no lineal —1/11/2026
+
+CASMI260 tiene plan revisado e integrado0M y código CPU inerte para tres ensembles residuales de hasta40árboles sobre las ocho señales257. Conserva encoder/cabezas/normalizador y rostersTRAIN de cada fold; BASE se reproduce en217/BLAS4 antes de pasar al entorno aislado LightGBM4.6.0. Doce fixtures CPU pertinentes pasan, incluido init_score/reload con>10000filas. La revisión detectó que un corte de capacidad debía conservar el modelo: corregido antes deAUTH con prefijo nativo inmutable/fsync por árbol. Preparación de dependencias cerrada, entornos anteriores intactos. Catálogo final/admisión científica todavía pendientes; no resultado molecular260. Presupuesto prospectivo1800s/CPU8/RAM12GiB/CUDAoculta/cap4GiB, sin nuevosforward/401/química/datos/reservas/limpieza o promoción. Ciclo7:9/20 sin incremento; GPUlocal sigue autorizada para lo pertinente.
+
+[Plan](../../../Phideus-CASMI/docs/CASMI260_NONLINEAR_RESIDUAL_RANKER_PLAN.md).
+
 Se adquirió y proyectó la fuente fija completa, 709.740 ocurrencias, sin química
 ni GPU. Sus 151.885 prefijos públicos incluyen 110.719 que no aparecen en banco,
 pero sólo tres consultas antes ausentes coinciden nominalmente. El banco conserva
