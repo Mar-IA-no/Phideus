@@ -135,6 +135,12 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI267: rectificación de continuidad y balance del concurso —2/11/2026
+
+Mariano mantiene la autorización de continuar y GPU local. ROOT había extendido indebidamente la parada del contrato anterior a toda la cadena; se rectifica esa decisión. Ambos CUT permanecen intactos. Nuevo plan prospectivo de scoring desde64tiles, con reloj separado3600s explícito y sin repetir TRAIN/OOF, en docs/CASMI267_SCORING_CONTINUATION_PLAN.md de CASMI. Plan y código revisados sin hallazgos materiales abiertos; seis fixtures sintéticas CPU propias y seis de la adaptación del checker aprobadas. Catálogo2 fija108pines,105anteriores intactos; ROOT leyó el método y los tres módulos nuevos del checker, verificando29pines runtime con25previos conservados. La admisión medirá GPU/RAM/espacio actual antes de AUTH3; todavía sin efectos nuevos. Goal267 incompleto y ciclo7:16/20.
+
+Balance pedido por Mariano: existe una ruta neuronal concreta hacia la entrega, pero aún no una ejecución completa comprobada en Kaggle ni evidencia de posición competitiva. Referencias cerradas:261 FIT1622 MRR25=0,2083887694/Top1=240/Top25=671;262 DEV401 MRR25=0,2240968082/Top1=67/Top25=168. Ambos paneles expuestos; no score oficial. La respuesta está dentro de ventana en1481/1622 y367/401, pero sólo≈42% llega aTop25: discriminar entre candidatas sigue siendo un problema material. El consumidor250 probó observables→CSV con modelo249 en un caso, no toda la receta262 ni el destino. Tras cerrar el scoring pendiente, priorizar consolidación de una entrega base, soporte de entradas/agrupación y notebook offline≤9h antes de más ajustes menores. Cierre oficial14/12, entrada7/12;42días desde2/11. Fuentes y límites: W267/control/competition-balance-20261102.json.
+
 ## CASMI267: segundo CUT; objetivo incompleto y cadena detenida —2/11/2026
 
 El productor completó y selló 186 updates nuevos (372 acumulados) y 32.672 predicciones OOF en 1.022 batches. El scoring original cortó tras 32 tiles; la finalización revisada reutilizó ese prefijo y toda la adaptación/OOF, con un nuevo sello de recuperación. Los 32 ciclos nuevos completos dieron un máximo de 0,035683675 s: proyección de 1.815,378365070 s frente a 1.718,404264916 s restantes. El segundo gate conservó CUT y el plan exigía detenerse, sin tercer intento ni checker científico. Se mantuvieron exactamente el inicio y deadline originales; la revisión y preparación entre scopes consumieron parte del saldo.
