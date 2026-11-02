@@ -11832,3 +11832,14 @@ Informe: Biblioteca/Competition_Delivery/CASMI262_FINAL_MOLECULAR_ADAPTATION_RES
 
 CASMI263 tiene plan y código CPU revisados sin materiales abiertos. Leerá sólo los artefactos cerrados259/262 para separar pertenencia/soporte, competencia entre hipótesis, empates e identidad de fingerprints; el oracle informado por la respuesta queda explícitamente fuera de una entrega. Nueve fixtures propias, ocho de auditoría y27 del checker pasaron sinTorch/GPU. ROOTleyó ambos métodos y los cinco módulos independientes completos, verificó20refs de código,15pines productores/36identidades; fuentes23roles/13autoridades. Catálogo candidate1 y presupuesto prospectivo600s/CPU8/RAM8GiB/swap0/CUDAoculta/salida256MiB/margen96GiB/cierre60s. Sin AUTH ni diagnóstico real todavía. Contador ciclo7:12/20 sin incremento. No nueva puntuación predictiva, entrenamiento, datos/reservas, limpieza o promoción.
 
+
+## CASMI267: segunda pasada preparada y código revisado —2/11/2026
+
+La candidata267 continúa una única pasada pairwise desde los tres estados finales261, restaurando exactamente modelo, Adam y RNG. Conserva head257, escalas248, orden, todas las negativas y divisor16 incluso en la cola2. Prevé186updates nuevos/372acumulados y32672prediccionesOOF nuevas; comparación primaria literal261, secundaria257. No añade los residuales265/266 ni abre401.
+
+Ocho módulos y siete pruebas sintéticasCPU aprobados. Auditoría independiente0hallazgos materiales; ROOT leyó el dictamen7640B y comprobó30fragmentos/28fuentes,102pines de código y117identidades por metadatos. El censoJSON confirma994/992/976consultas y63/62/61updates; proyección de retención7.175.694.180bytes, incluido partial y holguras de serialización/metadata, bajo cap7GiB. Checker reservado2GiB, proyección604.288.584bytes; margenM2 de96GiB. Son proyecciones, no picos medidos.
+
+Presupuesto prospectivo3600s/CPU8/RAM12GiB/GPU8GiB/cierre120s. Gates sobre dos ciclosTRAIN completos, dosOOF y32tiles con salidas durables; estimaciones de fases pendientes separadas y reservas conservadoras declaradas, sin garantía temporal ni retry automático. Método independiente aceptado; núcleo con20pruebas sintéticasCPU aprobadas, dispatcher/adaptación final y revisiónROOT todavía pendientes. NoAUTH ni efecto científico267 por este corte. Contador ciclo7:16/20 sin incremento;266 cerrado y entregado enambosrepositorios. FITexpuesto/diseño informado401/pretrainingdesconocido, sin promoción.
+
+FuentesCASMI: docs/CASMI267_SECOND_PAIRWISE_PASS_PLAN.md; Biblioteca/Competition_Delivery/casmi267_code_audit_20261102.md; W267/control/ROOT-code-review-1.json ymetadata-retention-preflight-1.json. GPUlocalautorizada; sin nuevosdatos/reservas/remoto/limpieza ni cambiosajenos. Los cortes siguientes conservan historia.
+
