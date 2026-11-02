@@ -135,6 +135,14 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI266: residual escalar preparado; todavía sin efecto —2/11/2026
+
+La preparación266 conserva las probabilidades TRAIN265 y OOF261, y añade un único coeficiente por fold de solapamiento crudo `dot(p,b)/(sum(p)+sum(b)-dot(p,b))`. Tau se calcula sólo con TRAIN mediante RMS ponderado por componente/consulta/negativa; Newton retiene todos sus ensayos y usa ridge0,1. La comparación primaria seguirá siendo MRR25 literalFIT1622 frente261, sin nuevo encoder o forward ni lectura401. Es una recomposición no lineal de información existente; no una nueva observación molecular.
+
+Plan y ocho módulos revisados sin hallazgos materiales. ROOT verificó33fragmentos exactos,70pines de código/70identidades fuente; diez pruebas sintéticas productoras PASS. Método independiente leído y código propio con12+5pruebasCPU PASS, sin admisión científica. Censo porrostersJSON11188tiles y proyección de salida543759372bytes<1GiB; presupuesto prospectivo3600s/CPU8/RAM8GiB/GPU4GiB/margen96GiB/cierre120s, no duración medida. Catálogo candidate1 congelado; aún sinAUTH, extracción, ajuste o resultado266. Contador ciclo7:15/20 sin incremento. GPUlocalautorizada; FITexpuesto/diseño informado401/TRAINin-sample/pretrainingdesconocido, sin nuevosdatos/reservas/remoto/limpieza/promoción.
+
+Fuentes enCASMI: docs/CASMI266_SOFT_OVERLAP_RESIDUAL_PLAN.md; Biblioteca/Competition_Delivery/casmi266_code_audit_20261102.md. Autoridad de preparación W266/control/root-code-review-1.json; el cierre265 ya está entregado y verificado enambosrepositorios. Los cortes anteriores se conservan como historia.
+
 ## CASMI265: cierre auditado, resultado mixto frente a261 —2/11/2026
 
 CASMI265 cerró completo y auditado. Los4096pesos residuales Bernoulli con encoder261 congelado llevan MRR25 literal FIT1622 de0,20838876944414897 a0,2068457612205082; Top1/5/25 pasa240/453/671→239/444/692. Top25 gana60/pierde39, RR mejora208/regresa221/empata1193 y macro1482 baja. No hubo nueva cobertura, entrenamiento de encoder o forward HELD. Se conserva el beneficio Top25 y las regresiones tempranas, sin contraparte final automática, grilla o promoción;261/262 siguen referencias.
