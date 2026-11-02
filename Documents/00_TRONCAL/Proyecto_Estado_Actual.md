@@ -1,5 +1,13 @@
 <div align="center">
 
+## CASMI265: cierre auditado, resultado mixto frente a261 —2/11/2026
+
+CASMI265 cerró completo y auditado. Los4096pesos residuales Bernoulli con encoder261 congelado llevan MRR25 literal FIT1622 de0,20838876944414897 a0,2068457612205082; Top1/5/25 pasa240/453/671→239/444/692. Top25 gana60/pierde39, RR mejora208/regresa221/empata1193 y macro1482 baja. No hubo nueva cobertura, entrenamiento de encoder o forward HELD. Se conserva el beneficio Top25 y las regresiones tempranas, sin contraparte final automática, grilla o promoción;261/262 siguen referencias.
+
+La comprobación compuesta verificó94forwards TRAIN bitexactos,90entradas de optimizador(54theta únicas:2previas+52nuevas),39estados aceptados exactos y todos los10.476.865residuales/scores conocidos, rangos/listas/1622registros. Error J máximo4,16e−17/gradiente5,42e−19; agregados5,55e−17. El CUT1exit1 queda intacto, con fit incompleto; la continuación reusó su prefijo, cambió sólo transporte packeduint8 y terminó529,488s dentro del reloj original, sin renovar7200s. RAM1,924GB, max/OOM/throttling0, tres scopes/cgroups ausentes yGPU vacía al cierre. El coste mejorado no prueba una causaPCIe. ROOT leyó dictamen7881B y57refs/104fragmentos, revalidó123pines/360metadatos; integración única ciclo7:14→15/20, sinDivina. FIT expuesto/diseño informado por401/pretraining desconocido; las vistasTRAIN no sonOOF para el nuevo lector.
+
+Informe: `Biblioteca/Competition_Delivery/CASMI265_WEIGHTED_BIT_LIKELIHOOD_RESULTS.md` enCASMI; autoridad W265/final-audit-integration-1.json. Siguiente266: un coeficiente de solapamiento suave sobre261, con probabilidades existentes y sin otro entrenamiento/forward. Plan en revisión/cierre de preparación, todavía sin código o efecto266. GPU local autorizada; sin datos/reservas/remoto/limpieza/promoción. Los cortes siguientes son históricos.
+
 ## CASMI265: productor mixto y verificación parcial conservada —2/11/2026
 
 El productor265 terminó en605,061s y cerró físicamente sin OOM/throttling, con scope/cgroup ausentes. Aprender4096pesos porfold sobre Bernoulli, con encoder261/head257/escalas248 congelados, llevó MRR25 literalFIT1622 de0,20838876944414897 a0,2068457612205082 y Top1/5/25 de240/453/671 a239/444/692. Es un resultado provisional mixto: Top25+21, pero primario, Top1 yTop5 inferiores. No justifica traslado a401, grilla o promoción. Se conservaron94forwardsTRAIN/2962slots,39estadosL-BFGS y90closures; no entrenamientoencoder ni nuevosforwardsHELD.
