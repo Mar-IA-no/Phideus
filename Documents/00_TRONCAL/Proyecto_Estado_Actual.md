@@ -1,5 +1,10 @@
 <div align="center">
 
+## CASMI263: diagnóstico cerrado; discriminación dentro de hipótesis —2/11/2026
+
+CASMI263 cerró completo y auditado. En401consultas/370componentes,367positivas conocidas están dentroQ95,9fuera y25ausentes; no cambió cobertura, scorer oCSV262. De199fallosTop25 elegibles262,184persisten al restringir a la hipótesis de la respuesta y15se recuperarían con ese oracle NOdesplegable; Top25literal168/oracle183. Ningún falloTop25 se debe sólo aempate; única colisiónprecedente q6 permanece fuera aun con desempate favorable. Blockers262:176.160mismohi/24.646otrohi, conteosdescriptivos no causas. Checkerpropio verificó todas401filas/2.711.229elementos de cada máscara/1342testigos/5.025.244gaps259+262; errorgapmáximo5,329e-15 dentro2e-12/2e-12. Productor7,063s/checker21,186s, RAM256,037/204,067MB; fuentescerradas/scopes-cgroupsausentes/maxOOMthrottle0, sinTorch/GPU. ROOTleyócrudoíntegro y30refs exactas, integraciónúnica ciclo7:12→13/20, sinDivina. DEVexpuesto/pretrainingdesconocido, sincausalidad/techo/promotion. Sigue propuesta264 de pérdidalistwise sobre mismosTRAIN/iniciales/head yuna pasada, FIT/OOFsin401; revisiónindependiente en curso, sinimplementación/AUTH264. GPUlocal sigueautorizada; sin nuevosdatos/reservas/remoto/limpieza.
+
+
 ## CASMI263: preparación del diagnóstico de errores —2/11/2026
 
 CASMI263 tiene plan y código CPU revisados sin materiales abiertos. Leerá sólo los artefactos cerrados259/262 para separar pertenencia/soporte, competencia entre hipótesis, empates e identidad de fingerprints; el oracle informado por la respuesta queda explícitamente fuera de una entrega. Nueve fixtures propias, ocho de auditoría y27 del checker pasaron sinTorch/GPU. ROOTleyó ambos métodos y los cinco módulos independientes completos, verificó20refs de código,15pines productores/36identidades; fuentes23roles/13autoridades. Catálogo candidate1 y presupuesto prospectivo600s/CPU8/RAM8GiB/swap0/CUDAoculta/salida256MiB/margen96GiB/cierre60s. Sin AUTH ni diagnóstico real todavía. Contador ciclo7:12/20 sin incremento. No nueva puntuación predictiva, entrenamiento, datos/reservas, limpieza o promoción.
