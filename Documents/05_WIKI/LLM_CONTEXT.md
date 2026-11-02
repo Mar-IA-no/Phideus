@@ -134,6 +134,11 @@ source_paths:
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
+## CASMI262: adaptación sellada y continuación predictiva —2/11/2026
+
+CASMI262 completó y selló93updatesALLFIT sobre8.021.363negativas intrafórmula desde249model74, conhead259/escalas249fijos. El intento cerró96,916883s/exit1 por comparar indebidamente endpointFIT256 yDEV238/249; el corte fue antesTorch/contextoGPUDEV, sin probabilidades/eventosDEV/lector. Scope/cgroupausentes, RAM4.947GB/maxOOMthrottle0; entrenamiento/Adam/RNG/prefix2/gradientes intactos. Las7668keys/aliases reales pasaron validaciónCPU con endpointliteralDEV. Plancontinuación revisado0M propone sólo predict+reader desdeadapt93sellado, mismoSTART/DEADLINEAUTH1/cap5GiB, sinreTRAIN/FITforward ni nuevo presupuesto; tresfixturesCPU PASS, wrappersnuevos revisados0M/22refs verificadas y método compuesto leído antesefecto. Goal262incompleto, ciclo7:11/20 sin cambio; checkerpropio todavía inerte. GPUlocalautorizada, sin datos/reservas/química nuevos, limpieza, remoto o promoción.
+
+
 ## CASMI262: preparación final con censo prospectivo —1/11/2026
 
 CASMI262 prepara la contraparte final del aprendizaje molecular261: una pasada ALLFIT desde249model74, cabeza259 y normalizador249 fijos, seguida de7668prediccionesDEV nuevas y CSV401 frente259. Plan revisado0M; preflightCPU4,300s autenticó1481queries/1358componentes y8.021.363negativas intrafórmula desde9.863.138GLOBAL,93updates/cola9. OncefixturesCPU sintéticas PASS; catálogo candidate1 tiene93pines/71roles. Cinco dependencias restauradas por metadatos sinSHAbackup:42.579.798B. Presupuesto prospectivo2400s/CPU8/RAM12GiB/GPU8GiB/cap5GiB/margen96GiB/cierre120; revisión de código cerrada0M con31refs verificadas y método checker leído íntegro antes del efecto. No AUTH ni cargaGPU262; contadorciclo7:11/20 sin cambio, no resultados nuevos ni selección por401. GPUlocalautorizada, sin datos/reservas/química nuevos, limpieza, remoto o promoción.
