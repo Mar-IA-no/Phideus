@@ -135,6 +135,13 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI265: preparación de un residual por bit —2/11/2026
+
+El siguiente contraste congela los encoders finales261 y aprende4096pesos sobre los términosBernoulli, con las mismas negativas intrahipótesisTRAIN y los folds por componente. Requiere2962prediccionesTRAIN nuevas en94batches; reutiliza las probabilidades y scoresOOF261 como referencia, sin nuevosforwardsHELD ni lectura401. La comparación primaria será MRR25 literalFIT1622 frente261, manteniendo el carácter de desarrollo adaptativo y pretrainingdesconocido.
+
+Plan y código revisados sin hallazgos materiales abiertos; ROOT leyó crudos y verificó82refs deplan/34decódigo. DocefixturesCPU propias aprobadas; catálogo finalcandidate2 con100roles/98pines y autoridadesJSON comprobadas sinTorch/GPU. Método independiente y14archivos/80627B dechecker/transporte leídos íntegros,21+2+3fixturesCPU PASS. Código y checker están inertes; no hayAUTH ni ejecución265. Presupuesto propuesto7200s/CPU8/RAM8GiB/GPU4GiB/salida2GiB/margen96GiB/cierre120s, aún sin admisión. Contadorciclo7:14/20 sin incremento. GPUlocalautorizada; sin datos/reservas/remoto/limpieza/promoción. Plan enCASMI: docs/CASMI265_WEIGHTED_BIT_LIKELIHOOD_PLAN.md.
+
+
 ## CASMI264: listwise cerrado; resultado mixto —2/11/2026
 
 CASMI264 cerró completo y auditado: MRR25 literalFIT1622 baja0,20838876944414897→0,20625604587433038 frente a261, y Top1/5/25 pasa240/453/671→238/441/677. Top25 gana23/pierde17; RR mejora125/regresa149/empata1348. Una pasada186updates desde248 con head257/escalas248 fijos cambia la pérdida completa, incluida escala de gradiente; no demuestra una causa exclusiva ni un techo listwise. Checker reprodujo estados/Adam/RNG/gradientes,186gP64 exactos,96forwards muestrales conerror0 y todas10.476.865tails/scores/rangos/listas/1622registros; agregadosmax5,55e-17. Productor494,634s/checker649,617s, RAM12,313/11,025GB bajo12GiB; maxOOMthrottle0, scopes/cgroupsausentes/GPUlibre al cierre. ROOTleyócrudo10965B y revisiónestructurada, verificó49refs/137fragmentos; integraciónúnica ciclo7:13→14/20, sinDivina. FITexpuesto/diseño informado por401expuestas263/pretrainingdesconocido. Se conservan261/262 como referencias, sin contrapartefinal264 ni grilla automática. Pesos porbit sobre encoder congelado es una candidata que requiere plan/revisión propios. GPUlocalautorizada; sin datos/reservas/remoto/limpieza/promoción.
