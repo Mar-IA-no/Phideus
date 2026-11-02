@@ -1,5 +1,10 @@
 <div align="center">
 
+## CASMI261: mejora molecular cerrada y auditada —1/11/2026
+
+CASMI261 cerró completo y auditado: una pasada molecular intrafórmula desde248 con head257/normalizador248 fijos lleva MRR25 literalFIT1622 de0,19794137857659627 a0,20838876944414897 y Top1/5/25 de233/423/635 a240/453/671. Top25 gana61/pierde25; RR mejora226/empeora124/empata1272. Tresfolds mejoranMRR, pero Top1f0 pierdeun caso. Checker reprodujo186updates/estados/Adam/RNG/gradientes exactos,96forwards muestrales conerror0 y todoslos10.476.865kernels conocidos/scores/rangos/listas/1622registros; agregadosmax5,55e-17. Los dosCUTexit1 quedan preservados: continuación añade184updates yfinalizador concluye sólofeatures/lector condeadlineAUTH2original, sin repetir entrenamiento/OOF. Checker568,075s/exit0/RAM9.973GB/maxOOMthrottle0; cinco scopes/cgroupsausentes yGPUlibre. ROOTleyórawíntegro y136refs exactas; integraciónúnica ciclo7:10→11/20,sinDivina. FITexpuesto/pretrainingdesconocido,sin401 ni promoción. Sigue plan262 condicionado a revisión propia: singlefinal249/head259fijo/ALLFIT1pass yCSV401frente259; no otraépoca/lr/headgrid. GPUlocal continúaautorizada.
+
+
 ## CASMI261: resultado productor cerrado; checker completo pendiente —1/11/2026
 
 CASMI261 completó adaptación186updates y32672prediccionesOOF, y el finalizador cerróexit0 en190,034536s bajo el mismo start/deadlineAUTH2, sin nuevo presupuesto ni repetir entrenamiento/OOF. Se preservaron2048filas de los dos tiles previos y se calcularon10474817filas conocidas nuevas;10476865conocidas/8634desconocidas sobre10485499pares. Lectura provisionalFIT1622: MRR25 0,19794137857659627→0,20838876944414897; Top1/5/25 233/423/635→240/453/671. Macro1482 0,18673641022569593→0,19659310046722292; Top25gana61/pierde25. La verificación independiente íntegra sigue pendiente: goal261incompleto/ciclo7:10/20. FITexpuesto/pretrainingdesconocido, sin401 ni promoción; GPUlocalautorizada. Los dos CUT previos permanecen íntegros y sus cierresexit1 no se convierten enCLOSED0.
