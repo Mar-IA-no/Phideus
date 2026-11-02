@@ -135,11 +135,11 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI260: preparación de contraste no lineal —1/11/2026
+## CASMI260: residual no lineal cerrado y auditado —1/11/2026
 
-CASMI260 tiene plan revisado e integrado0M y código CPU inerte para tres ensembles residuales de hasta40árboles sobre las ocho señales257. Conserva encoder/cabezas/normalizador y rostersTRAIN de cada fold; BASE se reproduce en217/BLAS4 antes de pasar al entorno aislado LightGBM4.6.0. Doce fixtures CPU pertinentes pasan, incluido init_score/reload con>10000filas. La revisión detectó que un corte de capacidad debía conservar el modelo: corregido antes deAUTH con prefijo nativo inmutable/fsync por árbol. Preparación de dependencias cerrada, entornos anteriores intactos. Catálogo final/admisión científica todavía pendientes; no resultado molecular260. Presupuesto prospectivo1800s/CPU8/RAM12GiB/CUDAoculta/cap4GiB, sin nuevosforward/401/química/datos/reservas/limpieza o promoción. Ciclo7:9/20 sin incremento; GPUlocal sigue autorizada para lo pertinente.
+CASMI260 cerró completo y auditado como resultado negativo: tres ensembles residuales de40 árboles sobre las mismas ocho señales257 llevan MRR25 de0,19794137857659627 a0,19619692630853405 y Top1/5/25 de233/423/635 a230/425/635. Top25 gana21/pierde21; RR mejora147/empeora143/empata1332. No nueva cobertura ni traslado a401, grilla o promoción. Checker independiente reprodujo las tres bases217/BLAS4,120 árboles/prefijos/modelos/gradH64+32 y todos los scoresTRAIN/OOF bitexactos, rangos/listas y1622 registros exactos (máxima diferencia agregada5,55e-17). Productor140,314s/checker228,944s exit0; RAMpeak6,489/5,703GB, OOM/max0, throttling observado4/1 períodos. Ambos scopes/cgroups ausentes, CUDA oculta. ROOT integró una sola vez ciclo7:9→10/20. Se conservan199 productos/2.292GB y el negativo, FIT expuesto/pretraining desconocido. La próxima pregunta debe cambiar señal u objetivo de aprendizaje, con plan propio; GPU local sigue autorizada.
 
-[Plan](../../../Phideus-CASMI/docs/CASMI260_NONLINEAR_RESIDUAL_RANKER_PLAN.md).
+[Informe](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI260_NONLINEAR_RESIDUAL_RANKER_RESULTS.md).
 
 
 ## CASMI196: resultados recuperables y callback SQL corregible — 2026-10-22 UTC
