@@ -1,5 +1,13 @@
 <div align="center">
 
+## CASMI265: productor mixto y verificación parcial conservada —2/11/2026
+
+El productor265 terminó en605,061s y cerró físicamente sin OOM/throttling, con scope/cgroup ausentes. Aprender4096pesos porfold sobre Bernoulli, con encoder261/head257/escalas248 congelados, llevó MRR25 literalFIT1622 de0,20838876944414897 a0,2068457612205082 y Top1/5/25 de240/453/671 a239/444/692. Es un resultado provisional mixto: Top25+21, pero primario, Top1 yTop5 inferiores. No justifica traslado a401, grilla o promoción. Se conservaron94forwardsTRAIN/2962slots,39estadosL-BFGS y90closures; no entrenamientoencoder ni nuevosforwardsHELD.
+
+El checker1 terminó con CUT controlado en209,057s: roster y94predicciones sellados completos, probabilidades bitexactas/error0; baselinef0 y dos J/g propios completos retenidos. Fit permanece incompleto y sin sello. Gate15870,925s proyectados frente6986,999s restantes; cierre y ausencia propios verificados. Una única continuación técnica, auditada en diseño, reutilizará esos productos y cambiará sólo transporte/descompresión packeduint8 enGPU. CPUunpack/conversión/transporte es hipótesis de coste, sin perfilPCIe o causa aislada demostrada. Gate tras dos evaluaciones completas nuevas, mismo start4788906,052507763/deadline4796106,052507763 y reserva1956,894s, sin renovación. Todavía no hayAUTH2 ni cierre completo de265. Contador ciclo7:14/20 sin incremento; GPUlocalautorizada, sin datos/reservas/remoto/limpieza/promoción.
+
+Informe provisional: `Biblioteca/Competition_Delivery/CASMI265_WEIGHTED_BIT_LIKELIHOOD_RESULTS.md` enCASMI; métodos y cortes preservados enA265. Los apartados de preparación siguientes son históricos.
+
 ## CASMI265: preparación de un residual por bit —2/11/2026
 
 El siguiente contraste congela los encoders finales261 y aprende4096pesos sobre los términosBernoulli, con las mismas negativas intrahipótesisTRAIN y los folds por componente. Requiere2962prediccionesTRAIN nuevas en94batches; reutiliza las probabilidades y scoresOOF261 como referencia, sin nuevosforwardsHELD ni lectura401. La comparación primaria será MRR25 literalFIT1622 frente261, manteniendo el carácter de desarrollo adaptativo y pretrainingdesconocido.
