@@ -1,3 +1,9 @@
+## CASMI268: preparación CPU del consumidor final; GPU suspendida —2/11/2026
+
+Mariano ordena continuar exclusivamente en CPU. La cesión GPU del1/11 queda suspendida: no CUDA, inferencia/training GPU ni sustitución remota. CASMI267 permanece completo y auditado; ciclo7:17/20. Se conserva además el criterio persistente de evaluar entrenamientos mucho mayores cuando una línea sea prometedora: una meseta breve no prueba un techo.
+
+El siguiente avance útil de entrega corrige la incompatibilidad entre el consumidor250/final249 y el predictor262 de93updates con cabeza259/normalizadores249. Plan268 revisado sin hallazgos materiales; ROOT leyó el crudo y verificó24referencias. Nueva proyección inerte de35Python/219.940bytes, doce activos referenciados sin copia pesada y nueve pruebas CPU aprobadas. Entrada científica bloqueada; sin forward, entrenamiento, targets o nueva evaluación. Revisión del código y admisión del probe de carga real estricta CPU pendientes. La carga no acreditará observables→CSV262, Kaggle o mejora molecular. Plan CASMI: docs/CASMI268_CPU_FINAL_CONSUMER_PLAN.md. Sin limpieza, datos/reservas nuevos ni promoción.
+
 ## CASMI266: cierre auditado; sin mejora primaria —2/11/2026
 
 El residual de solapamiento crudo sobre261 terminó completo y auditado. MRR25 literalFIT1622 baja0,20838876944414897→0,20811928342126423; macro1482 baja0,19659310046722292→0,1962879575730026. Top1/5/25 pasa240/453/671→240/454/671; Top1 yTop25 conservan los mismos aciertos. RR mejora14/regresa23/empata1585; Top5 gana2/pierde1. Se conservan261/262 como referencias, sin traslado266 a401 o grilla residual. No nuevo encoder/forward o cobertura; tauTRAIN sí es una normalización nueva, con escalas anteriores fijas.
