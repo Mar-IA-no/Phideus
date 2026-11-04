@@ -1,3 +1,11 @@
+## CASMI269: retoma GPU del consumidor final — 4/11/2026
+
+Mariano habilitó nuevamente la GPU local y ordenó continuar. Se retoma desde CASMI268 cerrado y auditado, ciclo 7:18/20. La primera prueba conecta el modelo final262 y la cabeza259 ya conservados con el recorrido completo desde observables hasta CSV; conserva el diagnóstico prefijado de una observación para aislar el cambio de modelo. No repite la carga CPU ni las evaluaciones cerradas y no acredita calidad molecular, cobertura general o ejecución en Kaggle.
+
+Plan previo revisado sin hallazgos materiales y seis pruebas CPU pertinentes aprobadas. La composición nueva conserva los doce activos y los 35 archivos Python; sólo cambia el schema y la habilitación del entrypoint científico. Código revisado sin hallazgos materiales; 84 referencias verificadas por ROOT. Efecto aún sin iniciar. Presupuesto prospectivo: 300 s, ocho CPU, 12 GiB de RAM, swap0, allocator GPU de 8 GiB y salida de 1 GiB, con márgenes de disco actuales. Se mantienen checkpoint y crudos, sin limpieza, datos/reservas nuevos, GPU remota, envío o promoción científica. Escalamiento y mejoras tardías continúan como criterios de diseño.
+
+Fuente: [plan del recorrido GPU](../../../Phideus-CASMI/docs/CASMI269_FINAL_CONSUMER_PLAN.md).
+
 ## CASMI268: preparación CPU del consumidor final; GPU suspendida —2/11/2026
 
 Mariano ordena continuar exclusivamente en CPU. La cesión GPU del 1/11 queda suspendida: no CUDA, inferencia/training GPU ni sustitución remota. CASMI267 permanece completo y auditado. CASMI268 queda completo como preparación CPU y carga real estricta, con auditoría final integrada una vez: ciclo 7, 17→18/20. Se conserva el criterio persistente de evaluar entrenamientos mucho mayores cuando una línea sea prometedora: una meseta breve no prueba un techo ni excluye mejoras tardías.
