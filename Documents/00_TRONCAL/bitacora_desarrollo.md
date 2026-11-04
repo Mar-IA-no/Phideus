@@ -1,3 +1,13 @@
+## CASMI271: escala de veinte pasadas, preparación y revisión — 4/11/2026
+
+El siguiente contraste amplía de dos a veinte las pasadas moleculares acumuladas desde los tres estados267, restaurando Adam/RNG y conservando receta, folds y datos. Son dieciocho pasadas nuevas y3.348updates; cortes4/8 descriptivos y20 como final primario prefijado frente267, sin elegir después el mejor por sus resultados. Se conservan checkpoints ycurvas; no se supone mejora tardía ni techo si no ocurre. No reemplaza el predictor final262 ni abre401 otra vez.
+
+Plan y precisión prospectiva del checker revisados sin hallazgos materiales. Implementación directa de once módulos y catálogo metadata-only con110pines/123identidades actuales. Siete pruebas de contratosCPU pasaron; tres pruebas con un modelo diminutoCPU ejercitaron el bucle real completo, continuidadAdamW, milestones y parada recuperable. No son un entrenamientoMIST oresultado molecular. Código revisado sin hallazgos materiales; el lector independiente sigue en preparación. NoAUTH ni ejecucióncientífica271 todavía. Presupuesto máximo prospectivo: productor6h/W16GiB ychecker8h/A4GiB, CPU8/RAM14GiB/GPU8GiB, margenM2nuevo72GiB y cierre180s. Los costes reales yla retención conjunta deben admitirse antes del efecto.
+
+Contador ciclo8:0/20 trasDivina270, sin incrementos por preparación. GPUlocal y continuidadautorizadas. Sin limpieza, datos/reservas nuevos, GPUremota, envío o promoción. La instalaciónlimpia/notebookoffline continúa como dependencia distinta.
+
+Fuente: [plan de escala](../../../Phideus-CASMI/docs/CASMI271_TWENTY_PASS_SCALE_PLAN.md).
+
 ## CASMI270: cobertura funcional completa y revisión de escala — 4/11/2026
 
 Las tres adquisiciones pendientes completaron el recorrido con el modelo262/cabeza259:15inferencias GPU nuevas,7.816puntajes conocidos sobre7.822pares y tres filas de25candidatos. Los seis pares sin puntaje conservanNaN por isótopos fuera del soporte. El lector independiente reconstruyó todo el caso y repitió15/15inferencias conerror0; cierres exit0 de productor18,324s ychecker18,884s, ambos scopes/cgroups ausentes yGPUlibre. Junto con269 quedan recorridas las cuatro entradas admitidas, sin repetir índice0. Es evidencia funcional, sin medición nueva de acierto molecular oKaggle.
