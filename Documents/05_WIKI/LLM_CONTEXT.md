@@ -135,13 +135,13 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## CASMI270: otras tres entradas admitidas, preparación revisada — 4/11/2026
+## CASMI270: cobertura funcional completa y revisión de escala — 4/11/2026
 
-La continuación usa el mismo modelo262/cabeza259 para los índices originales1,2,3 ya admitidos, conservando íntegros los observables y excluyendo el índice0 cerrado en269. El paquete conserva once activos científicos y deriva únicamente el JSON de esas tres adquisiciones. Rechaza compatibilidad química faltante antes del pool; no calcula química estructural nueva. Seis pruebas sintéticas y réplica independiente aprobadas, plan y código sin hallazgos materiales. No se ejecutó todavía el consumidor270.
+Las tres adquisiciones pendientes completaron el recorrido con el modelo262/cabeza259:15inferencias GPU nuevas,7.816puntajes conocidos sobre7.822pares y tres filas de25candidatos. Los seis pares sin puntaje conservanNaN por isótopos fuera del soporte. El lector independiente reconstruyó todo el caso y repitió15/15inferencias conerror0; cierres exit0 de productor18,324s ychecker18,884s, ambos scopes/cgroups ausentes yGPUlibre. Junto con269 quedan recorridas las cuatro entradas admitidas, sin repetir índice0. Es evidencia funcional, sin medición nueva de acierto molecular oKaggle.
 
-El efecto previsto dispone de300s/CPU8/RAM12GiB/GPU8GiB/output1GiB. Un lector independiente nuevo comprobará todos los inputs y las tres filasCSV con presupuesto separado600s y AUTH postcierre; ROOT leyó método y922líneas de runtime/fixtures y verificó152pines preparatorios y13identidades. Contador ciclo7:19/20, sin incremento por preparación. Al cierre270 se realizará la Divina completa antes del siguiente bloque. La GPU local y continuidad están autorizadas; entrenamiento mayor y mejoras tardías permanecen como opciones que requieren su propio diseño, sin inferir techo desde93updates.
+Revisión final sin hallazgos materiales, crudo completo y82referencias verificadas porROOT. Integración única19→20 yAuditoría Divina completa del coordinador con ambos prompts literales: nuevo ciclo8:0/20. La revisión prioriza evaluar mucha más exposición a la receta molecular que produjo mejora en261/262 y una ganancia pequeña en267, con un contraste20pasadas acumuladas y checkpoints4/8/20 fijados antes de resultados. Requiere su propio plan, presupuesto y revisión, sin inferir un techo o elegir retrospectivamente la mejor época. Instalación limpia y notebookoffline siguen pendientes. GPUlocal y continuidad autorizadas; sin limpieza, datos/reservas nuevos, GPUremota, envío o promoción.
 
-Fuente: [plan previo](../../../Phideus-CASMI/docs/CASMI270_REMAINING_INPUTS_PLAN.md).
+Fuentes: [resultado](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI270_REMAINING_INPUTS_RESULTS.md) y[Auditoría Divina](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI270_DIVINA_CYCLE7.md).
 
 ## CASMI269: retoma GPU del consumidor final — 4/11/2026
 
