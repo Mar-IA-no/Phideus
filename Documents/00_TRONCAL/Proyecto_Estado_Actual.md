@@ -1,3 +1,9 @@
+## CASMI274: revisión de rumbo — 4/11/2026
+
+La revisión transversal conserva MIST y los bancos por sus avances de identificación, pero corrige la prioridad de seguir cerrando comprobaciones pequeñas mientras falta una solución general. El próximo trabajo debe resolver entradas nuevas, química y retención con presupuesto viable, y comparar diversidad de espectros y escala de entrenamiento sobre roles declarados. La generación y las herramientas geométricas permanecen disponibles cuando atiendan un déficit medido. No hay todavía una estimación independiente de competitividad en CASMI.
+
+El plan quedó auditado y rectificado; la implementación sigue pendiente. Se conservan predictor262, checkpoints y curvas271. No hubo nuevas corridas; GPU local continúa autorizada, con verificación de ocupación y ownership antes de usarla. Desarrollo expuesto, reservas cerradas y decisiones científicas se mantienen separados. Fuentes: [informe y evidencia](../../../Phideus-CASMI/Biblioteca/Revision_Rumbo_CASMI_20261104/INFORME_Y_NORTE.md) y [hoja de ruta vigente](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md).
+
 ## CASMI273: diagnóstico del entorno preparado; Kaggle pendiente — 4/11/2026
 
 El notebook autocontenido y su script CPU quedaron comprobados localmente: una ejecución exit0 en 0,097 s, JSON de 2.307 B, sin inferencia, entrenamiento o acceso a datos. El bwrap mínimo y la consulta de hardware funcionaron en este host; esto no prueba el entorno Kaggle ni todos los requisitos del consumidor272. El notebook conserva sus celdas sin ejecutar. Revisión final sin hallazgos materiales; ROOT contrastó 17 fuentes y nueve fragmentos e integró una única auditoría: ciclo8, 2→3/20.

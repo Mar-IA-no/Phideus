@@ -1,3 +1,7 @@
+## CASMI274: revisión de rumbo solicitada por Mariano — 4/11/2026
+
+Revisé la evolución molecular, el corpus de investigación y la distancia entre los componentes disponibles y un producto general. El juicio conserva la base MIST+banco y reconoce una asignación excesiva a microcierres y verificaciones. Tres informes separados, Divina extraordinaria y auditoría final sustentan el nuevo orden: consumidor general con retención presupuestada, diversidad y escala de aprendizaje, y complementos sólo ante déficits medidos. El hallazgo de retención se corrigió en el diseño y tuvo revisión focal; no se presenta como implementación. Integración única ciclo8: 3→4/20, sin reinicio extraordinario ni corridas. Fuentes y alcance de lectura: [informe y evidencia](../../../Phideus-CASMI/Biblioteca/Revision_Rumbo_CASMI_20261104/INFORME_Y_NORTE.md) y [hoja de ruta vigente](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md).
+
 ## CASMI273: diagnóstico del entorno preparado; Kaggle pendiente — 4/11/2026
 
 El notebook autocontenido y su script CPU quedaron comprobados localmente: una ejecución exit0 en 0,097 s, JSON de 2.307 B, sin inferencia, entrenamiento o acceso a datos. El bwrap mínimo y la consulta de hardware funcionaron en este host; esto no prueba el entorno Kaggle ni todos los requisitos del consumidor272. El notebook conserva sus celdas sin ejecutar. Revisión final sin hallazgos materiales; ROOT contrastó 17 fuentes y nueve fragmentos e integró una única auditoría: ciclo8, 2→3/20.

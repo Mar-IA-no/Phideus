@@ -135,6 +135,10 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI274: revisión de rumbo — 4/11/2026
+
+Norte vigente: conservar MIST+bancos, completar consumidor general con química y retención por bloques bajo presupuesto medido; comparar diversidad de vistas a dosis comparable y considerar escala larga después. El resultado oculto sigue desconocido. Generación/forward/geometría son complementos condicionados; el probe273 de Kaggle no bloquea ciencia local. Revisión estratégica auditada, F1 integrado en diseño; implementación pendiente. Ciclo8: 4/20, Divina extraordinaria sin reinicio. Sin corridas nuevas; GPU local autorizada. Fuentes: [informe y evidencia](../../../Phideus-CASMI/Biblioteca/Revision_Rumbo_CASMI_20261104/INFORME_Y_NORTE.md) y [hoja de ruta vigente](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md).
+
 ## CASMI273: diagnóstico del entorno preparado; Kaggle pendiente — 4/11/2026
 
 El notebook autocontenido y su script CPU quedaron comprobados localmente: una ejecución exit0 en 0,097 s, JSON de 2.307 B, sin inferencia, entrenamiento o acceso a datos. El bwrap mínimo y la consulta de hardware funcionaron en este host; esto no prueba el entorno Kaggle ni todos los requisitos del consumidor272. El notebook conserva sus celdas sin ejecutar. Revisión final sin hallazgos materiales; ROOT contrastó 17 fuentes y nueve fragmentos e integró una única auditoría: ciclo8, 2→3/20.
