@@ -137,7 +137,7 @@ tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 
 ## Fuentes actuales de continuidad — 4/11/2026
 
-La conciliación051 separa instrucciones Phideus y CASMI. Para CASMI, consultar [su estado operativo vigente](../../../Phideus-CASMI/docs/STATUS.md#estado-operativo-vigente) y el [roadmap274](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md). Esta síntesis enlaza esas autoridades; los cortes siguientes preservan snapshots históricos. Para los demás frentes Phideus, consultar [estado del proyecto](../00_TRONCAL/Proyecto_Estado_Actual.md). No se cambió evidencia científica ni se reanudó trabajo experimental.
+La conciliación051 separa instrucciones Phideus y CASMI. Para CASMI, consultar [su estado operativo vigente](../../../Phideus-CASMI/docs/STATUS.md#estado-operativo-vigente) y el [roadmap274](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md). Esta síntesis enlaza esas autoridades; los cortes siguientes preservan snapshots históricos. La última entrega material se consulta en el [resultado275 del consumidor y roster de diversidad](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI275_GENERAL_CONSUMER_RESULTS.md). Para los demás frentes Phideus, consultar [estado del proyecto](../00_TRONCAL/Proyecto_Estado_Actual.md). La conciliación051 no cambió evidencia científica; los avances posteriores conservan sus informes propios.
 
 ## Snapshots históricos de continuidad
 

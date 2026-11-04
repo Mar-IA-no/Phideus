@@ -1,3 +1,11 @@
+## CASMI275: consumidor general y diversidad preparada — 4/11/2026
+
+Implementé el primer entregable local del roadmap274: agrupación de todas las vistas por molécula, química faltante dentro del banco admitido y retención por bloques con presupuesto realizable. El caso funcional conservó7moléculas/8vistas, con19inputs neuronales y7compatibilidades nuevos. El control401 procesó2.711.229pares; conservó el predictor262 y reutilizó sus7.668predicciones exactas por operandos.
+
+El comprobador independiente encontró una diferencia de1ULP en la colaBLAS que reordenaba una lista. Se preservó el fallo y se recuperaron sólo puntuación/fusión/CSV con padding numérico fijo, sin repetir entrenamiento o inferencia. Las401listas finales quedaron idénticas262; MRR25 0,2240968082 yTop1/5/25 67/112/168. Quedaron15.596vistas elegibles unidas a1622consultas/1482componentes con exclusión por fold, listas para materializar inputsMIST y comparar diversidad a dosis equivalente. La multivista real y el destinooffline general siguen pendientes; desarrollo expuesto no estima competitividad oculta.
+
+Fuentes y límites: [resultado275](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI275_GENERAL_CONSUMER_RESULTS.md) y [roadmap vigente](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md). El estado operativo y su auditoría se mantienen sólo en CASMI. No se reanudaron otros frentes Phideus.
+
 ## Mensaje recursivo 051 integrado — 4/11/2026
 
 Concilié la entrega administrativa62bloques+11cláusulas+2referencias y reemplacé las instrucciones acumuladas por contratos propios: Phideus/AGENTS46484→5407bytes y CASMI/AGENTS35870→4954bytes. CODEX local ignorado pasó13198→881bytes; su original literal queda en snapshot recuperable, los AGENTS anteriores también enGit. Global y raíz se heredan por puentes; CASMI mantiene una sola sección operativa vigente y Phideus la enlaza. Objetivos, roles y permisos sustituidos permanecen en la historia, sin efecto nuevo.
