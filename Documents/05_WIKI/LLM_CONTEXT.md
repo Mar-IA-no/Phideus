@@ -135,6 +135,16 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## CASMI271: veinte pasadas completas y mejora local comprobada — 4/11/2026
+
+La ampliación de dos a veinte pasadas acumuladas mejoró el MRR25 de las 1.622 consultas FIT/OOF de 0,2114307621 a 0,2174907556 y Top1/5/25 de 244/455/687 a 253/470/707. RR mejoró en 228 consultas, retrocedió en 192 y empató en 1.202. Los cortes de cuatro y ocho pasadas conservan su carácter descriptivo: ocho tuvo mejor Top1, Top25 y macro; veinte, mayor MRR25 y Top5. La pérdida online siguió bajando hasta veinte, sin que todas las métricas moleculares lo hicieran. Se conservaron nueve checkpoints y las curvas; no se declara un techo ni se promueve retrospectivamente un corte. FIT está expuesto, 401 informó históricamente el diseño y el pretraining sigue desconocido: no es un resultado oficial o una estimación de puesto.
+
+La continuación reutilizó los dos updates del corte inicial y completó 3.346 nuevos. El verificador reprodujo los 3.348 desde 267 y comparó los 18 estados/gradientes retenidos; comprobó 288 entradas OOF de muestra, todas las 98.016 visitas y 31.430.595 colas conocidas, scores, rankings, listas, CSV y 4.866 registros. Error máximo de agregados 5,55e−17. Productor y checker cerraron exit0 en 4.389,370 s y 3.811,410 s; las tres unidades/cgroups propios quedaron ausentes y la GPU libre. Revisión final sin problemas materiales, 76 fuentes y 24 fragmentos verificados por ROOT; integración única ciclo 8: 0→1/20. El corte original y su reloj permanecen conservados.
+
+El predictor final262 sigue vigente. El siguiente trabajo acotado es CASMI272: instalar el consumidor sin red desde archivos materializados y comprobar un caso completo, quitando su dependencia del entorno original. Plan y código revisados, todavía sin instalación o nueva corrida. La alternativa de doscientas pasadas queda registrada para un diseño y presupuesto propios. GPU local y continuidad autorizadas; sin limpieza, datos/reservas nuevos, GPU remota, envío o promoción científica.
+
+Fuente: [informe y límites del contraste](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI271_TWENTY_PASS_SCALE_RESULTS.md).
+
 ## CASMI271: corte recuperable y continuación aditiva — 4/11/2026
 
 El productor inició entrenamiento y conservó dos updates fold0, acumulados127/128, con próximo minibatch enposición32. El gate cortó por capacidad temporal: ciclos9,602/7,983s y proyección99.166s frente21.573s restantes. Cerró exit1 en29,349s, scope/cgroup ausentes, sinOOM/throttling yGPU libre; prefix/partial/P/gP/gradiente/traza originales se conservan. No hayOOF/HELD ni objetivo20 completo. La causa de la lentitud frente267 sigue desconocida; el corte no es un resultado molecular negativo.
