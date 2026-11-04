@@ -1,3 +1,11 @@
+## CASMI273: diagnóstico del entorno preparado; Kaggle pendiente — 4/11/2026
+
+El notebook autocontenido y su script CPU quedaron comprobados localmente: una ejecución exit0 en 0,097 s, JSON de 2.307 B, sin inferencia, entrenamiento o acceso a datos. El bwrap mínimo y la consulta de hardware funcionaron en este host; esto no prueba el entorno Kaggle ni todos los requisitos del consumidor272. El notebook conserva sus celdas sin ejecutar. Revisión final sin hallazgos materiales; ROOT contrastó 17 fuentes y nueve fragmentos e integró una única auditoría: ciclo8, 2→3/20.
+
+El siguiente paso material es obtener el recibo del destino real antes de adaptar el lanzador por una incompatibilidad supuesta. Se pidió autorización para ejecutar únicamente este diagnóstico privado en CPU de Kaggle, sin datos, modelos o submission; permanece pendiente. La GPU local y continuidad siguen habilitadas. Se conservan predictor262, bundle272, checkpoints y curvas271; no hay trabajo experimental propio activo ni GPU remota habilitada. No se repiten evaluaciones cerradas, inicia otro entrenamiento por inercia, limpian activos o promueve arquitectura.
+
+Fuente: [resultado y límites del diagnóstico](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI273_TARGET_PROBE_RESULTS.md).
+
 ## CASMI272: consumidor instalado desde cero y CSV idéntico — 4/11/2026
 
 El consumidor262 completó un caso prefijado observables→predicción→CSV en un entorno recién instalado sin red, usando archivos materializados y sin montar checkout, entorno, intérprete o activos originales. Las 29 distribuciones y sus requisitos quedaron comprobados; los 35 archivos científicos siguen idénticos a270. Hubo un forwardGPU nuevo, 57 puntajes conocidos y una fila con 25 candidatas. El CSV de 884 B coincide literalmente con la referencia269 fijada antes del efecto. Es evidencia funcional de instalación en este host y caso; no otra evaluación molecular, aceptación oficial, notebookKaggle o submission lista. El predictor262 y los checkpoints/resultados271 se conservan.
