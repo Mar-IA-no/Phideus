@@ -1,3 +1,9 @@
+## CASMI271: corte recuperable y continuación aditiva — 4/11/2026
+
+El productor inició entrenamiento y conservó dos updates fold0, acumulados127/128, con próximo minibatch enposición32. El gate cortó por capacidad temporal: ciclos9,602/7,983s y proyección99.166s frente21.573s restantes. Cerró exit1 en29,349s, scope/cgroup ausentes, sinOOM/throttling yGPU libre; prefix/partial/P/gP/gradiente/traza originales se conservan. No hayOOF/HELD ni objetivo20 completo. La causa de la lentitud frente267 sigue desconocida; el corte no es un resultado molecular negativo.
+
+Plan aditivo revisado sin hallazgos materiales: restaurar exactamente partial2/Adam/RNG/cursor y completar3.346updates nuevos sin repetir1/2, con20pasadas acumuladas como primario y4/8 descriptivos. Nueva envolvente prospectiva32hproductor/40hchecker, Wtotal18GiB/A4GiB/margen72GiB; máximos, noETAs ni extensión delreloj anterior. Seis módulos nuevos preservan los110pines ejecutados del original; trespruebas con AdamWCPU diminuto y trescontratos de recuperaciónCPU pasaron. Código revisado sin hallazgos materiales; checkercompuesto en preparación, aún sinAUTH2 o nueva corrida. La instrumentación medirá segmentos de los siguientes updates necesarios; sin modificar matemática o datos para forzar unPASS. Contador ciclo8:0/20 sin incremento. GPUlocal/continuidad autorizadas, sin nueva limpieza/datos/reservas/remoto/envío/promoción.
+
 ## CASMI271: escala de veinte pasadas, preparación y revisión — 4/11/2026
 
 El siguiente contraste amplía de dos a veinte las pasadas moleculares acumuladas desde los tres estados267, restaurando Adam/RNG y conservando receta, folds y datos. Son dieciocho pasadas nuevas y3.348updates; cortes4/8 descriptivos y20 como final primario prefijado frente267, sin elegir después el mejor por sus resultados. Se conservan checkpoints ycurvas; no se supone mejora tardía ni techo si no ocurre. No reemplaza el predictor final262 ni abre401 otra vez.
