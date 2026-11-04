@@ -1,3 +1,11 @@
+## CASMI270: otras tres entradas admitidas, preparación revisada — 4/11/2026
+
+La continuación usa el mismo modelo262/cabeza259 para los índices originales1,2,3 ya admitidos, conservando íntegros los observables y excluyendo el índice0 cerrado en269. El paquete conserva once activos científicos y deriva únicamente el JSON de esas tres adquisiciones. Rechaza compatibilidad química faltante antes del pool; no calcula química estructural nueva. Seis pruebas sintéticas y réplica independiente aprobadas, plan y código sin hallazgos materiales. No se ejecutó todavía el consumidor270.
+
+El efecto previsto dispone de300s/CPU8/RAM12GiB/GPU8GiB/output1GiB. Un lector independiente nuevo comprobará todos los inputs y las tres filasCSV con presupuesto separado600s y AUTH postcierre; ROOT leyó método y922líneas de runtime/fixtures y verificó152pines preparatorios y13identidades. Contador ciclo7:19/20, sin incremento por preparación. Al cierre270 se realizará la Divina completa antes del siguiente bloque. La GPU local y continuidad están autorizadas; entrenamiento mayor y mejoras tardías permanecen como opciones que requieren su propio diseño, sin inferir techo desde93updates.
+
+Fuente: [plan previo](../../../Phideus-CASMI/docs/CASMI270_REMAINING_INPUTS_PLAN.md).
+
 ## CASMI269: retoma GPU del consumidor final — 4/11/2026
 
 El modelo final262 y la cabeza259 completaron el recorrido desde la observación prefijada hasta un CSV de 25 candidatos. Hubo un forward GPU nuevo y 57 puntuaciones conocidas, sin reutilización histórica, entrenamiento o lectura de respuestas. El checker independiente reconstruyó todo el caso y repitió el forward con error máximo y medio cero; verificó también ranking, fusión y CSV literal. Es evidencia funcional focal: no estima una mejora molecular, cobertura general, instalación limpia o ejecución en Kaggle.
