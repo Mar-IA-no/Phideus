@@ -23,9 +23,11 @@ Un experimento conserva `last_epoch`, checkpoints intermedios/best según protoc
 
 La memoria propia de Codex es `.codex/memory.md`. No inspeccionar la memoria privada de otro agente ni `.claude/memory.md`. El antiguo modo de colaboración con Claude y el reparto fijo por proveedor son antecedentes, no requisitos para continuar el alcance autorizado. La antigua versión de `phideus-doc-maintainer` está retirada del uso ordinario por orden8/9; mantener documentación desde las fuentes actuales.
 
+El archivo principal de ambos proyectos reside en RAID1 desde la orden4/11; M.2 conserva el conjunto de trabajo CASMI y el plano documental. Procedimiento y conservación en la [política de almacenamiento](../Phideus-CASMI/docs/STORAGE_POLICY.md). Este cambio no reanuda frentes pausados.
+
 ## Documentación y síntesis
 
-Mantener la [bitácora](Documents/00_TRONCAL/bitacora_desarrollo.md) y las páginas pertinentes de la wiki cuando cambie un frente. La wiki sigue [SCHEMA.md](Documents/05_WIKI/SCHEMA.md); ejecutar `venv/bin/python scripts/lint_phideus_wiki.py --write-catalog` cuando se modifique. No usarla como backlog ni sustituir fuentes por copias.
+Mantener la [bitácora](Documents/00_TRONCAL/bitacora_desarrollo.md) y las páginas pertinentes de la wiki cuando cambie un frente. La wiki sigue [SCHEMA.md](Documents/05_WIKI/SCHEMA.md); ejecutar `python3 scripts/lint_phideus_wiki.py --write-catalog` (Python3 con PyYAML disponible) cuando se modifique. No usarla como backlog ni sustituir fuentes por copias.
 
 Cuando cambien descriptores, roadmap o framing, sincronizar [informe histórico](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/INFORME_HISTORICO_REPRESENTACIONES_RATIOS.md), [catálogo narrativo](Documents/04_TRANSVERSAL/TEORIA_Y_FUNDAMENTOS/CATALOGO_NARRATIVO_DESCRIPTORES_RATIOS_PHIDEUS.md) y el marco epistemológico si queda afectado. No editar `BACKPROPAGANDO_PHIDEUS.md` sin pedido explícito.
 

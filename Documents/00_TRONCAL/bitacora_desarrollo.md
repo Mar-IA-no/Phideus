@@ -11959,3 +11959,13 @@ Se conservaron ambos CUT y su reloj compartido; la continuación de scoring usó
 Mariano pidió balance del concurso: la presentación neuronal es una ruta concreta, pero aún no hay ejecución completa comprobada enKaggle ni base para estimar puesto. Predictorfinal262 conserva MRR25=0,2240968082 yTop25=168/401 en desarrollo expuesto. El consumidor250 sólo probó249 yuna observación; conectar262, comprobar entradas/agrupación/recorrido y preparar notebookoffline≤9h es ahora más material que otrogrid otercerpass. Cierreoficial14/12/2026, entrada7/12;42días desde2/11. No promoción o envío automático; la autorización sostenida yGPU siguen vigentes, sin inferir otra pausa global.
 
 InformeCASMI: Biblioteca/Competition_Delivery/CASMI267_SECOND_PAIRWISE_PASS_RESULTS.md ycasmi267_final_results_audit_20261102.md. AutoridadW267/final-audit-integration-1.json; balanceW267/control/competition-balance-20261102-3.json. Los cortes siguientes conservan historia.
+
+
+## 4/11/2026 — CASMI276 integrado y limpieza profunda autorizada
+
+CASMI276 completo y auditado: cuatro pasadas diversas frente al control monovista a igual dosis aumentaron MRR25 de0,2145916618 a0,2175707720 y Top5/25 de457/697 a469/709; Top1 pasó253→252. Verificación compuesta PASS, con ambos fallos técnicos y recuperaciones conservados, sin repetir ciencia. Desarrollo expuesto y pretraining desconocido; sin promoción. Integración única ciclo8:5→6/20. La orden posterior prioriza archivo principal RAID1 y limpieza profunda de M.2 antes de277; dependencias activas y evidencia científica conservadas. Se prepara retiro por manifiesto y archivo de faltantes excluidos, sin cambios de producto.
+
+
+## 4/11/2026 — retiro principal completado y comprobado
+
+RAID1 conserva el archivo principal; retiro neto1.388.989entradas/189.562.033.814bytes regulares lógicos, después de recuperar34dependencias/documentos pequeños. Los1.341lotes cerraron y sus respaldos/ausencias fueron cotejados; runtime sinCUDA y wiki22p/91fuentesPASS. Se conservaron código y cambios concurrentes. Poda214.908directoriosvacíos/quince recreados para continuidad; atributos guardados enRAID. Controles finales y archivo de ledgers cerrados, auditoría independiente corroborada. M.2con296,10GiBlibres en la medición final;4.076copias locales voluminosas del control quedaron únicamente enRAID. [Informe](ALMACENAMIENTO_RAID_PRINCIPAL_20261104.md). No otro experimento ni incremento del contador científico por esta administración.
