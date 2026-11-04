@@ -1,3 +1,11 @@
+## Fuentes de estado vigentes — 4/11/2026
+
+El estado operativo de CASMI se consulta exclusivamente en [su fuente vigente](../../../Phideus-CASMI/docs/STATUS.md#estado-operativo-vigente), y su secuencia en el [roadmap274](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md). Los cortes CASMI que siguen son snapshots históricos; no constituyen otra fuente editable de permisos, modelos, contador o próxima acción.
+
+Para investigación Phideus fuera de CASMI se conserva la autorización situada3/9 de usar Mendieta cuando un experimento pertinente tolere cola larga o convenga descargar recursos locales, justificando costo, urgencia y poder diagnóstico; no consultarlo ni ocuparlo por rutina. No se extiende a CASMI, PMP u otros proyectos ni reanuda frentes pausados. Procedencia literal: [conciliación051](RECONCILIACION_INSTRUCCIONES_20261104.md), entrega S145.R63.1 y AGENTS anterior. Esta intervención administrativa no comprobó acceso, ocupación ni ejecutó ese permiso. Las restricciones de un frente específico se rebasan antes de cualquier efecto.
+
+## Snapshots históricos de continuidad
+
 ## CASMI274: revisión de rumbo — 4/11/2026
 
 La revisión transversal conserva MIST y los bancos por sus avances de identificación, pero corrige la prioridad de seguir cerrando comprobaciones pequeñas mientras falta una solución general. El próximo trabajo debe resolver entradas nuevas, química y retención con presupuesto viable, y comparar diversidad de espectros y escala de entrenamiento sobre roles declarados. La generación y las herramientas geométricas permanecen disponibles cuando atiendan un déficit medido. No hay todavía una estimación independiente de competitividad en CASMI.

@@ -135,6 +135,12 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
+## Fuentes actuales de continuidad — 4/11/2026
+
+La conciliación051 separa instrucciones Phideus y CASMI. Para CASMI, consultar [su estado operativo vigente](../../../Phideus-CASMI/docs/STATUS.md#estado-operativo-vigente) y el [roadmap274](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md). Esta síntesis enlaza esas autoridades; los cortes siguientes preservan snapshots históricos. Para los demás frentes Phideus, consultar [estado del proyecto](../00_TRONCAL/Proyecto_Estado_Actual.md). No se cambió evidencia científica ni se reanudó trabajo experimental.
+
+## Snapshots históricos de continuidad
+
 ## CASMI274: revisión de rumbo — 4/11/2026
 
 Norte vigente: conservar MIST+bancos, completar consumidor general con química y retención por bloques bajo presupuesto medido; comparar diversidad de vistas a dosis comparable y considerar escala larga después. El resultado oculto sigue desconocido. Generación/forward/geometría son complementos condicionados; el probe273 de Kaggle no bloquea ciencia local. Revisión estratégica auditada, F1 integrado en diseño; implementación pendiente. Ciclo8: 4/20, Divina extraordinaria sin reinicio. Sin corridas nuevas; GPU local autorizada. Fuentes: [informe y evidencia](../../../Phideus-CASMI/Biblioteca/Revision_Rumbo_CASMI_20261104/INFORME_Y_NORTE.md) y [hoja de ruta vigente](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md).

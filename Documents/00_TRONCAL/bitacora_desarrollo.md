@@ -1,3 +1,9 @@
+## Mensaje recursivo 051 integrado — 4/11/2026
+
+Concilié la entrega administrativa62bloques+11cláusulas+2referencias y reemplacé las instrucciones acumuladas por contratos propios: Phideus/AGENTS46484→5407bytes y CASMI/AGENTS35870→4954bytes. CODEX local ignorado pasó13198→881bytes; su original literal queda en snapshot recuperable, los AGENTS anteriores también enGit. Global y raíz se heredan por puentes; CASMI mantiene una sola sección operativa vigente y Phideus la enlaza. Objetivos, roles y permisos sustituidos permanecen en la historia, sin efecto nuevo.
+
+La revisión documental independiente detectó y resolvió dos pérdidas: el disparador roadmap para sincronización documental y la autorización Mendieta propia de Phideus fuera CASMI, conservada con su alcance. También se preservan pausa condicionalGPU, goal de audio y fronteras científicas. Comprobados38 enlaces y lintwiki22p/91fuentesPASS. Sin producto, servicios, GPU, experimentos, datos, limpieza o modificación del ledger: ciclo8:4/20. Fuentes, originales, decisiones y restauración en el [registro de conciliación](RECONCILIACION_INSTRUCCIONES_20261104.md); respuesta por el canalOrca del mensaje msg_236fad1748e0, sin ACK al inbox.
+
 ## CASMI274: revisión de rumbo solicitada por Mariano — 4/11/2026
 
 Mariano aprueba seguir el roadmap274 y lo fija como referencia obligatoria de las auditorías de horizonte. La directiva quedó en memoria global y en las instrucciones de ambos repositorios: cada auditor debe contrastar el trabajo real con sus entregables y señalar desvíos hacia lo cosmético o secundario. Es una confirmación de rumbo, sin nueva auditoría ni incremento del contador.
