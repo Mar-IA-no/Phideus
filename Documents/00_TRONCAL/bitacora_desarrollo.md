@@ -1,10 +1,10 @@
 ## CASMI269: retoma GPU del consumidor final — 4/11/2026
 
-Mariano habilitó nuevamente la GPU local y ordenó continuar. Se retoma desde CASMI268 cerrado y auditado, ciclo 7:18/20. La primera prueba conecta el modelo final262 y la cabeza259 ya conservados con el recorrido completo desde observables hasta CSV; conserva el diagnóstico prefijado de una observación para aislar el cambio de modelo. No repite la carga CPU ni las evaluaciones cerradas y no acredita calidad molecular, cobertura general o ejecución en Kaggle.
+El modelo final262 y la cabeza259 completaron el recorrido desde la observación prefijada hasta un CSV de 25 candidatos. Hubo un forward GPU nuevo y 57 puntuaciones conocidas, sin reutilización histórica, entrenamiento o lectura de respuestas. El checker independiente reconstruyó todo el caso y repitió el forward con error máximo y medio cero; verificó también ranking, fusión y CSV literal. Es evidencia funcional focal: no estima una mejora molecular, cobertura general, instalación limpia o ejecución en Kaggle.
 
-Plan previo revisado sin hallazgos materiales y seis pruebas CPU pertinentes aprobadas. La composición nueva conserva los doce activos y los 35 archivos Python; sólo cambia el schema y la habilitación del entrypoint científico. Código revisado sin hallazgos materiales; 84 referencias verificadas por ROOT. Efecto aún sin iniciar. Presupuesto prospectivo: 300 s, ocho CPU, 12 GiB de RAM, swap0, allocator GPU de 8 GiB y salida de 1 GiB, con márgenes de disco actuales. Se mantienen checkpoint y crudos, sin limpieza, datos/reservas nuevos, GPU remota, envío o promoción científica. Escalamiento y mejoras tardías continúan como criterios de diseño.
+Productor y checker terminaron exit0 en 18,853 s y 10,758 s, respectivamente; sus scopes/cgroups quedaron ausentes y la GPU libre al relistar. Se conservaron crudos, modelos y fuentes. Auditorías sin hallazgos materiales; ROOT leyó el método y 858 líneas del checker, verificó 127 pines preparatorios y 30 referencias finales. Integración única: ciclo 7, 18→19/20. Código y plan estaban subidos antes del efecto. La habilitación GPU del 4/11 y la continuidad siguen vigentes: el siguiente paso es ampliar entradas y agrupaciones sobre fuentes admitidas y comprobar después el destino offline. Se mantiene el criterio de escala y mejoras tardías, sin nueva limpieza, datos/reservas, GPU remota, envíos o promoción científica.
 
-Fuente: [plan del recorrido GPU](../../../Phideus-CASMI/docs/CASMI269_FINAL_CONSUMER_PLAN.md).
+Fuente: [informe de cierre](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI269_FINAL_CONSUMER_RESULTS.md).
 
 ## CASMI268: preparación CPU del consumidor final; GPU suspendida —2/11/2026
 
