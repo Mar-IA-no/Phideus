@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-11-02
+updated: 2026-11-04
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -134,6 +134,14 @@ source_paths:
 depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
+
+## CASMI272: consumidor instalado desde cero y CSV idéntico — 4/11/2026
+
+El consumidor262 completó un caso prefijado observables→predicción→CSV en un entorno recién instalado sin red, usando archivos materializados y sin montar checkout, entorno, intérprete o activos originales. Las 29 distribuciones y sus requisitos quedaron comprobados; los 35 archivos científicos siguen idénticos a270. Hubo un forwardGPU nuevo, 57 puntajes conocidos y una fila con 25 candidatas. El CSV de 884 B coincide literalmente con la referencia269 fijada antes del efecto. Es evidencia funcional de instalación en este host y caso; no otra evaluación molecular, aceptación oficial, notebookKaggle o submission lista. El predictor262 y los checkpoints/resultados271 se conservan.
+
+Las tres fases cerraron exit0 en 59,725/63,394/18,944 s, dentro de sus presupuestos. A registró 4.378 eventos max y ceroOOM; B/C registraron cero max/OOM. Los datos de memoria/CPU son la última muestra conservada, sin prometer un muestreo final. Tres scopes/cgroups propios ausentes y GPU libre al relistar; artefactos y temporales preservados, sin limpieza. Revisión final sin hallazgos materiales; ROOT verificó 150 fuentes y 17 fragmentos e integró una vez: ciclo 8, 1→2/20. El siguiente avance útil es contrastar las diferencias concretas del contrato y entorno del concurso, sin asumir capacidades remotas no observadas. GPU local y continuidad siguen autorizadas; sin datos/reservas nuevos, GPU remota, envío o promoción científica.
+
+Fuente: [instalación y límites comprobados](../../../Phideus-CASMI/Biblioteca/Competition_Delivery/CASMI272_OFFLINE_INSTALL_RESULTS.md).
 
 ## CASMI271: veinte pasadas completas y mejora local comprobada — 4/11/2026
 
