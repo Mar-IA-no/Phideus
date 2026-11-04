@@ -1,5 +1,7 @@
 ## CASMI274: revisión de rumbo solicitada por Mariano — 4/11/2026
 
+Mariano aprueba seguir el roadmap274 y lo fija como referencia obligatoria de las auditorías de horizonte. La directiva quedó en memoria global y en las instrucciones de ambos repositorios: cada auditor debe contrastar el trabajo real con sus entregables y señalar desvíos hacia lo cosmético o secundario. Es una confirmación de rumbo, sin nueva auditoría ni incremento del contador.
+
 Revisé la evolución molecular, el corpus de investigación y la distancia entre los componentes disponibles y un producto general. El juicio conserva la base MIST+banco y reconoce una asignación excesiva a microcierres y verificaciones. Tres informes separados, Divina extraordinaria y auditoría final sustentan el nuevo orden: consumidor general con retención presupuestada, diversidad y escala de aprendizaje, y complementos sólo ante déficits medidos. El hallazgo de retención se corrigió en el diseño y tuvo revisión focal; no se presenta como implementación. Integración única ciclo8: 3→4/20, sin reinicio extraordinario ni corridas. Fuentes y alcance de lectura: [informe y evidencia](../../../Phideus-CASMI/Biblioteca/Revision_Rumbo_CASMI_20261104/INFORME_Y_NORTE.md) y [hoja de ruta vigente](../../../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md).
 
 ## CASMI273: diagnóstico del entorno preparado; Kaggle pendiente — 4/11/2026

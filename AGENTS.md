@@ -1,3 +1,9 @@
+## Phideus/CASMI: roadmap274 aprobado y referencia de auditorías — 2026-11-04
+
+Mariano aprueba seguir la [hoja de ruta274](../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md) y exige usarla para juzgar el horizonte. Es la guía operativa vigente: consumidor general con presupuesto realizable, diversidad y escala de aprendizaje, complementos según déficits medidos y candidata integrada con validación independiente.
+
+Toda auditoría de horizonte, intermitente o Divina, debe leer su versión vigente y contrastarla con el estado y la evidencia actuales. Incluir esa fuente en el contexto de los auditores delegados. Explicar qué entregable del roadmap habilita el trabajo, qué falta para completarlo y si el esfuerzo se desvió hacia tareas cosméticas o secundarias. Recomendar rectificaciones cuando la evidencia lo justifique y registrarlas; no reducir el examen a cumplimiento formal del plan. Se mantienen permisos, reservas, autoridad científica y criterio de mejoras tardías vigentes.
+
 ## Phideus/CASMI: GPU local habilitada para continuar — 2026-10-24
 Mariano indica «tenes gpu para continuar». Levanta la suspensión GPU del22/10
 para Phideus/CASMI y permite continuar trabajo experimental pertinente sin
