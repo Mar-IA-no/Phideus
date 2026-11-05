@@ -4,6 +4,10 @@ El estado operativo de CASMI se consulta exclusivamente en [su fuente vigente](.
 
 Para investigación Phideus fuera de CASMI se conserva la autorización situada3/9 de usar Mendieta cuando un experimento pertinente tolere cola larga o convenga descargar recursos locales, justificando costo, urgencia y poder diagnóstico; no consultarlo ni ocuparlo por rutina. No se extiende a CASMI, PMP u otros proyectos ni reanuda frentes pausados. Procedencia literal: [conciliación051](RECONCILIACION_INSTRUCCIONES_20261104.md), entrega S145.R63.1 y AGENTS anterior. Esta intervención administrativa no comprobó acceso, ocupación ni ejecutó ese permiso. Las restricciones de un frente específico se rebasan antes de cualquier efecto.
 
+## Instrucciones propias recuperadas — 5/11/2026
+
+Se reintegró en [AGENTS](../../AGENTS.md) el contenido propio no redundante del respaldo anterior a051. Los estados y contratos sustituidos quedaron registrados como historia en la [bitácora](bitacora_desarrollo.md#restauracion-de-instrucciones-propias-20261105); no modifican permisos, roles ni resultados actuales. Esta intervención es documental y no reanuda frentes.
+
 ## Archivo principal y conjunto local — 4/11/2026
 
 Mariano ordenó conservar el archivo principal de Phideus y Phideus-CASMI en RAID1 y dejar en M.2 sólo el conjunto necesario para CASMI, además del código y la documentación de continuidad. El retiro de datos y resultados terminó con contraparte verificada; el archivo del registro y su auditoría final quedaron completos. Los frentes pausados permanecen pausados. Véanse el [informe de archivo y limpieza](ALMACENAMIENTO_RAID_PRINCIPAL_20261104.md) y la [política de almacenamiento](../../../Phideus-CASMI/docs/STORAGE_POLICY.md).

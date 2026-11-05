@@ -11969,3 +11969,668 @@ CASMI276 completo y auditado: cuatro pasadas diversas frente al control monovist
 ## 4/11/2026 — retiro principal completado y comprobado
 
 RAID1 conserva el archivo principal; retiro neto1.388.989entradas/189.562.033.814bytes regulares lógicos, después de recuperar34dependencias/documentos pequeños. Los1.341lotes cerraron y sus respaldos/ausencias fueron cotejados; runtime sinCUDA y wiki22p/91fuentesPASS. Se conservaron código y cambios concurrentes. Poda214.908directoriosvacíos/quince recreados para continuidad; atributos guardados enRAID. Controles finales y archivo de ledgers cerrados, auditoría independiente corroborada. M.2con296,10GiBlibres en la medición final;4.076copias locales voluminosas del control quedaron únicamente enRAID. [Informe](ALMACENAMIENTO_RAID_PRINCIPAL_20261104.md). No otro experimento ni incremento del contador científico por esta administración.
+
+
+<a id="restauracion-de-instrucciones-propias-20261105"></a>
+
+## Restauración de instrucciones propias — 5/11/2026
+
+Mariano pidió recuperar todo el contenido propio del AGENTS anterior salvo redundancias con el global o internas, sin imponer una meta de brevedad. Aclaró expresamente que los estados sustituidos deben conservarse en bitácora y enlazarse desde AGENTS. La revisión recupera detalles metodológicos, de retención, wiki, aceptación de encargos y operación entre contextos que la conciliación051 había comprimido en exceso. No modifica producto, recursos, permisos, otros contratos ni el contador científico CASMI.
+
+El original íntegro pertenece al corte Git `5975f86c0191391e93ec30e63abcacb343940bc9:AGENTS.md`; la conciliación anterior conserva su procedencia. Los extractos siguientes son registro literal del respaldo, con sus líneas de origen: **no son instrucciones operativas vigentes**. Cesiones y suspensiones, modelos, cuotas, roles, contadores, PIDs y estados de corridas se interpretan exclusivamente como hechos del corte indicado. La fuente actual CASMI sigue siendo su contrato y estado propios. No se trasladan a los modelos actuales los topes de contexto, esfuerzos o tres rondas del antiguo protocolo Spark.
+
+El contenido vigente no redundante se incorpora a AGENTS. Las reglas universales y los procedimientos de máquina se heredan por sus capas; no se copian otra vez. Se conserva a continuación la historia singular para que deduplicar no borre decisiones, excepciones o parámetros anteriores.
+
+<details>
+<summary>Phideus/CASMI: roadmap274 aprobado y referencia de auditorías — 2026-11-04 — respaldo, líneas 1–6</summary>
+
+> ## Phideus/CASMI: roadmap274 aprobado y referencia de auditorías — 2026-11-04
+>
+> Mariano aprueba seguir la [hoja de ruta274](../Phideus-CASMI/docs/CASMI274_COMPETITIVENESS_ROADMAP.md) y exige usarla para juzgar el horizonte. Es la guía operativa vigente: consumidor general con presupuesto realizable, diversidad y escala de aprendizaje, complementos según déficits medidos y candidata integrada con validación independiente.
+>
+> Toda auditoría de horizonte, intermitente o Divina, debe leer su versión vigente y contrastarla con el estado y la evidencia actuales. Incluir esa fuente en el contexto de los auditores delegados. Explicar qué entregable del roadmap habilita el trabajo, qué falta para completarlo y si el esfuerzo se desvió hacia tareas cosméticas o secundarias. Recomendar rectificaciones cuando la evidencia lo justifique y registrarlas; no reducir el examen a cumplimiento formal del plan. Se mantienen permisos, reservas, autoridad científica y criterio de mejoras tardías vigentes.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU local habilitada para continuar — 2026-10-24 — respaldo, líneas 7–17</summary>
+
+> ## Phideus/CASMI: GPU local habilitada para continuar — 2026-10-24
+> Mariano indica «tenes gpu para continuar». Levanta la suspensión GPU del22/10
+> para Phideus/CASMI y permite continuar trabajo experimental pertinente sin
+> permisos por corrida. Retomar desde211 cerrado y Divina/ciclo5:0/20, rebasando
+> plan, fuentes, capacidad y auditoría antes del encoder real fuera de caché401.
+> Verificar disponibilidad/ownership antes de cargar; conservar checkpoints,
+> crudos y parada recuperable, sin intervenir procesos ajenos. No habilita GPU
+> remota, reservas/datos nuevos, limpieza ni promoción científica automática.
+> No repetir161,210/211 ni evaluaciones cerradas. Nuevas delegaciones de CASMI
+> GPT6.1SolHigh conforme orden19/10; la política Astra de PMP es otro frente.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: competitividad del concurso como objetivo central — 2026-10-21 — respaldo, líneas 18–39</summary>
+
+> ## Phideus/CASMI: competitividad del concurso como objetivo central — 2026-10-21
+>
+> Mariano ordena: «de ahora en mas el objetivo central es lograr resultados
+> competentes para el concurso. Usar cosas de phideus o del enfoque geometrico
+> pasa a ser herramientas de la caja de herramientas para usar solo si es
+> pertinente. Audita lo hecho y lo por hacer bajo este criterio. Luego diseña
+> un plan con objetivos principales y secundarios bien claros. Audita el plan
+> con auditoria normal y divina, y avanza por donde lo indique lo pertinente».
+>
+> Esta directiva sustituye la prioridad de validar transferencia de Phideus y
+> la obligación geometry-first de la ruta activa: la utilidad para CASMI dirige
+> representaciones, modelos, datos permitidos, métricas y esfuerzo. Conservar
+> resultados negativos, alternativas e historia sin prolongar líneas por identidad
+> del proyecto. Auditar retrospectiva y prospectiva; plan concreto con objetivos
+> principales/secundarios, auditor independiente y Auditoría Divina explícita
+> antes de avanzar al siguiente experimento. No esperar al contador20 para este
+> ejercicio solicitado; registrar su carácter extraordinario sin borrar historia.
+> Conserva reservas cerradas, licencias, recursos/ownership y GO/NO-GO científico;
+> no implica promoción de arquitectura ni abrir datos privados por inferencia.
+> GPU local vigente; nuevas delegaciones GPT6.1SolHigh, contexto limpio cuando
+> corresponda. La orden incluye continuar por la ruta pertinente tras las revisiones.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-17 — respaldo, líneas 40–50</summary>
+
+> ## Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-17
+>
+> Mariano indica «continua, tenes el gpu disponible hasta nuevo aviso». Reanuda
+> el trabajo Phideus/CASMI después del cierre161 y habilita GPU local para los
+> experimentos pertinentes, sin permisos por corrida. Recuperar el ledger y
+> rebasar el siguiente plan sobre fuentes actuales; no regenerar161 ni repetir
+> su evaluación. Verificar ocupación/ownership antes de cargar, preservar
+> checkpoints y parada recuperable; no intervenir procesos ajenos. No habilita
+> GPU remota, nuevas reservas ni promoción científica. Se conserva el contador
+> ciclo2 11/20 y auditorías independientes AstraMedium en hitos pertinentes.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: terminar únicamente las evaluaciones — 2026-10-16 UTC — respaldo, líneas 51–65</summary>
+
+> ## Phideus/CASMI: terminar únicamente las evaluaciones — 2026-10-16 UTC
+>
+> Mariano indica «terminá solamente con las evaluaciones». Autoriza completar
+> la lectura CPU pendiente de CASMI161, verificar sus resultados y guardarlos.
+> Reutilizar la generación terminada y el protocolo congelado; no nuevos
+> experimentos, entrenamientos, generación ni encadenamiento de goals. Al concluir
+> la evaluación y su cierre verificable, detenerse. GPU local/remota suspendida.
+> La pausa general se conserva fuera de esta excepción acotada.
+>
+> Cierre16/10: lectura161 completa y auditada, cobertura/top25 de0/16 en A/B,
+> sin desconocidos. Servicio lector cerrado y ausencia verificada a13:28:33UTC;
+> fuentes y checkpoints conservados. Auditorías725/730 integradas una vez,
+> contador11/20. Tras guardar la entrega, excepción agotada: mantener pausa
+> completa, incluido CPU/cadena, hasta nueva orden. GPU sigue suspendida.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: pausa completa solicitada — 2026-10-16 UTC — respaldo, líneas 66–75</summary>
+
+> ## Phideus/CASMI: pausa completa solicitada — 2026-10-16 UTC
+>
+> Mariano pide «necesito que hagas una pausa en tu trabajo». Detener la cadena
+> autónoma y todo trabajo experimental, incluido CPU, hasta retoma explícita.
+> CASMI161 terminó generación y admisión exterior; la evaluación no se inició.
+> Servicio propio cerrado y ausencia verificada a04:47:52UTC; preservar artefactos,
+> fuentes y checkpoints. Goal161 pausado, incompleto; contador10/20 sin cambio.
+> La GPU local/remota continúa suspendida y requiere permiso explícito separado.
+> No regenerar la colección al retomar: primero recuperar el corte del ledger.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU suspendida; continuidad sólo CPU — 2026-10-15 — respaldo, líneas 76–88</summary>
+
+> ## Phideus/CASMI: GPU suspendida; continuidad sólo CPU — 2026-10-15
+>
+> Mariano pide dejar de usar la GPU y avanzar únicamente hasta necesitarla.
+> Esta orden posterior revoca la cesión local del15/10: no iniciar CUDA,
+> entrenamiento/inferencia GPU, relanzadores ni sustitución por GPU remota hasta
+> nuevo permiso explícito. Preservar checkpoints y no intervenir procesos ajenos.
+> CASMI159 ya corre exclusivamente en CPU, con CUDA oculta; puede completar
+> generación, lectura sellada y auditoría. Continuar sólo CPU materialmente útil;
+> al llegar al siguiente avance que requiera GPU, avisar, pausar el goal y detener
+> la cadena, sin tareas periféricas ni entrenamiento CPU largo sustitutivo.
+> Comprobación23:23:30UTC: sin procesos de cómputo GPU;159 activo sóloCPU.
+> Fuente: pedido directo de Mariano del15/10/2026.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-15 — respaldo, líneas 89–98</summary>
+
+> ## Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-15
+>
+> Mariano indica «tenes el gpu para vos hasta nuevo aviso, avanza» y reanuda
+> el goal formal. Levanta la pausa del10/10 y la suspensión GPU local para
+> Phideus/CASMI. Retomar142 según su contrato sintético CPU; continuar luego
+> con experimentos pertinentes y auditados, usando GPU local cuando aporte.
+> Comprobar ocupación/ownership, conservar checkpoints y parada recuperable;
+> no intervenir procesos ajenos ni extender el permiso a GPU remota o reservas.
+> La autorización no certifica resultados ni marca142 completo.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: pausa solicitada para otra tarea — 2026-10-10 UTC — respaldo, líneas 99–108</summary>
+
+> ## Phideus/CASMI: pausa solicitada para otra tarea — 2026-10-10 UTC
+>
+> Mariano pide pausar en el siguiente momento pertinente y operativo. Se aplica
+> ahora, a las02:25:29UTC: CASMI141 cerrado, auditado y subido; CASMI142 conserva
+> sólo diseño/plan, sin implementación ni corridas. Detener la cadena autónoma,
+> incluido trabajoCPU, hasta que Mariano indique retomarla. No quedan trabajos
+> experimentales propios en ejecución ni delegaciones activas pendientes.
+> La GPU local/remota continúa suspendida y requiere permiso explícito aparte.
+> Conservar fuentes, checkpoints, artefactos y contador11/20; no marcar142completo.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU suspendida hasta nuevo permiso — 2026-10-09 (2026-10-10 UTC) — respaldo, líneas 109–121</summary>
+
+> ## Phideus/CASMI: GPU suspendida hasta nuevo permiso — 2026-10-09 (2026-10-10 UTC)
+>
+> Mariano ordena «necesito que no uses el gpu hasta que yo te lo vuelva a dar el
+> permiso». Esta instrucción posterior revoca la habilitación local del9/10.
+> No iniciar CUDA, entrenamiento/inferencia GPU, relanzadores ni sustitución por
+> GPU remota. Conservar checkpoints y no intervenir procesos ajenos. CASMI140
+> está ejecutando el piloto ya fijado exclusivamente en CPU,900s/8GiB, con CUDA
+> oculta; puede concluir junto con evaluación sellada y auditoría. Continuar sólo
+> trabajo CPU materialmente pertinente. Cuando el siguiente avance razonable
+> requiera GPU, informar, pausar el goal y detener la cadena sin tareas cosméticas
+> ni entrenamiento CPU largo sustitutivo. Esperar nuevo permiso explícito.
+> Fuente: pedido directo de Mariano, registrado2026-10-10 01:49:58UTC.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU local habilitada y continuidad — 2026-10-09 — respaldo, líneas 122–131</summary>
+
+> ## Phideus/CASMI: GPU local habilitada y continuidad — 2026-10-09
+>
+> Mariano autoriza «ya dispones del gpu para seguir». Levanta la suspensión
+> local del8/10 y reanuda la cadena CASMI desde la preparación CPU113 auditada.
+> Continuar diseño, implementación, revisión independiente y calibración GPU
+> finita antes de presupuestar entrenamiento; no pedir permiso por corrida.
+> Verificar ocupación y ownership antes de cargar, conservar checkpoints/parada
+> recuperable y no intervenir procesos ajenos. No habilita GPU remota, nuevas
+> reservas ni promoción científica. Mantener auditorías Astra Medium.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU suspendida nuevamente; continuidad sólo CPU — 2026-10-08 — respaldo, líneas 132–144</summary>
+
+> ## Phideus/CASMI: GPU suspendida nuevamente; continuidad sólo CPU — 2026-10-08
+>
+> Mariano indica «necesito usar el gpu para otra cosa, no lo uses hasta nuevo aviso,
+> avanza solo con lo que no implique gpu». Esta orden posterior revoca la cesión
+> local del8/10. No iniciar CUDA, entrenamiento/inferencia GPU, relanzadores ni
+> sustitución por GPU remota. No hay corrida GPU propia activa en este corte;
+> CASMI112 está ejecutando un experimento estructural sólo CPU, finito600s/4GiB,
+> que puede continuar. Preservar checkpoints y no intervenir procesos ajenos.
+> Continuar sólo trabajo CPU materialmente pertinente; cuando el siguiente avance
+> razonable requiera GPU, avisar, pausar el goal y detener la cadena sin tareas
+> periféricas ni entrenamiento CPU largo sustitutivo. Esperar habilitación explícita.
+> Fuente: pedido directo de Mariano, registrado 2026-10-08 18:08:37 UTC.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU local nuevamente habilitada — 2026-10-08 — respaldo, líneas 145–155</summary>
+
+> ## Phideus/CASMI: GPU local nuevamente habilitada — 2026-10-08
+>
+> Mariano indica «dispones del gpu de nuevo, continua». Levanta la suspensión
+> local del7/10 y reanuda CASMI100 y la cadena autónoma autorizada: diseño,
+> implementación, auditoría independiente y experimento finito. No pedir permiso
+> por corrida. Verificar ocupación y ownership antes de cargar, no intervenir
+> procesos ajenos; conservar checkpoints y parada recuperable. GPU remota,
+> reservas de datos y promoción científica no quedan habilitadas. Mantener
+> la selección de agentes del6/10 y auditorías Astra Medium en hitos pertinentes.
+> La propuesta100 todavía requiere diseño, revisión numérica y piloto.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU nuevamente suspendida; continuidad CPU — 2026-10-07 — respaldo, líneas 156–169</summary>
+
+> ## Phideus/CASMI: GPU nuevamente suspendida; continuidad CPU — 2026-10-07
+>
+> Mariano pide disponer de la GPU para otras tareas y ordena continuar con todo
+> lo que no implique GPU. Esta orden posterior revoca la habilitación local del
+> 7/10 para Phideus/CASMI hasta nuevo aviso explícito. No iniciar CUDA, training,
+> inferencia GPU, relanzadores ni sustitución por GPU remota. Detener de forma
+> recuperable sólo procesos propios si los hubiera; preservar checkpoints y no
+> intervenir procesos ajenos. CASMI97 completó entrenamiento y abortó la lectura
+> CPU por precisión numérica; CASMI98 continúa únicamente CPU con pesos congelados.
+> El goal formal97 sigue activo porque este trabajo avanza materialmente la
+> comparación pendiente. Si el siguiente paso razonable requiere GPU, informar,
+> pausar el goal y detener la cadena, sin tareas periféricas ni CPU larga sustitutiva.
+> Fuente: pedido directo de Mariano; registrado 2026-10-07 12:38:31 UTC.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU local habilitada y continuidad — 2026-10-07 — respaldo, líneas 170–179</summary>
+
+> ## Phideus/CASMI: GPU local habilitada y continuidad — 2026-10-07
+>
+> Mariano autoriza explícitamente «tenes el gpu para vos... dale para adelante».
+> Levanta la suspensión local de octubre para Phideus/CASMI y reanuda CASMI-90:
+> completar preparación, revisión independiente y comparación GPU finita, sin
+> pedir permisos por corrida. Verificar ocupación y ownership antes de cargar;
+> no detener procesos ajenos. Conservar checkpoints y parada recuperable. No
+> habilita GPU remota, reservas de datos ni promoción científica automática.
+> Mantener selección de agentes del6/10 y cadena autónoma hasta nueva pausa.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: investigación y selección de agentes — 2026-10-06 — respaldo, líneas 180–189</summary>
+
+> ## Phideus/CASMI: investigación y selección de agentes — 2026-10-06
+>
+> Mariano pide continuar la investigación. Para nuevas delegaciones: `gpt-6-astra`
+> con esfuerzo `medium` en tareas complejas y auditorías independientes; esfuerzo
+> `low` en tareas simples. Usar `gpt-6.1-sol` con esfuerzo `high` para trabajo lento
+> que pueda avanzar en paralelo sin bloquear otros avances. Esta selección sustituye
+> las reglas anteriores incompatibles de delegación de este frente; no cambia el
+> runtime del coordinador por sí sola. La reanudación de investigación no habilita
+> GPU local/remota ni tareas periféricas: conservar la pausa ante dependencia GPU.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU suspendida hasta nuevo aviso — 2026-10-01 (2026-10-02 UTC) — respaldo, líneas 190–200</summary>
+
+> ## Phideus/CASMI: GPU suspendida hasta nuevo aviso — 2026-10-01 (2026-10-02 UTC)
+>
+> Mariano confirma explícitamente: «no uses la GPU hasta nuevo aviso». Esta orden
+> posterior revoca la cesión local del01/10 para Phideus/CASMI. No iniciar CUDA,
+> entrenamiento/inferencia GPU, relanzadores ni sustitución remota; preservar
+> checkpoints y detener recuperablemente sólo trabajo propio si lo hubiera.
+> CASMI88 ya terminó y CASMI89 analiza trazas guardadas: puede continuar sólo CPU
+> si avanza materialmente el objetivo. Cuando el siguiente paso razonable requiera
+> GPU, avisar, pausar el goal y detener la cadena, sin tareas periféricas de relleno.
+> No modifica permisos de otros proyectos ni autoriza intervenir procesos ajenos.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI reanudado sólo CPU — 2026-09-30 — respaldo, líneas 205–214</summary>
+
+> ## Phideus/CASMI reanudado sólo CPU — 2026-09-30
+>
+> Mariano reanuda investigación y trabajo con goals pequeños encadenados hasta
+> pausa o bloqueo real. GPU local/remota sigue suspendida y no se amplían reservas,
+> promoción o autoridad científica. Mantener primer brazo prioritario y segundo
+> durante dependencias. Investigación Grassmanniano/amplituhedro preservada como
+> candidatas sin activación por analogía. Trabajo nuevo GPT-6.1 Sol High y auditoría
+> Astra Medium conforme al mensaje recursivo036; no afirmar cambio de runtime
+> sin evidencia ni reactivar el antiguo goal de audio por inferencia.
+
+</details>
+
+<details>
+<summary>Auditorías: comprobar siempre el horizonte — 2026-09-28 — respaldo, líneas 215–225</summary>
+
+> ## Auditorías: comprobar siempre el horizonte — 2026-09-28
+>
+> En cada auditoría periódica o situada, además de los riesgos técnicos del
+> momento, responder explícitamente y con evidencia si el trabajo sigue
+> alineado con el objetivo y horizonte geometry-first del proyecto o si se
+> desvió hacia optimizar un instrumento como fin propio. La auditoría puede
+> recomendar detener una línea, cambiar la pregunta o redistribuir esfuerzo.
+> No tratar esta lectura como fórmula ritual ni convertirla en una ronda
+> cosmética adicional. Esta directiva no cambia el modelo/esfuerzo vigente
+> de los auditores: en Phideus/CASMI sigue `gpt-6-astra` `medium`.
+
+</details>
+
+<details>
+<summary>Política vigente de modelos — 2026-09-27 — respaldo, líneas 226–237</summary>
+
+> ## Política vigente de modelos — 2026-09-27
+>
+> Por orden de Mariano, el trabajo habitual usa `gpt-6-sol` con esfuerzo `high`.
+> En hitos pertinentes —riesgo material, cambio de arquitectura, interpretación
+> de resultados o cierre— realizar auditoría independiente mediante un subagente
+> nuevo `gpt-6-astra` con esfuerzo `medium`. No usar una cadencia mecánica ni
+> abrir loops por cosmética; integrar findings y rectificar lo necesario.
+> Esta política reemplaza las selecciones históricas incompatibles de modelos
+> y esfuerzo en este proyecto y CASMI; no cambia modelos experimentales, permisos
+> de GPU ni exige repetir auditorías ya terminadas. Verificar la configuración
+> efectiva del runtime; una instrucción escrita no cambia por sí sola el modelo.
+
+</details>
+
+<details>
+<summary>Cadena autónoma de goals pequeños — 2026-09-27 — respaldo, líneas 238–247</summary>
+
+> ## Cadena autónoma de goals pequeños — 2026-09-27
+>
+> Mariano pide goals propios, breves y concretos. Cada goal fija una pregunta,
+> un entregable y una condición verificable de cierre; al terminar se registra
+> la evidencia, se formula el siguiente goal según el resultado y se continúa
+> hasta pausa o bloqueo real. Las auditorías se sitúan en hitos pertinentes con
+> la política de modelos vigente. No reanudar ni sustituir por inferencia el goal
+> histórico de audio que Mariano dejó en pausa; CASMI conserva su propia secuencia
+> durable mientras el goal formal de este hilo siga ocupado por aquél.
+
+</details>
+
+<details>
+<summary>Gobernanza de roles (por defecto) — respaldo, líneas 300–306</summary>
+
+> ## Gobernanza de roles (por defecto)
+>
+> - Claude: implementación y ejecución experimental.
+> - Codex: auditoría técnica, documentación, consistencia metodológica y trazabilidad.
+>
+> Este reparto puede cambiar solo por instrucción explícita del usuario.
+
+</details>
+
+<details>
+<summary>Colaboración entre agentes — respaldo, líneas 323–328</summary>
+
+> ## Colaboración entre agentes
+>
+> - Modo por defecto: `OFF` salvo orden explícita del usuario.
+> - En `OFF`: no coordinación agente-agente vía archivos de coordinación.
+> - En `ON`: coordinación explícita con trazabilidad y handoff verificable.
+
+</details>
+
+<details>
+<summary>Operación con Orca — respaldo, líneas 419–428</summary>
+
+> ## Operación con Orca
+>
+> 1. Elegir el mecanismo por responsabilidad: subagente interno para fan-out breve y efímero; worker Orca cuando importen Task/Dispatch verificables, supervisión, continuidad, preguntas, otro workspace o cierre auditable; handoff simple sólo si el receptor asume ownership completo.
+> 2. `gpt-5.6-sol` con esfuerzo `high` sigue como default para workers de razonamiento transversal y auditorías independientes. Los mensajes recursivos `024–026` habilitan `gpt-5.3-codex-spark` para trabajo acotado bajo la política siguiente; sus resultados no sustituyen una auditoría final independiente.
+> 3. Para workers cross-workspace, indicar siempre el `--worktree` destino explícito, también al reutilizar `--terminal`. Ante `terminal_worktree_mismatch`, verificar primero `worktreeId` y selector; no matar ni recrear recursos por reflejo. El mensaje recursivo `017` corrige la interpretación amplia de `014`.
+> 4. Continuidad e independencia son incompatibles: reutilizar terminal para continuaciones dependientes; lanzar agente y terminal nuevos para auditorías ciegas, réplicas o arbitrajes.
+> 5. Al cerrar un frente, inventariar y cerrar sólo recursos propios por su protocolo y handle exacto; verificar después con `tab list`, `terminal list`, estados de workers/worktrees y, si aplica, listeners. Nunca cerrar recursos ajenos o de ownership incierto.
+> 6. Un hallazgo reproducible de Orca se informa con versión, reproducción mínima, esperado/real, IDs, receipts y workaround. La decisión de abrir issue o PR upstream pertenece al administrador raíz.
+> 7. `m2-alert` se usa sólo si la intervención de Mariano es indispensable después de agotar recuperaciones autónomas. Antes se publica una nota inmutable en inbox con `request_id`, evidencia, próximo responsable y condición de reanudación; Telegram no sustituye inbox, Git ni bitácora.
+
+</details>
+
+<details>
+<summary>Política local de Spark — mensajes 024–026 (2026-09-10) — respaldo, líneas 429–491</summary>
+
+> ## Política local de Spark — mensajes 024–026 (2026-09-10)
+>
+> Spark amplía cobertura; no decide la orientación científica. Usarlo progresivamente
+> en tareas útiles, sin inventar trabajo para gastar cuota ni reabrir por inercia
+> la campaña bibliográfica cerrada. La suspensión de GPU y los freezes experimentales
+> conservan precedencia. La política no equivale a una validación empírica local.
+>
+> - **Tareas:** inventarios de símbolos, referencias y artefactos; extracción de
+>   manifests o métricas ya autorizadas a JSON/CSV; candidatos de enlaces rotos,
+>   contradicciones documentales o tests; ejecución de tests CPU ya definidos y
+>   acotados; cambios mecánicos pequeños en archivos no congelados, con allowlist.
+>   No delegar un comando que `rg`, un parser o un linter resuelva directamente
+>   cuando el worker no agregue cobertura o revisión útil.
+> - **Frontera:** no editar fuentes congeladas, checkpoints, splits, seeds,
+>   receipts ni artefactos canónicos; no abrir truth/holdouts antes del sello
+>   previsto. No decidir métricas, loss, arquitectura, GO/NO-GO, interpretación
+>   de HIT, seguridad, borrados, merges o despliegues. Puede señalar candidatos
+>   de problemas en esos objetos, en lectura autorizada, sin cerrar su validez.
+> - **Tamaño y esfuerzo:** una pregunta y una familia de archivos o fuentes por
+>   worker; presupuesto local inicial máximo de 32k tokens de material de tarea
+>   y 64k de entrada total, incluidas instrucciones. Son límites operativos
+>   conservadores, no resultados medidos. Dividir por unidad semántica antes de
+>   superar el presupuesto; no cargar toda la memoria, wiki o corpus. `low` para
+>   inventario/extracción, `medium` para código pequeño o búsqueda de fuentes;
+>   subir esfuerzo sólo con comparación local justificada.
+> - **Aceptación:** cada despacho fija entradas, salidas, archivos permitidos,
+>   comandos de prueba y condición de cierre. Inventarios incluyen path/línea y
+>   cobertura; extracciones conservan fuente, hash y schema con cotejo contra
+>   origen; cambios entregan diff y salida cruda de checks explícitamente
+>   ejecutados, incluido exit code. El coordinador revalida e integra; una
+>   respuesta plausible o una autoauditoría no basta.
+> - **Investigación:** wiki/corpus primero; búsquedas externas sólo por una
+>   dependencia concreta del experimento. Separar frentes por pregunta y fuente,
+>   abrir originales y priorizar papers, documentación y repos oficiales frente
+>   a comentarios secundarios. Cada claim conserva URL completa, ubicación,
+>   condiciones, limitaciones y distinción entre cita, extracción e inferencia.
+>   Guardar crudos verbatim separados y síntesis en `Biblioteca/<tema>/`.
+>   Lecturas integrales hermenéuticas, física, geometría/arquitectura/loss y
+>   arbitraje de contradicciones quedan al coordinador capaz o auditor independiente;
+>   la coincidencia de scouts no demuestra verdad.
+> - **Loops y escalación:** máximo inicial de tres rondas trazables por tarea,
+>   cerrando antes si se agotaron unidades y pasan los checks. Un fallo material,
+>   ambigüedad de fuente, contexto insuficiente o conflicto de ownership se eleva
+>   al coordinador/Sol; no corregir silenciosamente el protocolo para hacer pasar
+>   un test. Réplicas nuevas pueden desafiar claims, no simular independencia
+>   reutilizando el mismo hilo ni sustituir la auditoría científica.
+> - **Operación:** registrar clase de delegación, owner, propósito e IDs antes de
+>   lanzar. Comprobar modelo y esfuerzo en el runtime, no preguntárselos al modelo.
+>   Si Spark no está expuesto en el mecanismo elegido, no sustituirlo en silencio;
+>   usar un mecanismo autorizado que lo soporte o registrar la limitación.
+>   Para Orca: Task/Dispatch, worktree explícito, worker nuevo para seleccionar
+>   modelo/esfuerzo; cierre por `worker-release` y reconciliación del handle.
+>   No archivar sesiones top-level ni cerrar recursos ajenos por heurística.
+> - **Aprendizaje compartido:** en la primera tarea compatible, comparar candidato
+>   inicial, correcciones y verificador; registrar modelo, esfuerzo, alcance,
+>   contexto, tiempos observados, errores y resultado en `Biblioteca/<tema>/`.
+>   No transferir latencias de otro proyecto ni una prueba aislada como capacidad
+>   general. Actualizar esta política sólo ante evidencia material. Hallazgos
+>   transversales verificables van una sola vez al administrador por inbox, con
+>   `request_id`, estado `finding_for_admin_review`, evidencia, reproducibilidad,
+>   regla candidata, próximo responsable y condición de reanudación. No enviar
+>   ACK ni progreso; la skill común la mantiene el administrador.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: goals según necesidad material — 2026-10-09 — respaldo, líneas 535–542</summary>
+
+> ## Phideus/CASMI: goals según necesidad material — 2026-10-09
+>
+> Mariano autoriza fijar goals propios cuando el trabajo o cómputo sostenido lo
+> requiera y ayude a mantener continuidad; deja esa decisión al agente. No abrir
+> goals sólo para mantenerse activo. Esta precisión rige la cadena autónoma:
+> entregables finitos y útiles, sin actividad artificial ni ampliación de recursos.
+
+</details>
+
+<details>
+<summary>Nuevos subagentes GPT-6.1 Sol High — 2026-10-19 — respaldo, líneas 543–552</summary>
+
+> ## Nuevos subagentes GPT-6.1 Sol High — 2026-10-19
+>
+> Mariano indica: «Por favor de ahora en más, los subagentes que spawnees hacelos
+> con GPT 6.1 Sol High». Desde esta orden, toda nueva instancia delegada por este
+> coordinador, incluidas auditorías, usa `gpt-6.1-sol`, esfuerzo `high`, con
+> independencia y contexto mínimo cuando corresponda. Sustituye selecciones
+> anteriores incompatibles para nuevas delegaciones; no cambia el runtime de
+> agentes ya iniciados ni modelos experimentales. Verificar la selección efectiva.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU suspendida; continuidad sólo CPU — 2026-10-19 — respaldo, líneas 553–565</summary>
+
+> ## Phideus/CASMI: GPU suspendida; continuidad sólo CPU — 2026-10-19
+>
+> Mariano indica: «Necesito que dejes de usar la GPU por ahora, seguí solamente
+> con cosas que sean de CPU». Revoca la habilitación GPU local del17/10 para
+> Phideus/CASMI: no iniciar CUDA, inferencia/training GPU, relanzadores ni GPU
+> remota como sustitución hasta nueva habilitación explícita. Detener únicamente
+> trabajo GPU propio de forma recuperable, preservando intentos, trazas, fuentes
+> y checkpoints; no intervenir procesos ajenos. Continuar sólo CPU que avance
+> materialmente el objetivo. Ante dependencia material de GPU, informar y pausar
+> el goal/cadena; no sustituir por CPU larga ni actividad periférica. La colección
+> 174 interrumpida no se regenera ni se declara completa por esta orden.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-20 — respaldo, líneas 566–579</summary>
+
+> ## Phideus/CASMI: reanudación y GPU local habilitada — 2026-10-20
+>
+> Mariano indica «tenes gpu hasta nuevo aviso, continua». Levanta la suspensión
+> GPU del19/10 y reanuda CASMI174 desde su corte conservado, sin permisos por
+> corrida. La cesión directa mantiene PMP sin proveedoresGPU hasta nueva orden.
+> Verificar ocupación y ownership antes de cargar; no intervenir procesos ajenos.
+> Conservar los6784intentos completos, el intento6784interrumpido y las3065
+> posiciones aún sin iniciar; diseñar y revisar continuación aditiva sin reiniciar
+> presupuestos ni regenerar canónicos. Reutilizar admisiónCPU3392 y sus compactos.
+> No habilita GPU remota, reservas nuevas, entrenamiento extra o promoción
+> científica. Contador ciclo3:3/20; toda delegación nueva Sol6.1High, incluidas
+> auditorías, según orden19/10. No repetir161 ni auditorías cerradas.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: pausa inmediata por almacenamiento — 2026-10-22 — respaldo, líneas 580–591</summary>
+
+> ## Phideus/CASMI: pausa inmediata por almacenamiento — 2026-10-22
+>
+> Mariano ordena detenerse ahora porque el volumen se está quedando sin espacio.
+> Pausar toda la cadena, CPU/GPU y delegaciones, hasta retoma explícita. No limpiar,
+> borrar, mover ni lanzar trabajos por esta orden. Corte14:01:38UTC: CASMI197 aún
+> sin reserva, salida bank-1 ni scope;194/196/197 scopes not-found/inactive y cgroup
+> vacío. Subagentes195sources/195audit interrumpidos; goal197 pausado, incompleto.
+> Conservar fuentes, journals, código candidato y revisiones; contador ciclo4:4/20.
+> 197 plan/código/manifiesto revisados, sin efectos.195 tiene hallazgo cross-shard
+> pendiente y reader en rebase interrumpido: no ejecutar ni declararlo listo.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: auditoría de almacenamiento y propuesta previa — 2026-10-22 — respaldo, líneas 592–602</summary>
+
+> ## Phideus/CASMI: auditoría de almacenamiento y propuesta previa — 2026-10-22
+>
+> Mariano encarga auditoría completa de todos los activos CASMI locales y su
+> continuidad/necesidad futura, con copia declarada reciente en RAID1
+> /mnt/raid1/m2-1tb_backup. Entregar informe preciso de candidatos ANTES de borrar
+> nada. Alcance exclusivo CASMI: conservar otros frentes Phideus intactos. Verificar
+> copia y dependencias reales; no asumir igualdad desde declaración o nombre.
+> Esta etapa habilita inventario y auditoría documental/metadata, no borrados,
+> movimientos ni reanudar experimentos CPU/GPU. Mantener goal197 pausado.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: limpieza auditada autorizada — 2026-10-22 — respaldo, líneas 603–614</summary>
+
+> ## Phideus/CASMI: limpieza auditada autorizada — 2026-10-22
+>
+> Mariano autoriza «Adelante con la limpieza» tras el informe de almacenamiento.
+> Retirar sólo archivos exactos del manifiesto aprobado SHA256
+> fb1a76d57a6bcf1a5e1528ea155a980722544245a103843023a5ff06dfce7467,
+> comprobando SHA256 íntegro y estabilidad de cada contraparte RAID antes del
+> unlink local, con ledger durable y restauración pequeña verificada. Ausencias
+> o discrepancias se conservan. RAID y otros frentes Phideus intactos. No borrar
+> directorios/symlinks ni ampliar selección. Pausa experimental y goal197 vigentes.
+> Ejecución/evidencia: Phideus-CASMI/.agent-work/casmi-storage-audit-20261022/cleanup-20261022/.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: limpieza sin SHA por instrucción directa — 2026-10-22 — respaldo, líneas 615–625</summary>
+
+> ## Phideus/CASMI: limpieza sin SHA por instrucción directa — 2026-10-22
+>
+> Mariano corrige: «no hagas ninguna comprobación SHA». Sustituye desde ahora
+> el requisito SHA de esta limpieza CASMI por cotejo de los mismos archivos
+> mediante presencia, ruta, tipo, tamaño y fecha, sin lectura integral de payloads
+> ni hashes de contenido/manifiesto/código. Conservar selección exacta aprobada,
+> RAID intacto, identidades estables, ledger y retención ante ausencia/discrepancia.
+> Ejecutor SHA detenido antes del ledger y sin retiros; registrar transición.
+> No reanuda experimentos CPU/GPU ni goal197; no amplía a otros frentes.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU suspendida y continuidad CPU reanudada — 2026-10-22 — respaldo, líneas 626–640</summary>
+
+> ## Phideus/CASMI: GPU suspendida y continuidad CPU reanudada — 2026-10-22
+>
+> Mariano ordena: «No uses el GPU hasta nuevo aviso. Si tenés algo para continuar
+> sin GPU, continúalo». Revoca la habilitación GPU local: no CUDA, inferencia ni
+> training GPU, relanzadores o GPU remota hasta nueva orden explícita. Reanuda
+> trabajo CPU materialmente útil después de la limpieza cerrada, desde el corte
+> 197 y sus fuentes conservadas, sin repetir corridas/evaluaciones concluidas.
+> Rebasar gates, saldo, capacidad y revisiones antes de cualquier efecto; preservar
+> checkpoints, journals, incertidumbres y procesos ajenos. No nueva limpieza ni
+> ampliación de datos/reservas. Al necesitar GPU para el siguiente avance útil,
+> informar y detener la cadena, sin entrenamiento CPU largo sustitutivo ni relleno.
+> La prohibición SHA de la operación de backup/limpieza queda vigente para esa
+> operación cerrada; no reabrir sus comprobaciones de contenido.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: continuar prueba larga y gestión periódica de espacio — 2026-10-25 — respaldo, líneas 641–645</summary>
+
+> ## Phideus/CASMI: continuar prueba larga y gestión periódica de espacio — 2026-10-25
+>
+> Mariano autoriza continuar CASMI255 aunque requiera unas14horas, disponer de los recursos locales disponibles y decidir pertinencia sin consultas por corrida. Esta orden supera el bloqueo por el presupuesto8h de la ejecución anterior: fijar prospectivamente nueva continuación, conservar ambos cortes y no repetir intentos. No convierte estimación conservadora en duración medida ni garantiza mejora molecular. Revisar periódicamente artefactos CASMI que convenga trasladar a /mnt/raid1/m2-1tb_backup para evitar llenar M2; conservar dependencias activas y recuperación, selección exacta y ledger. Verificar traslados por ruta/presencia/tipo/tamaño/fecha, sin SHA ni lecturas integrales de comprobación del backup. Sólo retirar locales con copia comprobada y sin dependencia activa; otros frentes y archivos ajenos intactos. GPU local autorizada, química184 es CPU; no GPU remota/datos/reservas nuevos ni promoción.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: esperar backup M2→RAID1 antes del efecto largo — 2026-10-25 — respaldo, líneas 646–649</summary>
+
+> ## Phideus/CASMI: esperar backup M2→RAID1 antes del efecto largo — 2026-10-25
+> Mariano informa que está corriendo su backup de M2 a RAID1 y propone esperar. Esperar cierre observable de la copia antes de lanzar continuación larga255 o trasladar/retirar artefactos; revisión de código y documentación pequeña pueden avanzar. No intervenir el backup ni inferir copia íntegra sólo por fin del proceso. Proceso observado bash ./backup_m2_to_drive.sh PID2091742 y rsync2091746/48/49 hacia /mnt/raid1/m2-1tb_backup; revalidar por identidad/starttime, sin controlar procesos ajenos.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: copia local terminada, continuar durante subida Drive — 2026-10-25 — respaldo, líneas 650–653</summary>
+
+> ## Phideus/CASMI: copia local terminada, continuar durante subida Drive — 2026-10-25
+> Mariano confirma que terminó la copia M2→RAID1 y autoriza continuar mientras el script sube a Google Drive. Rebasar espera sobre rsync local, sin esperar al padre que continúa la subida ni intervenirlo. Rsync2091746/48/49 ausentes comprobados; parent2091742 conservado. La orden supera la espera del padre completo, mantiene comprobacionesmetadata de traslados y recursos actuales.
+
+</details>
+
+<details>
+<summary>Phideus/CASMI: GPU suspendida hasta nueva orden — 2026-10-25 (26 UTC) — respaldo, líneas 654–664</summary>
+
+> ## Phideus/CASMI: GPU suspendida hasta nueva orden — 2026-10-25 (26 UTC)
+>
+> Mariano ordena «No uses el GPU hasta que yo te diga». Revoca la habilitación
+> GPU local anterior para este frente: no CUDA, inferencia/training GPU,
+> supervisores capaces de activarla ni sustitución remota hasta nueva orden
+> explícita. Conservar artefactos y detener recuperablemente sólo trabajo propio
+> si lo hubiera; procesos ajenos intactos. CASMI255 está completo y auditado,
+> ciclo7:5/20. CASMI256 sólo tiene plan revisado y código CPU candidato, sin
+> reserva ni corrida iniciada; no había proceso de cómputo GPU al comprobar.
+> Continuar únicamente CPU materialmente útil; al depender de GPU, informar
+> y detener la cadena sin CPU larga sustitutiva ni relleno. No repetir255.
+
+</details>
+
+La secuencia universal de Auditoría Divina se hereda del global, sin copiarla aquí. Del bloque antiguo de auditorías se conserva como dato histórico que adoptó contador1/20 y auditor AstraMedium; no establece el valor actual. Su precisión sobre releer Mandinga sin reinicializar ni usar codex-audit-loop se recupera en el AGENTS. La recuperación es documental: no prueba por sí sola un cambio de comportamiento del modelo.
+
+<details>
+<summary>Lectura y edición cruzada de adaptadores — antecedente del respaldo, líneas307–310</summary>
+
+> ## Lectura/edición cruzada de reglas
+>
+> - Codex puede leer `CLAUDE.md`, pero nunca editarlo.
+> - Claude puede leer `CODEX.md`, pero nunca editarlo.
+
+El reparto por proveedor está sustituido; se conserva la prohibición de editar CLAUDE.md en el contrato propio y la autoridad sobre configuraciones ajenas se hereda del global.
+
+</details>
+
+Cierre documental: auditoría independiente completa de53bloques/664líneas y39extractos históricos, con19enlaces activos comprobados. Se integró una corrección de fidelidad sobre el alcance de la purga selectiva; no quedaron hallazgos materiales abiertos. Global sin cambios; el contrato raíz tuvo una actualización concurrente de administración, leída y compatible, no realizada por este trabajo. CASMI conserva contratos, estado y contador sin cambios. La comprobación acredita cobertura y coherencia documental, no eficacia conductual medida del prompt.
