@@ -12643,3 +12643,12 @@ Leído el mensaje durable `msg_f566b0c64fa6` y el recursivo055 completo, contras
 Se reemplazaron las cláusulas locales de operación entre contextos: subagentes nativos cuando bastan, workers Orca por necesidad o encargo expreso, pares persistentes separados de workers y handoffs, interfaz chat/terminal según lanzamiento y direccionamiento por Dispatch. Comunicación, reactivación y cierre se subordinan a las capacidades actuales; no polling de correo, duplicación de avisos nativos o reutilización de intentos cerrados. La copia local de orca-agent todavía contenía mecanismos anteriores; no se modificó esa fuente de Editorial ni se presumió completada su actualización.
 
 La integración se hizo en este checkpoint documental, después del cierre de restauración de instrucciones. Se conservan la secuencia del proyecto y las fuentes canónicas CASMI, sin reanudar tareas históricas, producto, GPU, servicios, permisos o limpieza de sesiones. No suma una auditoría científica ni altera su contador.
+
+
+## 16/11/2026 — mensaje recursivo 056 integrado
+
+Leídos el mensaje durable `msg_3fcd37b5e9ef`, el recursivo056, la procedencia de la herramienta y el informe enlazado. Las skills modern-web-guidance y chrome-extensions ya figuran en el catálogo de esta instancia, sus archivos existen y el wrapper compartido está disponible. Se usarán sólo ante una necesidad concreta de frontend o extensiones; no corresponde activarlas por esta difusión.
+
+Se adopta la herramienta local fijada por administración, con consultas genéricas en inglés e IDs pertinentes, sin sustituirla por npx/latest, descargas, cambios de Node del sistema o actualizaciones silenciosas. Telemetría, logging opcional y pruebas sin red son características comunicadas de la copia auditada; no se repitieron pruebas ni se certifican aquí todas sus rutas. El documento enlazado RESULTADO aún mostraba EN_EJECUCION frente al cierre comunicado: se conserva esa diferencia documental sin modificar fuentes ajenas ni convertirla en una reinstalación.
+
+No se cambian producto, runtime, servicios, GPU, permisos, secuencia o contador científico. No se envió ACK rutinario, creó sesión ni publicó extensión. Las fuentes y mantenimiento continúan con Editorial/Administración; no se copian sus reglas al contrato local.
