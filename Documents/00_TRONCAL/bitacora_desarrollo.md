@@ -12634,3 +12634,12 @@ El reparto por proveedor está sustituido; se conserva la prohibición de editar
 </details>
 
 Cierre documental: auditoría independiente completa de53bloques/664líneas y39extractos históricos, con19enlaces activos comprobados. Se integró una corrección de fidelidad sobre el alcance de la purga selectiva; no quedaron hallazgos materiales abiertos. Global sin cambios; el contrato raíz tuvo una actualización concurrente de administración, leída y compatible, no realizada por este trabajo. CASMI conserva contratos, estado y contador sin cambios. La comprobación acredita cobertura y coherencia documental, no eficacia conductual medida del prompt.
+
+
+## 16/11/2026 — mensaje recursivo 055 integrado
+
+Leído el mensaje durable `msg_f566b0c64fa6` y el recursivo055 completo, contrastados con el diagnóstico administrativo, las guías vivas del ejecutable efectivo y el help de check. El runtime observado informó 1.4.261; se conserva como evidencia de este corte, no como requisito fijo del contrato. Check devolvió el único mensaje y marcó atendido el lote; no se envió ACK ni otro aviso manual.
+
+Se reemplazaron las cláusulas locales de operación entre contextos: subagentes nativos cuando bastan, workers Orca por necesidad o encargo expreso, pares persistentes separados de workers y handoffs, interfaz chat/terminal según lanzamiento y direccionamiento por Dispatch. Comunicación, reactivación y cierre se subordinan a las capacidades actuales; no polling de correo, duplicación de avisos nativos o reutilización de intentos cerrados. La copia local de orca-agent todavía contenía mecanismos anteriores; no se modificó esa fuente de Editorial ni se presumió completada su actualización.
+
+La integración se hizo en este checkpoint documental, después del cierre de restauración de instrucciones. Se conservan la secuencia del proyecto y las fuentes canónicas CASMI, sin reanudar tareas históricas, producto, GPU, servicios, permisos o limpieza de sesiones. No suma una auditoría científica ni altera su contador.
