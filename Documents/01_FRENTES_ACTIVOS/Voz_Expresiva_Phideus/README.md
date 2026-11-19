@@ -121,7 +121,7 @@ Cumplido. Fase 0B ejecutada y cerrada el mismo 2026-06-22; resultados arriba.
 - **Reporte ZH consolidado**: `../../../data/voz_expresiva/1_zh/REPORTE_1_ZH.md`
 - **Spike de compatibilidad previo a Fase 1**: `../../../experiments/voz_expresiva/SPIKE_FASE_1_0.md`
 - **Reporte empírico Fase 1**: `../../../data/voz_expresiva/1/REPORTE_1.md`
-- **Investigación bibliográfica de junio 2026**: referencia editorial externa al repo Phideus, en `editorial-altermundi/Biblioteca/analisis-carga-emocional-del-habla/`. Cubre 7 reportes de subagentes (productos, OSS, datasets, métodos, entrenamiento/licencias, substrato físico EGG/cross-modal, disentanglement/voice conversion/expressive TTS), un NARRATED_REPORT integrador (~60 KB), bibliografía deduplicada y un CROSS_REPORT denso.
+- **Investigación bibliográfica de junio 2026**: el índice de la Biblioteca común de Inference dirige al paquete `analisis-carga-emocional-del-habla` en el archivo RAID de Editorial. Cubre siete reportes de subagentes, un informe integrador, bibliografía deduplicada y una síntesis cruzada. [Ubicación y alcance](./ROADMAP_VOZ_EXPRESIVA_PHIDEUS.md#2-origen-documental).
 - **Antecedente exploratorio**: `../EIR-EMR/` (preservado, no activo).
 
 ## Siguiente corte

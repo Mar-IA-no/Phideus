@@ -18,7 +18,7 @@
 
 ## §2 Origen documental
 
-- **Investigación bibliográfica de junio 2026** — referencia editorial externa al repo Phideus, en `editorial-altermundi/Biblioteca/analisis-carga-emocional-del-habla/`. Cubre el campo SER moderno (SSL backbones, OSS stack, datasets, métricas, problemas metodológicos), el substrato físico de la voz (source-filter, voice quality ratios, EGG, fisiología cross-modal) y la representación/generación expresiva (disentanglement, voice conversion, expressive TTS, speech LLMs).
+- **Investigación bibliográfica de junio 2026** — el índice de la Biblioteca común dirige a `analisis-carga-emocional-del-habla` en la colección histórica de Editorial en RAID. Su `NARRATED_REPORT.md`, `CROSS_REPORT.md` y bibliografía cubren SER, el sustrato físico de la voz (source-filter, ratios de calidad vocal, EGG y fisiología cross-modal) y la representación y generación expresivas.
 - **Antecedente Phideus** — paper arXiv:2604.10283 (Escalón 1, Audio↔MIDI MAESTRO).
 - **Antecedente reciente** — `../EIR-EMR/` (preservado como exploratorio, no activo).
 

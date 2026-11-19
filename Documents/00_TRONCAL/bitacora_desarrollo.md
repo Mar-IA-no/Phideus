@@ -1,3 +1,7 @@
+## Reconstrucción del M.2 y retorno de Phideus/CASMI — 19/11/2026
+
+La restauración conservó ambos checkouts y sus cambios locales. El control final resolvió los cuatro enlaces del entorno, importó MIST y el consumidor CASMI y leyó la escala CASMI249 con CUDA sin inicializar. El alcance fue la recuperación del conjunto local. GPU y ciencia quedaron en pausa.
+
 ## CASMI275: consumidor general y diversidad preparada — 4/11/2026
 
 Implementé el primer entregable local del roadmap274: agrupación de todas las vistas por molécula, química faltante dentro del banco admitido y retención por bloques con presupuesto realizable. El caso funcional conservó7moléculas/8vistas, con19inputs neuronales y7compatibilidades nuevos. El control401 procesó2.711.229pares; conservó el predictor262 y reutilizó sus7.668predicciones exactas por operandos.
@@ -12652,3 +12656,21 @@ Leídos el mensaje durable `msg_3fcd37b5e9ef`, el recursivo056, la procedencia d
 Se adopta la herramienta local fijada por administración, con consultas genéricas en inglés e IDs pertinentes, sin sustituirla por npx/latest, descargas, cambios de Node del sistema o actualizaciones silenciosas. Telemetría, logging opcional y pruebas sin red son características comunicadas de la copia auditada; no se repitieron pruebas ni se certifican aquí todas sus rutas. El documento enlazado RESULTADO aún mostraba EN_EJECUCION frente al cierre comunicado: se conserva esa diferencia documental sin modificar fuentes ajenas ni convertirla en una reinstalación.
 
 No se cambian producto, runtime, servicios, GPU, permisos, secuencia o contador científico. No se envió ACK rutinario, creó sesión ni publicó extensión. Las fuentes y mantenimiento continúan con Editorial/Administración; no se copian sus reglas al contrato local.
+
+## 18/11/2026 — auditoría de almacenamiento Phideus/CASMI
+
+La auditoría identificó el conjunto de trabajo de CASMI, las dependencias de intérprete y paquetes entre raíces, y los resultados del archivo principal que ya carecían de réplica local. El cotejo de respaldo usó metadatos. La ficha de retorno enumeró 41.928 entradas en ambos proyectos y se ensayó en lectura aislada con un operando recuperado de RAID. Administración conservó el manifiesto y los recibos de la operación.
+
+<a id="mensaje-recursivo-060-integrado"></a>
+
+## 19/11/2026 — mensaje recursivo 060 integrado
+
+Phideus y CASMI adoptaron la Biblioteca común para investigaciones de `multi-agent-research` y Orca para la coordinación. El índice, la wiki y el estado de cada proyecto son las entradas de continuidad mientras la Memoria Colectiva se rediseña. La revisión local no encontró consumidores activos de los canales y servicios retirados. Se recuperó el adaptador local de Codex junto con 37 fuentes documentales de RAID y la wiki pasó con 22 páginas y 91 fuentes.
+
+<a id="mensaje-recursivo-061-integrado"></a>
+
+## 19/11/2026 — mensaje recursivo 061 integrado
+
+La limpieza y consolidación de ambos proyectos retiró **171,18 GiB en bloques asignados**, principalmente de una extracción duplicada y cachés reconstruibles. Se preservaron las fuentes, las variantes únicas, los estados de entrenamiento y las rutas necesarias de recuperación. El archivo físico de CASMI quedó debajo de Phideus en RAID, con un enlace de compatibilidad para los consumidores que siguen usando la ruta anterior.
+
+Cada proyecto conserva y organiza sus privados dentro de su directorio y comunica a Administración las rutas y copias secundarias identificadas. El respaldo local sigue siendo completo y acumulativo. La configuración central filtra la etapa remota y excluye los árboles de CASMI. El ensayo local acreditó la selección, sin comprobar una transferencia real. Se mantienen las pausas científicas y de GPU. El detalle de los manifiestos, cotejos y ensayos se conserva en la evidencia local de los titulares y de Administración. [Estado de Phideus](Proyecto_Estado_Actual.md) · [Estado y custodia de CASMI](../../../Phideus-CASMI/docs/STATUS.md).

@@ -1,6 +1,6 @@
-# .backupignore - exclusiones regenerables especificas de Phideus.
-# Lo consume el backup global mediante rsync dir-merge.
-# No copiar reglas de .gitignore: secretos y datos unicos deben respaldarse.
+# Registro histórico de exclusiones regenerables específicas de Phideus.
+# Desde el recursivo 060 este archivo dejó de regir el respaldo acumulativo
+# de Inference. Las reglas se conservan como antecedente.
 
 # Entornos, dependencias y builds reinstalables.
 /venv/

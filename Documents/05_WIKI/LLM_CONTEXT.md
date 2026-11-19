@@ -4,7 +4,7 @@ id: phideus-llm-context
 kind: context
 page_status: current
 front_status: transversal
-updated: 2026-11-04
+updated: 2026-11-19
 verified_at: 2026-09-15
 valid_at: 2026-09-15
 recorded_at: 2026-09-15
@@ -135,9 +135,9 @@ depends_on: []
 tangents: [phideus-three-routes, ppu-natural-harmonic-geometry]
 ---
 
-## Archivo principal RAID1 — 4/11/2026
+## Archivo principal y recuperación de antecedentes
 
-RAID1 pasa a ser el archivo principal de Phideus y CASMI por orden de Mariano. M.2 conserva el conjunto de trabajo CASMI, código y documentación; el retiro y su registro final quedaron cerrados con copias verificadas. Los frentes pausados mantienen sus pausas. [Estado y política](../00_TRONCAL/Proyecto_Estado_Actual.md). CASMI conserva su [fuente operativa propia](../../../Phideus-CASMI/docs/STATUS.md#estado-operativo-vigente); el contraste276 terminó y precede al archivo, sin iniciar277 durante esta tarea.
+RAID1 es el archivo principal de Phideus y CASMI. M.2 conserva sus rutas de trabajo, código y documentación. El archivo físico de CASMI y los complementos de recuperación están consolidados debajo de Phideus, con enlaces para los consumidores que aún usan las rutas anteriores. El respaldo acumulativo local abarca todo el volumen. La etapa que copia a Drive excluye el material confidencial y cada proyecto comunica las rutas privadas que identifica. Las pausas científicas se consultan en el estado operativo. Para antecedentes, partir del índice y la wiki de cada proyecto mientras se rediseña la Memoria Colectiva. [Estado de Phideus](../00_TRONCAL/Proyecto_Estado_Actual.md) · [Estado de CASMI](../../../Phideus-CASMI/docs/STATUS.md#estado-operativo-vigente) · [Política de almacenamiento](../../../Phideus-CASMI/docs/STORAGE_POLICY.md).
 
 
 ## Fuentes actuales de continuidad — 4/11/2026

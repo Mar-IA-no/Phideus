@@ -8,9 +8,13 @@ Para investigación Phideus fuera de CASMI se conserva la autorización situada3
 
 Se reintegró en [AGENTS](../../AGENTS.md) el contenido propio no redundante del respaldo anterior a051. Los estados y contratos sustituidos quedaron registrados como historia en la [bitácora](bitacora_desarrollo.md#restauracion-de-instrucciones-propias-20261105); no modifican permisos, roles ni resultados actuales. Esta intervención es documental y no reanuda frentes.
 
-## Archivo principal y conjunto local — 4/11/2026
+## Archivo principal y conjunto local
 
 Mariano ordenó conservar el archivo principal de Phideus y Phideus-CASMI en RAID1 y dejar en M.2 sólo el conjunto necesario para CASMI, además del código y la documentación de continuidad. El retiro de datos y resultados terminó con contraparte verificada; el archivo del registro y su auditoría final quedaron completos. Los frentes pausados permanecen pausados. Véanse el [informe de archivo y limpieza](ALMACENAMIENTO_RAID_PRINCIPAL_20261104.md) y la [política de almacenamiento](../../../Phideus-CASMI/docs/STORAGE_POLICY.md).
+
+La reconstrucción conservó las rutas de trabajo de ambos proyectos y el control de lectura de CASMI pasó en ellas. La limpieza posterior consolidó el archivo de CASMI y los complementos debajo del archivo privado de Phideus. Los enlaces de compatibilidad preservan el acceso del consumidor y del verificador de CASMI y las rutas de recuperación. Se retiraron duplicados y derivados reconstruibles después de comprobar sus fuentes.
+
+El respaldo local es completo y acumulativo. La copia a Drive aplica el filtro central de confidencialidad, que se verificó con destinos locales. Cada proyecto organiza sus privados en su propio directorio y comunica a Administración las rutas que deben quedar fuera de la copia remota. Los antecedentes se recuperan desde el [índice de Phideus](INDICE_DOCUMENTACION.md) y su [wiki](../05_WIKI/index.md) mientras la Memoria Colectiva permanece desactivada. Las dependencias y pausas científicas se consultan en el [estado operativo de CASMI](../../../Phideus-CASMI/docs/STATUS.md#estado-operativo-vigente).
 
 ## Snapshots históricos de continuidad
 
